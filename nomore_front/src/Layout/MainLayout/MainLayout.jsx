@@ -1,9 +1,11 @@
+/** @jsxImportSource @emotion/react */
+import * as s from './styles';
 import React from 'react';
 
-function MainLayout(props) {
+function MainLayout({children}) {
   return (
-    <div>
-      
+    <div css={s.layout}>
+      {children}
     </div>
   );
 }
