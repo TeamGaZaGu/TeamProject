@@ -6,7 +6,6 @@ import NotFound from '../pages/NotFound/NotFound';
 
 function RootRoute(props) {
     
-
     return (
         <MainLayout>
             <Routes>
