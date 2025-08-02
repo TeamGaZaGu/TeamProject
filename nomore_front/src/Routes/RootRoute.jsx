@@ -9,7 +9,7 @@ function RootRoute(props) {
     return (
         <MainLayout>
             <Routes>
-                <Route path='/auth/*' element={ <Auth /> } />
+                <Route path='/auth' element={ <Auth /> } />
                 <Route path='/' element={ <Home />} />
                 <Route path='*' element={ <NotFound /> } />
             </Routes>
