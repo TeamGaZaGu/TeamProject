@@ -162,3 +162,22 @@ export const content = css`
   flex-grow: 1;
   background-color: lightblue;
 `;
+
+export const radioLabel = css`
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  cursor: pointer;
+
+  input[type="radio"] {
+    margin-right: 8px;
+  }
+
+  &:hover {
+    color: #4e89ff;
+  }
+`;
+
+export const radioInput = css`
+  accent-color: #4e89ff;
+`;

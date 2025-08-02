@@ -1,7 +1,7 @@
 /** @jsxImportSource @emotion/react */
 import { FcGoogle } from 'react-icons/fc';
 import * as s from './styles';
-import React from 'react';
+import React, { useState } from 'react';
 import { SiKakaotalk } from 'react-icons/si';
 import { FaCalendarAlt} from 'react-icons/fa';
 import { IoHomeSharp } from 'react-icons/io5';
@@ -11,6 +11,22 @@ import { FaRegCircleCheck } from 'react-icons/fa6';
 import { BiRun } from 'react-icons/bi';
 
 function MainLayout({ children }) {
+  const [ searchInput, setSearchInput ] = useState("");
+
+  const searchInputOnChange = (e) => {
+    setSearchInput(e.target.value);
+    console.log(searchInput)
+  }
+
+  const [ selectedCategory, setSelectedCategory ] = useState("");
+
+  const categories = [
+    '전체',
+    '운동/스포츠',
+    '사교/인맥',
+    '인문학/책/글',
+  ];
+
   return (
     <div css={s.root}>
       <div css={s.header}>
@@ -20,7 +36,7 @@ function MainLayout({ children }) {
           </div>
           <div css={s.searchContainer}>
             <button>지역설정</button>
-            <input type="text" placeholder='원하는 모임을 검색해주세요' />
+            <input type="text" placeholder='원하는 모임을 검색해주세요' value={searchInput} onChange={searchInputOnChange}/>
           </div>
       </div>
         <div css={s.leftSideBar}>
@@ -36,106 +52,22 @@ function MainLayout({ children }) {
           </div>
           <div css={s.sideCategory}>
             <h3>카테고리</h3>
-            <button>
-              <FaRegCircleCheck />
-              <BiRun />
-              운동/스포츠
-            </button>
-            <button>
-              <FaRegCircleCheck />
-              <BiRun />
-              운동/스포츠
-            </button>
-            <button>
-              <FaRegCircleCheck />
-              <BiRun />
-              운동/스포츠
-            </button>
-            <button>
-              <FaRegCircleCheck />
-              <BiRun />
-              운동/스포츠
-            </button>
-            <button>
-              <FaRegCircleCheck />
-              <BiRun />
-              운동/스포츠
-            </button>
-            <button>
-              <FaRegCircleCheck />
-              <BiRun />
-              운동/스포츠
-            </button>
-            <button>
-              <FaRegCircleCheck />
-              <BiRun />
-              운동/스포츠
-            </button>
-            <button>
-              <FaRegCircleCheck />
-              <BiRun />
-              운동/스포츠
-            </button>
-            <button>
-              <FaRegCircleCheck />
-              <BiRun />
-              운동/스포츠
-            </button>
-            <button>
-              <FaRegCircleCheck />
-              <BiRun />
-              운동/스포츠
-            </button>
-            <button>
-              <FaRegCircleCheck />
-              <BiRun />
-              운동/스포츠
-            </button>
-            <button>
-              <FaRegCircleCheck />
-              <BiRun />
-              운동/스포츠
-            </button>
-            <button>
-              <FaRegCircleCheck />
-              <BiRun />
-              운동/스포츠
-            </button>
-            <button>
-              <FaRegCircleCheck />
-              <BiRun />
-              운동/스포츠
-            </button>
-            <button>
-              <FaRegCircleCheck />
-              <BiRun />
-              운동/스포츠
-            </button>
-            <button>
-              <FaRegCircleCheck />
-              <BiRun />
-              운동/스포츠
-            </button>
-            <button>
-              <FaRegCircleCheck />
-              <BiRun />
-              운동/스포츠
-            </button>
-            <button>
-              <FaRegCircleCheck />
-              <BiRun />
-              운동/스포츠
-            </button>
-            <button>
-              <FaRegCircleCheck />
-              <BiRun />
-              운동/스포츠
-            </button>
-            <button>
-              <FaRegCircleCheck />
-              <BiRun />
-              운동/스포츠
-            </button>
+            {categories.map((category, index) => (
+              <div>
+                <label key={index} css={s.radioLabel}>
+                  <input
+                    type="radio"
+                    name="category"
+                    value={category}
+                    checked={selectedCategory === category}
+                    onChange={(e) => setSelectedCategory(e.target.value)}
+                    css={s.radioInput}
+                  />
+                  <BiRun />
+                  {category}
+                </label>
+              </div>
+            ))}
           </div>
       </div>
         <div css={s.content}>
