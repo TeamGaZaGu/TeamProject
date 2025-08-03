@@ -1,14 +1,18 @@
 import { css } from "@emotion/react";
 
 export const root = css`
-  height: 100vh;
   display: flex;
+  position: relative;
   flex-direction: column;
+  height: 100vh;
+  
 `;
 
 export const header = css`
   display: flex;
+  position: fixed;
   align-items: center;
+  top: 0;
   border: 0.1rem solid #dbdbdb;
   margin-bottom: 1rem;
   width: 100%;
@@ -55,6 +59,8 @@ export const body = css`
 `;
 
 export const leftSideBar = css`
+  position: fixed;
+  top: 7rem;
   margin-left: 1rem;
   padding: 2rem;
   border: 0.1rem solid #dbdbdb;
@@ -131,7 +137,7 @@ export const sideMenu = css`
     transition: background-color 0.2s;
 
     &:hover {
-      background-color: #fafafa;
+      background-color: #dbdbdb;
     }
 
     & > svg {
@@ -159,8 +165,20 @@ export const sideCategory = css`
 
 export const content = css`
   display: flex;
+  position: absolute;
+  border: 0.1rem solid #fafafa;
+  border-radius: 1rem;
+  margin-top: 7.16rem;
+  margin-left: 26.16rem;
+  width: 126.5rem;
+  height: calc(100vh - 7.16rem);
   flex-grow: 1;
-  background-color: lightblue;
+  background-color: #fafafa;
+  overflow-y: auto;
+  
+  &::-webkit-scrollbar {
+    display: none;
+  }
 `;
 
 export const radioLabel = css`
@@ -174,7 +192,7 @@ export const radioLabel = css`
   }
 
   &:hover {
-    color: #4e89ff;
+    color: #ff5a4e;
   }
 `;
 

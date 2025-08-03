@@ -25,6 +25,22 @@ function MainLayout({ children }) {
     '운동/스포츠',
     '사교/인맥',
     '인문학/책/글',
+    '전체',
+    '운동/스포츠',
+    '사교/인맥',
+    '인문학/책/글',
+    '전체',
+    '운동/스포츠',
+    '사교/인맥',
+    '인문학/책/글',
+    '전체',
+    '운동/스포츠',
+    '사교/인맥',
+    '인문학/책/글',
+    '전체',
+    '운동/스포츠',
+    '사교/인맥',
+    '인문학/책/글',
   ];
 
   return (
@@ -39,6 +55,7 @@ function MainLayout({ children }) {
             <input type="text" placeholder='원하는 모임을 검색해주세요' value={searchInput} onChange={searchInputOnChange}/>
           </div>
       </div>
+      <div css={s.body}>
         <div css={s.leftSideBar}>
           <div css={s.loginContainer}>
             <h2>로그인</h2>
@@ -69,11 +86,11 @@ function MainLayout({ children }) {
               </div>
             ))}
           </div>
-      </div>
+        </div>
         <div css={s.content}>
           {children}
-          <div>asdfasdf</div>
         </div>
+      </div>
     </div>
   );
 }
