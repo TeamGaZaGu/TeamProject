@@ -11,7 +11,7 @@ function RootRoute(props) {
             <Routes>
                 <Route path='/auth/*' element={ <Auth /> } />
                 <Route path='/' element={ <Home />} />
-                <Route path='*' element={ <NotFound /> } />
+                <Route path='*' element={ <NotFound /> } /> 
             </Routes>
         </MainLayout>
     );
