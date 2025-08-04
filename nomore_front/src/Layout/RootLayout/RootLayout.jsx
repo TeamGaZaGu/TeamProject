@@ -4,7 +4,7 @@ import React from 'react';
 
 function RootLayout({children}) {
     return (
-        <div css={s.layout}>
+        <div>
             {children}
         </div>
     );

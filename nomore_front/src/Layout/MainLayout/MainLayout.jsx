@@ -14,15 +14,15 @@ import LeftSidebarLayout from '../LeftSidebarLayout/LeftSidebarLayout';
 function MainLayout({ children }) {
 
   return (
-    <div css={s.root}>
-      <div css={s.header}>
+    <div>
+      <div>
           <HeaderLayout />
       </div>
-      <div css={s.body}>
+      <div>
         <div>
           <LeftSidebarLayout />
         </div>
-        <div css={s.content}>
+        <div>
           {children}
         </div>
       </div>
