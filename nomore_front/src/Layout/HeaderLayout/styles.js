@@ -4,11 +4,11 @@ import { css } from '@emotion/react';
 export const headerContainer = css`
   display: flex;
   align-items: center;
-  justify-content: space-between;
   padding: 12px 24px;
   background-color: #ffffff;
   border-bottom: 1px solid #e0e0e0;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  gap: 40px;
 `;
 
 // 로고 영역
@@ -39,8 +39,11 @@ export const controlSection = css`
   align-items: center;
   gap: 0;
   border: 1px solid #d1d5db;
-  border-radius: 8px;
+  border-radius: 12px;
   background-color: #ffffff;
+  flex: 1;
+  max-width: 800px;
+  margin: 0 auto;
 `;
 
 // 드롭다운 컨테이너
@@ -91,7 +94,7 @@ export const dropdownMenu = css`
   background-color: #ffffff;
   border: 1px solid #d1d5db;
   border-top: none;
-  border-radius: 0 0 8px 8px;
+  border-radius: 0 0 12px 12px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   z-index: 1000;
 `;
@@ -130,7 +133,8 @@ export const searchInput = css`
   font-size: 14px;
   color: #374151;
   background-color: #ffffff;
-  min-width: 280px;
+  flex: 1;
+  min-width: 400px;
   outline: none;
 
   &::placeholder {
@@ -149,6 +153,7 @@ export const searchButton = css`
   align-items: center;
   justify-content: center;
   transition: background-color 0.2s ease;
+  border-radius: 0 11px 11px 0;
 
   &:hover {
     background-color: #1d4ed8;
