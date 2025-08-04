@@ -6,13 +6,15 @@ import { BsCalendar2EventFill } from 'react-icons/bs';
 import { BiRun } from 'react-icons/bi';
 
 function LeftSidebarLayout(props) {
+    const categories = [];
+
     return (
         <div>
             <div>
                 <div>
                     <Oauth2 />
                 </div>
-                <div css={s.sideMenu}>
+                <div>
                     <button><IoHomeSharp />홈</button>
                     <button><HiUsers />추천모임</button>
                     <button><BsCalendar2EventFill />정모일정</button>
@@ -28,7 +30,6 @@ function LeftSidebarLayout(props) {
                             value={category}
                             checked={selectedCategory === category}
                             onChange={(e) => setSelectedCategory(e.target.value)}
-                            css={s.radioInput}
                         />
                         <BiRun />
                         {category}
