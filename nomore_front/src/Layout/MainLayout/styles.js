@@ -20,38 +20,38 @@ export const header = css`
   background-color: #fafafa;
 `;
 
-export const logo = css`
-  margin-left: 3rem;
-  & > h1 {
-    margin: 0;
-  }
+// export const logo = css`
+//   margin-left: 3rem;
+//   & > h1 {
+//     margin: 0;
+//   }
 
-  & > h4 {
-    display: flex;
-    justify-content: center;
-    margin: 0;
-  }
-`;
+//   & > h4 {
+//     display: flex;
+//     justify-content: center;
+//     margin: 0;
+//   }
+// `;
 
-export const searchContainer = css`
-  flex-grow: 1;
-  display: flex;
-  justify-content: center;
-  height: 4.1rem;
+// export const searchContainer = css`
+//   flex-grow: 1;
+//   display: flex;
+//   justify-content: center;
+//   height: 4.1rem;
   
-  & > button {
-    border-radius: 1rem;
-  }
+//   & > button {
+//     border-radius: 1rem;
+//   }
 
-  & > input {
-    padding: 1rem;
-    border-radius: 1rem;
-    margin-left: 1.2rem;
-    box-sizing: border-box;
-    width: 59rem;
-    height: 3.6rem;
-  }
-`;
+//   & > input {
+//     padding: 1rem;
+//     border-radius: 1rem;
+//     margin-left: 1.2rem;
+//     box-sizing: border-box;
+//     width: 59rem;
+//     height: 3.6rem;
+//   }
+// `;
 
 export const body = css`
   display: flex;

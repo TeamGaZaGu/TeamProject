@@ -3,89 +3,24 @@ import { FcGoogle } from 'react-icons/fc';
 import * as s from './styles';
 import React, { useState } from 'react';
 import { SiKakaotalk } from 'react-icons/si';
-import { FaCalendarAlt} from 'react-icons/fa';
 import { IoHomeSharp } from 'react-icons/io5';
 import { HiUsers } from 'react-icons/hi';
 import { BsCalendar2EventFill } from 'react-icons/bs';
-import { FaRegCircleCheck } from 'react-icons/fa6';
 import { BiRun } from 'react-icons/bi';
+import Oauth2 from '../../Oauth2/Oauth2';
+import HeaderLayout from '../HeaderLayout/HeaderLayout';
+import LeftSidebarLayout from '../LeftSidebarLayout/LeftSidebarLayout';
 
 function MainLayout({ children }) {
-  const [ searchInput, setSearchInput ] = useState("");
-
-  const searchInputOnChange = (e) => {
-    setSearchInput(e.target.value);
-    console.log(searchInput)
-  }
-
-  const [ selectedCategory, setSelectedCategory ] = useState("");
-
-  const categories = [
-    '전체',
-    '운동/스포츠',
-    '사교/인맥',
-    '인문학/책/글',
-    '전체',
-    '운동/스포츠',
-    '사교/인맥',
-    '인문학/책/글',
-    '전체',
-    '운동/스포츠',
-    '사교/인맥',
-    '인문학/책/글',
-    '전체',
-    '운동/스포츠',
-    '사교/인맥',
-    '인문학/책/글',
-    '전체',
-    '운동/스포츠',
-    '사교/인맥',
-    '인문학/책/글',
-  ];
 
   return (
     <div css={s.root}>
       <div css={s.header}>
-          <div css={s.logo}>
-            <h1>MEEU</h1>
-            <h4>meet+you</h4>
-          </div>
-          <div css={s.searchContainer}>
-            <button>지역설정</button>
-            <input type="text" placeholder='원하는 모임을 검색해주세요' value={searchInput} onChange={searchInputOnChange}/>
-          </div>
+          <HeaderLayout />
       </div>
       <div css={s.body}>
-        <div css={s.leftSideBar}>
-          <div css={s.loginContainer}>
-            <h2>로그인</h2>
-            <button><FcGoogle />구글 로그인</button>
-            <button><SiKakaotalk />카카오 로그인</button>
-          </div>
-          <div css={s.sideMenu}>
-            <button><IoHomeSharp />홈</button>
-            <button><HiUsers />추천모임</button>
-            <button><BsCalendar2EventFill />정모일정</button>
-          </div>
-          <div css={s.sideCategory}>
-            <h3>카테고리</h3>
-            {categories.map((category, index) => (
-              <div>
-                <label key={index} css={s.radioLabel}>
-                  <input
-                    type="radio"
-                    name="category"
-                    value={category}
-                    checked={selectedCategory === category}
-                    onChange={(e) => setSelectedCategory(e.target.value)}
-                    css={s.radioInput}
-                  />
-                  <BiRun />
-                  {category}
-                </label>
-              </div>
-            ))}
-          </div>
+        <div>
+          <LeftSidebarLayout />
         </div>
         <div css={s.content}>
           {children}
