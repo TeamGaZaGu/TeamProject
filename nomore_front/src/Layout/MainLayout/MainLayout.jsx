@@ -1,45 +1,33 @@
-import React, { useState } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+/** @jsxImportSource @emotion/react */
+import { FcGoogle } from 'react-icons/fc';
 import * as s from './styles';
+import React, { useState } from 'react';
+import { SiKakaotalk } from 'react-icons/si';
+import { IoHomeSharp } from 'react-icons/io5';
+import { HiUsers } from 'react-icons/hi';
+import { BsCalendar2EventFill } from 'react-icons/bs';
+import { BiRun } from 'react-icons/bi';
+import Oauth2 from '../../Oauth2/Oauth2';
+import HeaderLayout from '../HeaderLayout/HeaderLayout';
 import LeftSidebarLayout from '../LeftSidebarLayout/LeftSidebarLayout';
-import HeaderBarLayout from '../HeaderbarLayout/HeaderbarLayout';
-import Home from '../../pages/home/Home';
 
-const MainLayout = () => {
-  const [activeMenu, setActiveMenu] = useState('home');
-
-  const handleMenuChange = (menuId) => {
-    setActiveMenu(menuId);
-  };
+function MainLayout({ children }) {
 
   return (
-    <BrowserRouter>
-      <div css={s.layoutContainer}>
-        {/* 헤더 */}
-        <HeaderBarLayout />
-        
-        {/* 사이드바 */}
-        <LeftSidebarLayout 
-          activeMenu={activeMenu} 
-          onMenuChange={handleMenuChange} 
-        />
-        
-        {/* 메인 콘텐츠 */}
-        <main css={s.mainContent}>
-          <div css={s.contentWrapper}>
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/home" element={<Home />} />
-              <Route path="/recommended" element={<div>추천모임 페이지</div>} />
-              <Route path="/location" element={<div>지역모임 페이지</div>} />
-              <Route path="/my-view" element={<div>내가 본 모임 페이지</div>} />
-              <Route path="/category-:categoryId" element={<div>카테고리 페이지</div>} />
-            </Routes>
-          </div>
-        </main>
+    <div>
+      <div>
+          <HeaderLayout />
       </div>
-    </BrowserRouter>
+      <div>
+        <div>
+          <LeftSidebarLayout />
+        </div>
+        <div>
+          {children}
+        </div>
+      </div>
+    </div>
   );
-};
+}
 
 export default MainLayout;

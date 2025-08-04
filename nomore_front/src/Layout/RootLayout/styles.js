@@ -2,7 +2,7 @@ import { css } from "@emotion/react";
 
 export const layout = css`
     margin: 0 auto;
-    width: 82rem;
+    width: 100%;
     height: 100vh;
-    background-color: #ffffff;
+    background-color: #dbdbdb;
 `;
