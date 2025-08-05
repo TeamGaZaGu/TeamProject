@@ -5,15 +5,22 @@ import * as s from './styles';
 import { reqCategory, reqDistrict } from '../../api/searchApi';
 import { category } from '../LeftSidebarLayout/styles';
 import useCategoryQuery from '../../queries/useCategoryQuery';
+import { useNavigate } from 'react-router-dom';
 
 function HeaderLayout(props) {
+
+    const navigate = useNavigate();
+
+    const handleLogoOnClick = () => {
+        navigate("/");
+    }
 
     /** 지역 함수 */
     const [ districtList, setDistrictList ] = useState([]);
     const [selectedDistrict, setSelectedDistrict] = useState('');
     const [isDistrictOpen, setIsDistrictOpen] = useState(false);
 
-    const toggleDistrict = async () => {
+    const handleToggleDistrictOnClick = async () => {
         setIsDistrictOpen((prev) => !prev);
         if (isCategoryOpen) {
             setIsCategoryOpen(false);
@@ -40,7 +47,7 @@ function HeaderLayout(props) {
     const [selectedCategory, setSelectedCategory] = useState('');
     const [isCategoryOpen, setIsCategoryOpen] = useState(false);
 
-    const toggleCategory = () => {
+    const handleToggleCategoryOnClick = () => {
         setIsCategoryOpen((prev) => !prev);
         if (isDistrictOpen) {
             setIsDistrictOpen(false);
@@ -72,15 +79,15 @@ function HeaderLayout(props) {
         <div css={s.headerContainer}>
             {/* 로고 영역 */}
             <div css={s.logoSection}>
-                <h1 css={s.logoTitle}>MEEU</h1>
-                <h4 css={s.logoSubtitle}>meet+you</h4>
+                <h1 css={s.logoTitle} onClick={handleLogoOnClick}>MEEU</h1>
+                <h4 css={s.logoSubtitle} onClick={handleLogoOnClick}>meet+you</h4>
             </div>
 
             {/* 컨트롤 영역 */}
             <div css={s.controlSection}>
                 {/* 지역 설정 드롭다운 */}
                 <div css={s.dropdownContainer}>
-                    <button css={s.dropdownButton} onClick={toggleDistrict}>
+                    <button css={s.dropdownButton} onClick={handleToggleDistrictOnClick}>
                         {selectedDistrict || '지역설정'}
                     </button>
                     {isDistrictOpen && (
@@ -105,7 +112,7 @@ function HeaderLayout(props) {
 
                 {/* 카테고리 설정 드롭다운 */}
                 <div css={s.dropdownContainer}>
-                    <button css={s.dropdownButton} onClick={toggleCategory}>
+                    <button css={s.dropdownButton} onClick={handleToggleCategoryOnClick}>
                         {selectedCategory || '카테고리설정'}
                     </button>
                     {isCategoryOpen && (

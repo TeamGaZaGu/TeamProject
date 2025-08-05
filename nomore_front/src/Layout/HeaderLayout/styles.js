@@ -16,6 +16,10 @@ export const logoSection = css`
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+
+  &:hover {
+    cursor: pointer;
+  }
 `;
 
 export const logoTitle = css`
@@ -24,6 +28,7 @@ export const logoTitle = css`
   color: #2563eb;
   margin: 0;
   line-height: 1;
+  
 `;
 
 export const logoSubtitle = css`
