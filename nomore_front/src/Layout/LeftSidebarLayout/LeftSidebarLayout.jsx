@@ -7,6 +7,7 @@ import { HiUsers } from 'react-icons/hi';
 import { BsCalendar2EventFill } from 'react-icons/bs';
 import useCategoryQuery from '../../queries/useCategoryQuery';
 import { BiRun } from 'react-icons/bi';
+import MypageButton from '../Mypage/MypageButton';
 
 function LeftSidebarLayout(props) {
 
@@ -18,6 +19,9 @@ function LeftSidebarLayout(props) {
         <div css={s.leftSideBar}>
             <div>
                 <Oauth2 />
+            </div>
+            <div>
+                <MypageButton />
             </div>
             <div css={s.sideMenu}>
                 <button><IoHomeSharp />홈</button>
