@@ -7,7 +7,6 @@ import { SiKakaotalk } from 'react-icons/si';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
 function Oauth2(props) {
-
     const [ searchParams ] = useSearchParams();
     const navigate = useNavigate();
     const queryClient = useQueryClient();

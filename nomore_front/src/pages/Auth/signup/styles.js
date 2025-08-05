@@ -7,9 +7,14 @@ export const layout = css`
   margin-top: 5rem;
   padding: 2rem;
   width: 100%;
+  max-width: 600px; 
+  min-width: 300px; 
+  margin-left: auto;
+  margin-right: auto;
   background-color: #fafafa;
   border-radius: 1rem;
   height: 100vh;
+  box-sizing: border-box;
 `;
 
 export const inputContainer = css`
@@ -40,16 +45,42 @@ export const inputStyle = css`
   }
 `;
 
-export const categoryContainer = css`
-  margin-top: 2rem;
-  width: 100%;
-  max-width: 40rem;
+export const dropdownContainer = css`
+  position: relative;
+  display: inline-block;
 `;
 
-export const categoryTitle = css`
-  font-size: 1.5rem;
-  margin-bottom: 1rem;
-  font-weight: 600;
+export const dropdownButton = css`
+  position: relative;
+  padding: 12px 16px;
+  background-color: #ffffff;
+  border: none;
+  border-right: 1px solid #d1d5db;
+  width: 100%;
+  font-size: 14px;
+  color: #374151;
+  cursor: pointer;
+  min-width: 120px;
+  text-align: left;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: #f9fafb;
+  }
+
+  &:last-of-type {
+    border-right: none;
+  }
+
+  &::after {
+    content: '▼';
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 10px;
+    color: #9ca3af;
+  }
 `;
 
 export const buttonContainer = css`
@@ -73,5 +104,44 @@ export const signupButton = css`
 
   &:hover {
     background-color: #673ab7;
+  }
+`;
+
+export const dropdownMenu = css`
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-color: #ffffff;
+  border: 1px solid #d1d5db;
+  border-top: none;
+  border-radius: 0 0 12px 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+`;
+
+export const dropdownItem = css`
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: #f3f4f6;
+  }
+
+  input[type="radio"] {
+    margin-right: 8px;
+    accent-color: #2563eb;
+  }
+
+  label {
+    font-size: 14px;
+    color: #374151;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    width: 100%;
   }
 `;

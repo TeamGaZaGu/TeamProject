@@ -1,9 +1,14 @@
 /** @jsxImportSource @emotion/react */
+import useCategoryQuery from '../../../queries/useCategoryQuery.jsx';
 import * as s from './styles.js';
 import React, { useEffect, useState } from 'react';
 
 function Signup(props) {
-
+  const categories= useCategoryQuery();
+  const categoryList = (categories.data?.data || []).filter(category => category.categoryName !== '전체');
+  
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [isCategoryOpen, setIsCategoryOpen] = useState(false); 
   const [ buttonDisabled, setButtonDisabled ] = useState(true);
   const SIGNUP_REGEX = {
     nickName: /^[a-zA-Z0-9가-힣]{2,15}$/,
@@ -29,8 +34,9 @@ function Signup(props) {
     fullName: "",
     birthDate: "",
     gender: "male", 
+    category: "",
   }) 
-  
+
   const [ error, setError ] = useState({
     nickName: false,
     fullName: false,
@@ -38,48 +44,65 @@ function Signup(props) {
   });
 
   useEffect(() => {
-        const isEmptyValue = !!Object.values(inputValue).filter(value => !value.trim()).length;
-        const isError = !!Object.values(error).filter(value => !!value).length;
-        setButtonDisabled(isEmptyValue || isError);
+      const isEmptyValue = !!Object.values(inputValue).filter(value => !value.trim()).length;
+      const isError = !!Object.values(error).filter(value => !!value).length;
+      setButtonDisabled(isEmptyValue || isError);
 
-        const errorEntries = Object.entries(error);
-        errorEntries.forEach(([key, value]) => {
-            setHelpText(prev => ({
-                ...prev,
-                [key]: !value ? "" : SIGNUP_REGEX_ERROR_MESSAGE[key],
-            }));
-        });
+      const errorEntries = Object.entries(error);
+      errorEntries.forEach(([key, value]) => {
+          setHelpText(prev => ({
+              ...prev,
+              [key]: !value ? "" : SIGNUP_REGEX_ERROR_MESSAGE[key],
+          }));
+      });
     }, [error]);
 
-  const handleGenderChange = (e) => {
-    setInputValue(prev => ({
-      ...prev,
-      gender: e.target.value // "male" 또는 "female"
-    }));
-  };
+  const handleToggleCategoryOnClik = () => {
+    setIsCategoryOpen((prev) => !prev);
+    if (isCategoryOpen) {
+        setIsCategoryOpen(false);
+    }
 
+    if (categoryList.length === 0) {
+        categoryList();
+    }
+  }
+
+  const handleCategoryOnChange = (e) => {
+    setSelectedCategory(e.target.value);
+    setIsCategoryOpen(false);
+  }
 
   const handleSignupRegOnClick = () => {
 
   }
-    const handleOnChange = (e) => {
-      setInputValue(prev => ({
-        ...prev,
-        [e.target.name]: e.target.value
-      }))
-  
-      if (!SIGNUP_REGEX["notEmpty"].test(e.target.value)) {
-            setError(prev => ({
-                ...prev,
-                [e.target.name]: false,
-            }));
-            return;
-        }
 
-        setError(prev => ({
-            ...prev,
-            [e.target.name]: !SIGNUP_REGEX[e.target.name].test(e.target.value),
-        }))
+  const handleOnChange = (e) => {
+    setInputValue(prev => ({
+      ...prev,
+      [e.target.name]: e.target.value
+    }))
+
+    if (!SIGNUP_REGEX.hasOwnProperty(e.target.name)) {
+          setError(prev => ({
+              ...prev,
+              [e.target.name]: false,
+          }));
+          return;
+     }
+
+    if (!SIGNUP_REGEX["notEmpty"].test(e.target.value)) {
+          setError(prev => ({
+              ...prev,
+              [e.target.name]: false,
+          }));
+          return;
+      }
+
+      setError(prev => ({
+          ...prev,
+          [e.target.name]: !SIGNUP_REGEX[e.target.name].test(e.target.value),
+      }))
     } 
  
 
@@ -116,7 +139,7 @@ function Signup(props) {
               name="gender"
               value="male"
               checked={inputValue.gender === "male"}
-              onChange={handleGenderChange}
+              onChange={handleOnChange}
             />
             <span>남</span>
           </label>
@@ -126,12 +149,35 @@ function Signup(props) {
               name="gender"
               value="female"
               checked={inputValue.gender === "female"}
-              onChange={handleGenderChange}
+              onChange={handleOnChange}
             />
             <span>여</span>
           </label>
         </div>
-      </div>
+        <div css={s.dropdownContainer}>
+              <button css={s.dropdownButton} onClick={handleToggleCategoryOnClik}>
+                  {selectedCategory || '카테고리설정'}
+              </button>
+              {isCategoryOpen && (
+                  <div css={s.dropdownMenu}>
+                      {categoryList.map((category) => (
+                          <div key={category} css={s.dropdownItem}>
+                              <label>
+                                  <input
+                                      type="radio"
+                                      name='category'
+                                      value={category.categoryName}
+                                      checked={selectedCategory === category.categoryName}
+                                      onChange={handleCategoryOnChange}
+                                  />
+                                  {category.categoryName}
+                              </label>
+                          </div>
+                      ))}
+                  </div>
+              )}
+          </div>
+        </div>
       <div css={s.buttonContainer}>
         <button css={s.signupButton} disabled={buttonDisabled} onClick={handleSignupRegOnClick}>회원가입</button>
       </div>
