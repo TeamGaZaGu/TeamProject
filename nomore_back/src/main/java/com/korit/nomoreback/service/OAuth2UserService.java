@@ -60,19 +60,12 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
         }
 
         User user = userMapper.findByProviderAndProviderId(registrationId, providerId);
+        boolean isNewUser = false;
 
         if (user == null) {
-            // 1. 닉네임 기본값 생성
-            String baseNickName = (name != null && !name.isEmpty())
+            String nickName = (name != null && !name.isEmpty())
                     ? name
                     : (email != null ? email.split("@")[0] : "user" + System.currentTimeMillis());
-            String nickName = baseNickName;
-            int count = 1;
-            // 2. nickName 중복 있으면 뒤에 숫자 붙이기
-            while (userMapper.findByNickName(nickName) != null) {
-                nickName = baseNickName + "_" + count;
-                count++;
-            }
 
             user = User.builder()
                     .nickName(nickName)
@@ -91,9 +84,7 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
             userMapper.insert(user);
 
             Role role = roleMapper.findByRoleName("ROLE_USER");
-            if (role == null) {
-                throw new OAuth2AuthenticationException("기본 권한이 DB에 없습니다.");
-            }
+            if (role == null) throw new OAuth2AuthenticationException("기본 권한이 DB에 없습니다.");
 
             UserRole userRole = UserRole.builder()
                     .roleId(role.getRoleId())
@@ -103,11 +94,13 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
             userRoleMapper.insert(userRole);
             userRole.setRole(role);
             user.setUserRoles(List.of(userRole));
+            isNewUser = true;
         }
 
         return PrincipalUser.builder()
                 .user(user)
                 .attributes(oAuth2User.getAttributes())
+                .isNewUser(isNewUser)
                 .build();
     }
 }
