@@ -4,6 +4,7 @@ import { IoIosSearch } from "react-icons/io";
 import * as s from './styles';
 import { reqCategory } from '../../api/searchApi';
 import { category } from '../LeftSidebarLayout/styles';
+import useCategoryQuery from '../../queries/useCategoryQuery';
 
 function HeaderLayout(props) {
 
@@ -26,23 +27,20 @@ function HeaderLayout(props) {
     }
 
     /** 카테고리 함수 */
+    const categoryQuery = useCategoryQuery();
     const [ categoryList, setCategoryList ] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState('');
     const [isCategoryOpen, setIsCategoryOpen] = useState(false);
 
-    const toggleCategory = async () => {
+    const toggleCategory = () => {
         setIsCategoryOpen((prev) => !prev);
         if (isDistrictOpen) {
             setIsDistrictOpen(false);
         }
 
         if (categoryList.length === 0) {
-            try {
-                const response = await reqCategory();
-                setCategoryList(response.data);
-            } catch (error) {
-                console.log(error)
-            }
+            const response = categoryQuery;
+            setCategoryList(response.data.data);
         }
     }
 
@@ -61,8 +59,6 @@ function HeaderLayout(props) {
     const handleSearchInputOnClick = () => {
 
     }
-
-    console.log(categoryList);
 
     return (
         <div css={s.headerContainer}>
@@ -111,7 +107,7 @@ function HeaderLayout(props) {
                                     <label>
                                         <input
                                             type="radio"
-                                            name='categ'
+                                            name='category'
                                             value={category.categoryName}
                                             checked={selectedCategory === category.categoryName}
                                             onChange={handleCategoryOnChange}
