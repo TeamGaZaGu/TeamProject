@@ -1,12 +1,15 @@
 import Home from '../pages/home/Home';
 import MainLayout from '../Layout/MainLayout/MainLayout';
-import { Route, Routes } from 'react-router-dom';
+import { Route, Routes, useNavigate, useSearchParams } from 'react-router-dom';
 import NotFound from '../pages/NotFound/NotFound';
 import Mypage from '../pages/Mypage/Mypage';
 import Signup from '../pages/Auth/signup/Signup';
+import { useQueryClient } from '@tanstack/react-query';
+import { useEffect } from 'react';
 
 function RootRoute(props) {
-    
+   
+
     return (
         <MainLayout>
             <Routes>
