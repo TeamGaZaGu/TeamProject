@@ -24,8 +24,8 @@ public class JwtUtil {
 
     public String generateAccessToken(User user) {
         return Jwts.builder()
-                .subject("book_project_access_token")
-                .issuer("junil")
+                .subject("access_token")
+                .issuer("jinhyuk")
                 .expiration(new Date(new Date().getTime() + EXPIRED_TIME))
                 .claim("userId", user.getUserId())
                 .signWith(KEY)

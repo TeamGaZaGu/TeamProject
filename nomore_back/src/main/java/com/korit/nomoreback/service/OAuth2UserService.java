@@ -35,10 +35,11 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
         OAuth2User oAuth2User = super.loadUser(userRequest);
 
         String registrationId = userRequest.getClientRegistration().getRegistrationId();
-        String providerId;
-        String email;
-        String name;
-        String profileImgPath;
+
+        String providerId = null;
+        String email = null;
+        String name = null;
+        String profileImgPath = null;
 
         if ("google".equals(registrationId)) {
             providerId = oAuth2User.getAttribute("sub");
@@ -52,7 +53,7 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
 
             providerId = attributes.get("id").toString();
             email = kakaoAccount.get("email") != null ? kakaoAccount.get("email").toString() : null;
-            name = profile.get("nickname").toString();
+            name = profile.get("nickname") != null ? profile.get("nickname").toString() : null;
             profileImgPath = profile.get("profile_image_url") != null ? profile.get("profile_image_url").toString() : "/profile/default.jpg";
         } else {
             throw new OAuth2AuthenticationException("지원하지 않는 소셜 로그인입니다: " + registrationId);
@@ -61,19 +62,38 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
         User user = userMapper.findByProviderAndProviderId(registrationId, providerId);
 
         if (user == null) {
+            // 1. 닉네임 기본값 생성
+            String baseNickName = (name != null && !name.isEmpty())
+                    ? name
+                    : (email != null ? email.split("@")[0] : "user" + System.currentTimeMillis());
+            String nickName = baseNickName;
+            int count = 1;
+            // 2. nickName 중복 있으면 뒤에 숫자 붙이기
+            while (userMapper.findByNickName(nickName) != null) {
+                nickName = baseNickName + "_" + count;
+                count++;
+            }
+
             user = User.builder()
-                    .username(email != null ? email : name)
-                    .password(passwordEncoder.encode(UUID.randomUUID().toString()))
-                    .fullName(name)
-                    .email(email)
-                    .profileImgPath(profileImgPath)
+                    .nickName(nickName)
+                    .fullName(name != null ? name : nickName)
+                    .email(email != null ? email : (nickName + "@temp.com"))
+                    .profileImgPath(profileImgPath != null ? profileImgPath : "/profile/default.jpg")
                     .provider(registrationId)
                     .providerId(providerId)
+                    .password(passwordEncoder.encode(UUID.randomUUID().toString()))
+                    .age(0)
+                    .introduction("")
+                    .gender("Unknown")
+                    .categoryId(1)
                     .build();
 
             userMapper.insert(user);
 
             Role role = roleMapper.findByRoleName("ROLE_USER");
+            if (role == null) {
+                throw new OAuth2AuthenticationException("기본 권한이 DB에 없습니다.");
+            }
 
             UserRole userRole = UserRole.builder()
                     .roleId(role.getRoleId())
