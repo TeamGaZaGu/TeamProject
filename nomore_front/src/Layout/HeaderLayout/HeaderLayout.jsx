@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { IoIosSearch } from "react-icons/io";
 /** @jsxImportSource @emotion/react */
 import * as s from './styles';
+import { reqCategory } from '../../api/searchApi';
+import { category } from '../LeftSidebarLayout/styles';
 
 function HeaderLayout(props) {
 
@@ -24,15 +26,23 @@ function HeaderLayout(props) {
     }
 
     /** 카테고리 함수 */
-    const category = ["운동", "독서", "음악"];
-    // const [ categoryList, setCategoryList ] = useState([]);
+    const [ categoryList, setCategoryList ] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState('');
     const [isCategoryOpen, setIsCategoryOpen] = useState(false);
 
-    const toggleCategory = () => {
+    const toggleCategory = async () => {
         setIsCategoryOpen((prev) => !prev);
         if (isDistrictOpen) {
             setIsDistrictOpen(false);
+        }
+
+        if (categoryList.length === 0) {
+            try {
+                const response = await reqCategory();
+                setCategoryList(response.data);
+            } catch (error) {
+                console.log(error)
+            }
         }
     }
 
@@ -51,6 +61,8 @@ function HeaderLayout(props) {
     const handleSearchInputOnClick = () => {
 
     }
+
+    console.log(categoryList);
 
     return (
         <div css={s.headerContainer}>
@@ -94,17 +106,17 @@ function HeaderLayout(props) {
                     </button>
                     {isCategoryOpen && (
                         <div css={s.dropdownMenu}>
-                            {category.map((categ) => (
-                                <div key={categ} css={s.dropdownItem}>
+                            {categoryList.map((category) => (
+                                <div key={category} css={s.dropdownItem}>
                                     <label>
                                         <input
                                             type="radio"
                                             name='categ'
-                                            value={categ}
-                                            checked={selectedCategory === categ}
+                                            value={category.categoryName}
+                                            checked={selectedCategory === category.categoryName}
                                             onChange={handleCategoryOnChange}
                                         />
-                                        {categ}
+                                        {category.categoryName}
                                     </label>
                                 </div>
                             ))}
