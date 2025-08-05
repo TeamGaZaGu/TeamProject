@@ -17,50 +17,13 @@ public class SecurityConfig {
     private final OAuth2SuccessHandler successHandler;
 
     @Bean
-<<<<<<< HEAD
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**", "/signin/**", "/oauth2/**").permitAll()
+                        .requestMatchers("/auth/**", "/signin/**", "/oauth2/**", "/api/search/**").permitAll()
                         .anyRequest().authenticated()
-=======
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration corsConfiguration = new CorsConfiguration();
-        corsConfiguration.addAllowedOriginPattern(CorsConfiguration.ALL);
-        corsConfiguration.addAllowedMethod(CorsConfiguration.ALL);
-        corsConfiguration.addAllowedHeader(CorsConfiguration.ALL);
 
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", corsConfiguration);
-        return source;
-    }
-
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.cors(Customizer.withDefaults());
-        http.csrf(csrf -> csrf.disable());
-        http.formLogin(formLogin -> formLogin.disable());
-        // Restful API -> 무상태성
-        http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-
-        // Filter Setting
-        http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
-
-        http.authorizeHttpRequests(auth -> {
-            auth.requestMatchers("/oauth2/**").permitAll();
-            auth.requestMatchers("/api/auth/**").permitAll();
-            auth.requestMatchers("/api/search/category").permitAll();
-            auth.requestMatchers("/api/search/district").permitAll();
-            auth.requestMatchers("/api/create").permitAll();
-            auth.anyRequest().authenticated();
-        });
-
-        http.exceptionHandling(handling ->
-                handling.authenticationEntryPoint((request, response, authException) -> {
-                            response.setStatus(401);
-                        }
->>>>>>> origin/46-모임-생성-기능-구현
                 )
                 .oauth2Login(oauth2 -> oauth2
                         .loginPage("http://localhost:5173/auth/signin")
