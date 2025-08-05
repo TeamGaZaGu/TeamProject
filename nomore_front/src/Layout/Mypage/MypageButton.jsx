@@ -11,6 +11,10 @@ function MypageButton(props) {
 
     return (
         <div>
+            <div>
+                <img src='' alt="" />
+                <div>zzz</div>
+            </div>
             <button onClick={handleMypageOnClick}>마이페이지</button>
         </div>
     );

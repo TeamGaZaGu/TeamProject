@@ -49,8 +49,8 @@ function HeaderLayout(props) {
 
     const handleToggleCategoryOnClick = () => {
         setIsCategoryOpen((prev) => !prev);
-        if (isDistrictOpen) {
-            setIsDistrictOpen(false);
+        if (isCategoryOpen) {
+            setIsCategoryOpen(false);
         }
 
         if (categoryList.length === 0) {
