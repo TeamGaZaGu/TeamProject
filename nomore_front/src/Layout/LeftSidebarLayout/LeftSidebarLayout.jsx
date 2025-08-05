@@ -13,7 +13,7 @@ function LeftSidebarLayout(props) {
     const categoryQuery = useCategoryQuery();
 
     const categories = categoryQuery.data?.data || [];
-
+ 
     return (
         <div css={s.leftSideBar}>
             <div>
