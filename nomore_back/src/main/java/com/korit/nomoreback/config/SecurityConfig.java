@@ -51,6 +51,8 @@ public class SecurityConfig {
         http.authorizeHttpRequests(auth -> {
             auth.requestMatchers("/oauth2/**").permitAll();
             auth.requestMatchers("/api/auth/**").permitAll();
+            auth.requestMatchers("/api/search/category").permitAll();
+            auth.requestMatchers("/api/search/district").permitAll();
             auth.anyRequest().authenticated();
         });
 
