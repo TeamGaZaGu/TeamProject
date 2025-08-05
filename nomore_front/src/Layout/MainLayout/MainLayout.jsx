@@ -14,7 +14,7 @@ function MainLayout({ children }) {
         <div>
           <LeftSidebarLayout />
         </div>
-        <div css={s.main}>
+        <div>
           {children}
         </div>
       </div>
