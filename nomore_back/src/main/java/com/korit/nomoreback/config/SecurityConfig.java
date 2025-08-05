@@ -53,6 +53,7 @@ public class SecurityConfig {
             auth.requestMatchers("/api/auth/**").permitAll();
             auth.requestMatchers("/api/search/category").permitAll();
             auth.requestMatchers("/api/search/district").permitAll();
+            auth.requestMatchers("/api/create").permitAll();
             auth.anyRequest().authenticated();
         });
 
