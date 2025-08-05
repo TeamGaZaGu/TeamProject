@@ -14,7 +14,7 @@ public interface UserMapper {
     int getCountOfOptions(UserSearchOption option);
     int updateProfileImgPathById(@Param("userId") Integer userId, @Param("path") String path);
     int update(User user);
-    int deleteByIds(List<Integer> userIds);
+    int deleteByIds(@Param("userIds") List<Integer> userIds);
 
     User findByProviderAndProviderId(@Param("provider") String provider, @Param("providerId") String providerId);
 }
