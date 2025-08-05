@@ -2,22 +2,30 @@ import React, { useState } from 'react';
 import { IoIosSearch } from "react-icons/io";
 /** @jsxImportSource @emotion/react */
 import * as s from './styles';
-import { reqCategory } from '../../api/searchApi';
+import { reqCategory, reqDistrict } from '../../api/searchApi';
 import { category } from '../LeftSidebarLayout/styles';
 import useCategoryQuery from '../../queries/useCategoryQuery';
 
 function HeaderLayout(props) {
 
     /** 지역 함수 */
-    const district = ["강서구", "사하구", "해운대구"];
-    // const [ districtList, setDistrictList ] = useState([]);
+    const [ districtList, setDistrictList ] = useState([]);
     const [selectedDistrict, setSelectedDistrict] = useState('');
     const [isDistrictOpen, setIsDistrictOpen] = useState(false);
 
-    const toggleDistrict = () => {
+    const toggleDistrict = async () => {
         setIsDistrictOpen((prev) => !prev);
         if (isCategoryOpen) {
             setIsCategoryOpen(false);
+        }
+
+        if (districtList.length === 0) {
+            try {
+                const response = await reqDistrict();
+                setDistrictList(response?.data);
+            } catch (error) {
+                console.log(error);
+            }
         }
     };
     
@@ -40,7 +48,7 @@ function HeaderLayout(props) {
 
         if (categoryList.length === 0) {
             const response = categoryQuery;
-            setCategoryList(response.data.data);
+            setCategoryList(response?.data?.data);
         }
     }
 
@@ -77,17 +85,17 @@ function HeaderLayout(props) {
                     </button>
                     {isDistrictOpen && (
                         <div css={s.dropdownMenu}>
-                            {district.map((dist) => (
-                                <div key={dist} css={s.dropdownItem}>
+                            {districtList.map((district, index) => (
+                                <div key={index} css={s.dropdownItem}>
                                     <label>
                                         <input
                                             type='radio'
-                                            name='dist'
-                                            value={dist}
-                                            checked={selectedDistrict === dist}
+                                            name='district'
+                                            value={district.districtName}
+                                            checked={selectedDistrict === district.districtName}
                                             onChange={handleDistrictOnChange}
                                         />
-                                        {dist}
+                                        {district.districtName}
                                     </label>
                                 </div>
                             ))}
@@ -102,8 +110,8 @@ function HeaderLayout(props) {
                     </button>
                     {isCategoryOpen && (
                         <div css={s.dropdownMenu}>
-                            {categoryList.map((category) => (
-                                <div key={category} css={s.dropdownItem}>
+                            {categoryList.map((category, index) => (
+                                <div key={index} css={s.dropdownItem}>
                                     <label>
                                         <input
                                             type="radio"
