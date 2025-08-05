@@ -1,3 +1,5 @@
+/** @jsxImportSource @emotion/react */
+import * as s from './styles';
 import React from 'react';
 import { FcGoogle } from 'react-icons/fc';
 import { SiKakaotalk } from 'react-icons/si';
@@ -13,8 +15,7 @@ function Oauth2(props) {
     }
 
     return (
-        <div>
-            <h2>로그인</h2>
+        <div css={s.loginContainer}>
             <button onClick={handleGoogleOnCLick}><FcGoogle />구글 로그인</button>
             <button onClick={handleKakaoOnClick}><SiKakaotalk />카카오 로그인</button>
         </div>
