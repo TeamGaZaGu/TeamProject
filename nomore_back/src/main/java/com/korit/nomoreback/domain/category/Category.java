@@ -7,11 +7,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
+@Entity
 public class Category {
-
+    @Id
     private Integer categoryId;
 
     private String categoryName;

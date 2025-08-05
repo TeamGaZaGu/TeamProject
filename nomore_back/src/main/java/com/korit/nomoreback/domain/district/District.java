@@ -1,16 +1,14 @@
 package com.korit.nomoreback.domain.district;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+
 
 @Data
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
+@Entity
 public class District {
-
+    @Id
     private Integer districtId;
 
     private String districtName;
