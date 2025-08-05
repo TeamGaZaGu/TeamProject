@@ -7,15 +7,19 @@
 
     <resultMap id="UserMap" type="com.korit.nomoreback.domain.user.User">
         <id property="userId" column="user_id" />
-        <result property="username" column="username" />
-        <result property="password" column="password" />
+        <result property="nickName" column="nick_name" />
         <result property="fullName" column="full_name" />
+        <result property="age" column="age" />
         <result property="email" column="email" />
         <result property="profileImgPath" column="profile_img_path" />
+        <result property="introduction" column="introduction" />
+        <result property="gender" column="gender" />
+        <result property="categoryId" column="category_id" />
         <result property="provider" column="provider" />
         <result property="providerId" column="provider_id" />
         <collection property="userRoles" javaType="list" resultMap="UserRoleMap" />
     </resultMap>
+
     <resultMap id="UserRoleMap" type="com.korit.nomoreback.domain.userRole.UserRole">
         <id property="userRoleId" column="user_role_id" />
         <result property="userId" column="urt_user_id" />
@@ -27,163 +31,139 @@
         <result property="roleName" column="role_name" />
     </resultMap>
 
-    <insert id="insert" useGeneratedKeys="true" keyProperty="userId">
-
-        insert into user_tb
-        values (default, #{username}, #{password}, #{fullName}, #{email}, #{profileImgPath}, #{provider}, #{providerId})
-
+    <insert id="insert" useGeneratedKeys="true" parameterType="com.korit.nomoreback.domain.user.User" keyProperty="userId" >
+        INSERT INTO user_tb
+            (nick_name, full_name, age, email, profile_img_path, introduction, gender, category_id, provider, provider_id)
+        VALUES
+            (#{nickName}, #{fullName}, #{age}, #{email}, #{profileImgPath}, #{introduction}, #{gender}, #{categoryId}, #{provider}, #{providerId})
     </insert>
 
     <update id="updateProfileImgPathById">
         update user_tb
         set profile_img_path = #{path}
-        where
-            user_id = #{userId}
+        where user_id = #{userId}
     </update>
 
     <update id="update">
         update user_tb
         set
-            <if test="fullName != null">
-                full_name = #{fullName},
-            </if>
-            <if test="email != null">
-                email = #{email},
-            </if>
-            <if test="profileImgPath != null">
-                profile_img_path = #{profileImgPath},
-            </if>
-            username = username
-        where
-            user_id = #{userId}
-
+        <if test="nickName != null">nick_name = #{nickName},</if>
+        <if test="fullName != null">full_name = #{fullName},</if>
+        <if test="age != null">age = #{age},</if>
+        <if test="email != null">email = #{email},</if>
+        <if test="profileImgPath != null">profile_img_path = #{profileImgPath},</if>
+        <if test="introduction != null">introduction = #{introduction},</if>
+        <if test="gender != null">gender = #{gender},</if>
+        <if test="categoryId != null">category_id = #{categoryId},</if>
+        user_id = user_id
+        where user_id = #{userId}
     </update>
+
     <delete id="deleteByIds">
-        delete
-        from
-            user_tb
-        where
-            user_id in <foreach item="userId" collection="userIds" open="(" close=")" separator=",">#{userId}</foreach>
+        delete from user_tb
+        where user_id in
+        <foreach item="userId" collection="userIds" open="(" close=")" separator=",">
+            #{userId}
+        </foreach>
     </delete>
 
-    <select id="findByUsername" resultMap="UserMap">
+    <select id="findByEmail" resultMap="UserMap">
         select
-            ut.user_id,
-            ut.username,
-            ut.password,
-            ut.full_name,
-            ut.email,
-            ut.profile_img_path,
-            ut.provider,
-            ut.provider_id,
-
-            urt.user_role_id,
-            urt.user_id as urt_user_id,
-            urt.role_id as urt_role_id,
-
-            rt.role_id,
-            rt.role_name
-        from
-            user_tb ut
-            left outer join user_role_tb urt on(urt.user_id = ut.user_id)
-            left outer join role_tb rt on(rt.role_id = urt.role_id)
-        where
-            ut.username = #{username}
+        ut.user_id,
+        ut.nick_name,
+        ut.full_name,
+        ut.age,
+        ut.email,
+        ut.profile_img_path,
+        ut.introduction,
+        ut.gender,
+        ut.category_id,
+        urt.user_role_id,
+        urt.user_id as urt_user_id,
+        urt.role_id as urt_role_id,
+        rt.role_id,
+        rt.role_name
+        from user_tb ut
+        left outer join user_role_tb urt on urt.user_id = ut.user_id
+        left outer join role_tb rt on rt.role_id = urt.role_id
+        where ut.email = #{email}
     </select>
 
     <select id="findById" resultMap="UserMap">
         select
-            ut.user_id,
-            ut.username,
-            ut.password,
-            ut.full_name,
-            ut.email,
-            ut.profile_img_path,
-            ut.provider,
-            ut.provider_id,
-
-            urt.user_role_id,
-            urt.user_id as urt_user_id,
-            urt.role_id as urt_role_id,
-
-            rt.role_id,
-            rt.role_name
-        from
-            user_tb ut
-            left outer join user_role_tb urt on(urt.user_id = ut.user_id)
-            left outer join role_tb rt on(rt.role_id = urt.role_id)
-        where
-            ut.user_id = #{userId}
-
+        ut.user_id,
+        ut.nick_name,
+        ut.full_name,
+        ut.age,
+        ut.email,
+        ut.profile_img_path,
+        ut.introduction,
+        ut.gender,
+        ut.category_id,
+        urt.user_role_id,
+        urt.user_id as urt_user_id,
+        urt.role_id as urt_role_id,
+        rt.role_id,
+        rt.role_name
+        from user_tb ut
+        left outer join user_role_tb urt on urt.user_id = ut.user_id
+        left outer join role_tb rt on rt.role_id = urt.role_id
+        where ut.user_id = #{userId}
     </select>
 
     <select id="findAllBySearchOption" resultType="com.korit.nomoreback.domain.user.User">
         select
-            ut.user_id,
-            ut.username,
-            ut.password,
-            ut.full_name,
-            ut.email,
-            ut.profile_img_path,
-            ut.provider,
-            ut.provider_id,
-
-            group_concat(rt.role_name) as roleNames
-        from
-            user_tb ut
-            left outer join user_role_tb urt on(urt.user_id = ut.user_id)
-            left outer join role_tb rt on(rt.role_id = urt.role_id)
-        where
-            ut.username like concat('%', #{searchText}, '%')
-            or ut.full_name like concat('%', #{searchText}, '%')
-            or ut.email like concat('%', #{searchText}, '%')
-        group by
-            ut.user_id,
-            ut.username,
-            ut.password,
-            ut.full_name,
-            ut.email,
-            ut.profile_img_path
-        order by
-            ut.user_id
+        ut.user_id,
+        ut.nick_name,
+        ut.full_name,
+        ut.age,
+        ut.email,
+        ut.profile_img_path,
+        ut.introduction,
+        ut.gender,
+        ut.category_id,
+        group_concat(rt.role_name) as roleNames
+        from user_tb ut
+        left outer join user_role_tb urt on urt.user_id = ut.user_id
+        left outer join role_tb rt on rt.role_id = urt.role_id
+        where ut.nick_name like concat('%', #{searchText}, '%')
+        or ut.full_name like concat('%', #{searchText}, '%')
+        or ut.email like concat('%', #{searchText}, '%')
+        group by ut.user_id, ut.nick_name, ut.full_name, ut.age, ut.email, ut.profile_img_path, ut.introduction, ut.gender, ut.category_id
+        order by ut.user_id
         limit #{startIndex}, #{size}
     </select>
 
     <select id="getCountOfOptions" resultType="java.lang.Integer">
-        select
-            count(*)
-        from
-            user_tb
-        where
-            username like concat('%', #{searchText}, '%')
+        select count(*)
+        from user_tb
+        where nick_name like concat('%', #{searchText}, '%')
             or full_name like concat('%', #{searchText}, '%')
             or email like concat('%', #{searchText}, '%')
     </select>
-    <select id="findByProviderAndProviderId" resultType="com.korit.nomoreback.domain.user.User">
-        SELECT
+    <select id="findByUsername" resultMap="UserMap">
+        select
             user_id,
-            username,
             nick_name,
+            full_name,
             age,
             email,
             profile_img_path,
             introduction,
             gender,
-            phone_number,
-            category_id,
-            district_id,
-            provider,
-            provider_id
+            category_id
         from user_tb
-        where provider = #{provider}
+        where nick_name = #{username}
+    </select>
+    <select id="findByProviderAndProviderId" resultType="com.korit.nomoreback.domain.user.User">
+        SELECT *
+        FROM user_tb
+        WHERE provider = #{provider}
             AND provider_id = #{providerId}
     </select>
+    <select id="findByNickName" resultType="com.korit.nomoreback.domain.user.User">
+        SELECT *
+        FROM user_tb
+        WHERE nick_name = #{nickName}
+    </select>
 </mapper>
-
-
-
-
-
-
-
-

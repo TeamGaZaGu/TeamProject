@@ -10,6 +10,7 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Builder
@@ -33,11 +34,54 @@ public class PrincipalUser implements UserDetails, OAuth2User {
 
     @Override
     public String getUsername() {
-        return user.getUsername();
+        if (user.getNickName() != null && !user.getNickName().isEmpty()) {
+            return user.getNickName();
+        }
+        if (user.getEmail() != null && !user.getEmail().isEmpty()) {
+            return user.getEmail();
+        }
+        if (user.getUserId() != null) {
+            return user.getUserId().toString();
+        }
+        return UUID.randomUUID().toString();
     }
 
     @Override
     public String getName() {
-        return user.getUsername();
+        if (user.getNickName() != null && !user.getNickName().isEmpty()) {
+            return user.getNickName();
+        }
+        if (user.getEmail() != null && !user.getEmail().isEmpty()) {
+            return user.getEmail();
+        }
+        if (user.getUserId() != null) {
+            return user.getUserId().toString();
+        }
+        return UUID.randomUUID().toString();
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
+
+    @Override
+    public Map<String, Object> getAttributes() {
+        return attributes;
     }
 }

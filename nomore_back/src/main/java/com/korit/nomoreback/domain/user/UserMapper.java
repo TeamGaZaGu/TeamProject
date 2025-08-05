@@ -17,4 +17,6 @@ public interface UserMapper {
     int deleteByIds(List<Integer> userIds);
 
     User findByProviderAndProviderId(@Param("provider") String provider, @Param("providerId") String providerId);
+
+    User findByNickName(String nickName);
 }
