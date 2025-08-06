@@ -7,8 +7,52 @@
 
 
     <insert id="createMoim" useGeneratedKeys="true" keyProperty="moimId">
-        insert into moim_tb
-        values (default,#{title},#{discription},#{memberCount},#{maxMember},#{date},#{time},#{moimImgPath},#{districtId},#{categoryId},#{userId})
+        INSERT INTO moim_tb (
+            moim_title,
+            moim_discription,
+            moim_member_count,
+            moim_max_member,
+            moim_date,
+            moim_time,
+            moim_image_path,
+            district_id,
+            category_id,
+            user_id
+        ) VALUES (
+            #{title},
+            #{discription},
+            #{memberCount},
+            #{maxMember},
+            #{date},
+            #{time},
+            #{moimImgPath},
+            #{districtId},
+            #{categoryId},
+            #{userId}
+        )
     </insert>
+
+    <update id="increaseMoimCount">
+        UPDATE moim_tb
+        set moim_member_count = moim_member_count + 1
+        where moim_id = #{moimId}
+    </update>
+
+    <select id="findAll" resultType="com.korit.nomoreback.domain.moim.Moim">
+        select
+            *
+        from
+            moim_tb
+    </select>
+
+    <select id="findByMoimId" resultType="com.korit.nomoreback.domain.moim.Moim">
+            select
+                *
+            from
+                moim_tb
+            where
+                moim_id = #{moimId}
+    </select>
+
 
 </mapper>
