@@ -11,7 +11,8 @@ function Signup(props) {
   const email = searchParams.get("email");
   const name = searchParams.get("name");
   const provider = searchParams.get("provider");
-  console.log(provider)
+  const providerId = searchParams.get("providerId");
+  console.log(providerId)
   const categories = useCategoryQuery();
   const categoryList = (categories.data?.data || []).filter(category => category.categoryName !== '전체');
   
@@ -47,6 +48,7 @@ function Signup(props) {
     gender: "male", 
     categoryId: "",
     provider: provider,
+    providerId: providerId,
   }) 
 
   const [ error, setError ] = useState({
@@ -93,8 +95,9 @@ function Signup(props) {
     const response = await reqSignup(inputValue);
     console.log("회원가입 성공", response);
     navigate("/oauth2/login")
+    window.location.href = `http://localhost:8080/oauth2/authorization/${provider}`;
   } catch (error) {
-    console.error("회원가입 실패", error);
+    alert("회원가입 실패", error);
   }
 }
 
