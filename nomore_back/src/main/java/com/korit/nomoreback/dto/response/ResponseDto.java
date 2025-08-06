@@ -1,0 +1,17 @@
+package com.korit.nomoreback.dto.response;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import org.springframework.http.HttpStatus;
+
+@Getter
+@AllArgsConstructor
+public class ResponseDto<T> {
+    private int code;
+    private String message;
+    private T body;
+
+    public static <T> ResponseDto<T> fail(HttpStatus status, String message, T body) {
+        return new ResponseDto<>(status.value(), message, body);
+    }
+}

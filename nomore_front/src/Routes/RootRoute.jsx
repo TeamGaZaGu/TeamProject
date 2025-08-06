@@ -23,7 +23,7 @@ function RootRoute(props) {
                 <Route path='/auth/signup' element={ <Signup /> } />
                 <Route path='/mypage' element={ <Mypage /> } />
                 <Route path='/' element={ <Home />} />
-                {/* <Route path='*' element={ <NotFound /> } />  */}
+                <Route path='*' element={ <NotFound /> } /> 
             </Routes>
         </MainLayout>
     );
