@@ -79,7 +79,6 @@ function Signup(props) {
   }
 
   const handleCategoryOnChange = (e, category) => {
-      console.log(category)
       setSelectedCategory(category.categoryId);
       setIsCategoryOpen(false);
       setInputValue(prev => ({
