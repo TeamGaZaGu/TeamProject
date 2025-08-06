@@ -1,14 +1,22 @@
 /** @jsxImportSource @emotion/react */
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import useCategoryQuery from '../../../queries/useCategoryQuery.jsx';
 import * as s from './styles.js';
 import React, { useEffect, useState } from 'react';
+import { reqSignup } from '../../../api/authApi.js';
 
 function Signup(props) {
-  const categories= useCategoryQuery();
+  const navigate = useNavigate();
+  const [ searchParams ] = useSearchParams();
+  const email = searchParams.get("email");
+  const name = searchParams.get("name");
+  const provider = searchParams.get("provider");
+  console.log(provider)
+  const categories = useCategoryQuery();
   const categoryList = (categories.data?.data || []).filter(category => category.categoryName !== '전체');
   
-  const [selectedCategory, setSelectedCategory] = useState('');
-  const [isCategoryOpen, setIsCategoryOpen] = useState(false); 
+  const [ selectedCategory, setSelectedCategory ] = useState();
+  const [ isCategoryOpen, setIsCategoryOpen ] = useState(false); 
   const [ buttonDisabled, setButtonDisabled ] = useState(true);
   const SIGNUP_REGEX = {
     nickName: /^[a-zA-Z0-9가-힣]{2,15}$/,
@@ -33,8 +41,12 @@ function Signup(props) {
     nickName: "",
     fullName: "",
     birthDate: "",
+    email: email,
+    profileImgPath: "",
+    introduction: "",
     gender: "male", 
-    category: "",
+    categoryId: "",
+    provider: provider,
   }) 
 
   const [ error, setError ] = useState({
@@ -44,9 +56,11 @@ function Signup(props) {
   });
 
   useEffect(() => {
-      const isEmptyValue = !!Object.values(inputValue).filter(value => !value.trim()).length;
+      const isEmptyValue = !!Object.values(inputValue).filter(value => !String(value || "").trim()).length;
       const isError = !!Object.values(error).filter(value => !!value).length;
-      setButtonDisabled(isEmptyValue || isError);
+      const isCategoryEmpty = !selectedCategory;
+
+      setButtonDisabled(isEmptyValue || isError || isCategoryEmpty);
 
       const errorEntries = Object.entries(error);
       errorEntries.forEach(([key, value]) => {
@@ -55,27 +69,34 @@ function Signup(props) {
               [key]: !value ? "" : SIGNUP_REGEX_ERROR_MESSAGE[key],
           }));
       });
-    }, [error]);
+    }, [error, inputValue, selectedCategory]);
 
   const handleToggleCategoryOnClik = () => {
     setIsCategoryOpen((prev) => !prev);
     if (isCategoryOpen) {
         setIsCategoryOpen(false);
     }
-
-    if (categoryList.length === 0) {
-        categoryList();
-    }
   }
 
-  const handleCategoryOnChange = (e) => {
-    setSelectedCategory(e.target.value);
-    setIsCategoryOpen(false);
+  const handleCategoryOnChange = (e, category) => {
+      console.log(category)
+      setSelectedCategory(category.categoryId);
+      setIsCategoryOpen(false);
+      setInputValue(prev => ({
+      ...prev,
+      categoryId: category.categoryId,
+    }));
   }
 
-  const handleSignupRegOnClick = () => {
-
+  const handleSignupRegOnClick = async () => {
+  try {
+    const response = await reqSignup(inputValue);
+    console.log("회원가입 성공", response);
+    navigate("/oauth2/login")
+  } catch (error) {
+    console.error("회원가입 실패", error);
   }
+}
 
   const handleOnChange = (e) => {
     setInputValue(prev => ({
@@ -117,9 +138,9 @@ function Signup(props) {
             <p>{helpText.nickName}</p>
           }
         </div>
-        <input type="email" placeholder="email" onChange={handleOnChange} css={s.inputStyle} />
+        <input type="email" disabled value={email} onChange={handleOnChange} css={s.inputStyle} />
         <div>
-          <input type="text" name='fullName' placeholder="이름" onChange={handleOnChange} css={s.inputStyle} />
+          <input type="text" name='fullName' placeholder='이름' value={inputValue.fullName} onChange={handleOnChange} css={s.inputStyle} />
           {
             error.fullName && 
             <p>{helpText.fullName}</p>
@@ -161,14 +182,14 @@ function Signup(props) {
               {isCategoryOpen && (
                   <div css={s.dropdownMenu}>
                       {categoryList.map((category) => (
-                          <div key={category} css={s.dropdownItem}>
+                          <div key={category.categoryId} css={s.dropdownItem}>
                               <label>
                                   <input
                                       type="radio"
                                       name='category'
                                       value={category.categoryName}
-                                      checked={selectedCategory === category.categoryName}
-                                      onChange={handleCategoryOnChange}
+                                      checked={selectedCategory === category.categoryId}
+                                      onChange={(e) => handleCategoryOnChange(e, category)}
                                   />
                                   {category.categoryName}
                               </label>
@@ -179,7 +200,7 @@ function Signup(props) {
           </div>
         </div>
       <div css={s.buttonContainer}>
-        <button css={s.signupButton} disabled={buttonDisabled} onClick={handleSignupRegOnClick}>회원가입</button>
+        <button css={s.signupButton} onClick={handleSignupRegOnClick}>회원가입</button>
       </div>
     </div>
   );  

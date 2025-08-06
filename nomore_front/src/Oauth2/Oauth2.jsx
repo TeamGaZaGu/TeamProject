@@ -1,23 +1,20 @@
 /** @jsxImportSource @emotion/react */
-import { useQueryClient } from '@tanstack/react-query';
 import * as s from './styles';
 import React from 'react';
 import { FcGoogle } from 'react-icons/fc';
 import { SiKakaotalk } from 'react-icons/si';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import Oauth2Redirect from './Oauth2Redirect';
 
 function Oauth2(props) {
-    const [ searchParams ] = useSearchParams();
-    const navigate = useNavigate();
-    const queryClient = useQueryClient();
+
 
     const handleGoogleOnClick = () => {
-    window.location.href = "http://localhost:8080/oauth2/authorization/google";
-};
+        window.location.href = "http://localhost:8080/oauth2/authorization/google";
+    };
 
-const handleKakaoOnClick = () => {
-    window.location.href = "http://localhost:8080/oauth2/authorization/kakao";
-};
+    const handleKakaoOnClick = () => {
+        window.location.href = "http://localhost:8080/oauth2/authorization/kakao";
+    };
 
     return (
         <div css={s.loginContainer}>

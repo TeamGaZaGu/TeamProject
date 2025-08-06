@@ -58,7 +58,7 @@ public class JwtFilter implements Filter {
             return;
         }
         PrincipalUser principal = PrincipalUser.builder().user(foundUser).build();
-        Authentication authentication = new UsernamePasswordAuthenticationToken(principal, "", principal.getAuthorities());
+        Authentication authentication = new UsernamePasswordAuthenticationToken(principal, "", principal.   getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 }
