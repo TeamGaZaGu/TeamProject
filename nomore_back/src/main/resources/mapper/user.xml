@@ -16,6 +16,7 @@
         <result property="gender" column="gender" />
         <result property="categoryId" column="category_id" />
         <result property="provider" column="provider" />
+        <result property="providerId" column="provider_id" />
     </resultMap>
     <insert id="insert" useGeneratedKeys="true" keyProperty="userId">
         insert into user_tb
@@ -24,13 +25,13 @@
         #{age})
     </insert>
 
-    <select id="findByUserEmail" resultType="com.korit.nomoreback.domain.user.User">
+    <select id="findByProviderId" resultType="com.korit.nomoreback.domain.user.User">
         select
             *
         from
             user_tb
         where
-            email = #{email}
+            provider_id = #{providerId}
     </select>
     <select id="findById" resultType="com.korit.nomoreback.domain.user.User">
         select

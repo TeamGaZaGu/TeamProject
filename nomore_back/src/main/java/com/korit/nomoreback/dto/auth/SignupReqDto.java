@@ -18,6 +18,7 @@ public class SignupReqDto {
     private String gender;
     private Integer categoryId;
     private String provider;
+    private String providerId;
 
     public User toEntity() {
         return User.builder()
@@ -30,6 +31,7 @@ public class SignupReqDto {
                 .gender(gender)
                 .categoryId(categoryId)
                 .provider(provider)
+                .providerId(providerId)
                 .build();
     }
 }

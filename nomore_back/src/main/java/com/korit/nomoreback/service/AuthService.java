@@ -19,7 +19,7 @@ public class AuthService {
 
     @Transactional(rollbackFor = Exception.class)
     public void signin(SignupReqDto dto) throws BindException {
-        User foundUser = userMapper.findByUserEmail(dto.getEmail());
+        User foundUser = userMapper.findByProviderId(dto.getEmail());
         if (foundUser != null) {
             BindingResult bindingResult = new BeanPropertyBindingResult(foundUser, "");
             FieldError fieldError = new FieldError("nickName", "nickName", "이미 존재하는 사용자이름 입니다.");

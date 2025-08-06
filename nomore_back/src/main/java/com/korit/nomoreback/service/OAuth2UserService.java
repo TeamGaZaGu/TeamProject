@@ -39,19 +39,19 @@ public class OAuth2UserService extends DefaultOAuth2UserService {
             Map<String, Object> attributes = oAuth2User.getAttributes();
             Map<String, Object> kakaoAccount = (Map<String, Object>) attributes.get("kakao_account");
             Map<String, Object> profile = (Map<String, Object>) kakaoAccount.get("profile");
-
-            providerId = attributes.get("id").toString();
             email = kakaoAccount.get("email").toString();
-            name = profile.get("name").toString();
+            name = profile.get("nickname").toString();
+            providerId = attributes.get("id").toString();
         }
 
-        User user = userMapper.findByUserEmail(email);
+        User user = userMapper.findByProviderId(providerId);
 
         if (user == null) {
             user = User.builder()
                     .fullName(name)
                     .email(email)
                     .provider(registrationId)
+                    .providerId(providerId)
                     .build();
         }
 
