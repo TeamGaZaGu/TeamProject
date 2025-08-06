@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { IoIosSearch } from "react-icons/io";
 /** @jsxImportSource @emotion/react */
 import * as s from './styles';
-import { reqCategory, reqDistrict } from '../../api/searchApi';
+import { reqCategory, reqDistrict, reqSearch } from '../../api/searchApi';
 import { category } from '../LeftSidebarLayout/styles';
 import useCategoryQuery from '../../queries/useCategoryQuery';
 import { useNavigate } from 'react-router-dom';
@@ -38,6 +38,11 @@ function HeaderLayout(props) {
     
     const handleDistrictOnChange = (e) => {
         setSelectedDistrict(e.target.value);
+        const findDistrict = districtList.find(prev => prev.districtName === e.target.value)
+        setCombinedSearch(prev => ({
+            ...prev,
+            districtId: findDistrict.districtId
+        }))
         setIsDistrictOpen(false);
     }
 
@@ -61,20 +66,40 @@ function HeaderLayout(props) {
 
     const handleCategoryOnChange = (e) => {
         setSelectedCategory(e.target.value);
+        const findCategory = categoryList.find(prev => prev.categoryName === e.target.value)
+        setCombinedSearch(prev => ({
+            ...prev,
+            categoryId: findCategory.categoryId
+        }))
         setIsCategoryOpen(false);
     }
 
     /** 검색 함수 */
     const [ searchInputValue, setSearchInputValue ] = useState("");
+    const combinedSearchEmpty = {
+        districtId: "",
+        categoryId: "",
+        search: "",
+    }
+    const [ combinedSearch, setCombinedSearch ] = useState(combinedSearchEmpty);
     
     const handleSearchInputOnChange = (e) => {
         setSearchInputValue(e.target.value);
+        setCombinedSearch(prev => ({
+            ...prev,
+            search: searchInputValue,
+        }))
     }
-
-    const handleSearchInputOnClick = () => {
-
+    
+    const handleSearchInputOnClick = async () => {
+        try {
+            const response = await reqSearch(combinedSearch);
+            console.log("검색 성공", response);
+        } catch (error) {
+            console.error("검색 실패", error);
+        }
     }
-
+    
     return (
         <div css={s.headerContainer}>
             {/* 로고 영역 */}
