@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Mapper;
 public interface UserMapper {
 
     User findByProviderId(String providerId);
+    User findByNicName(String nickName);
 
     User findById(Integer userId);
 

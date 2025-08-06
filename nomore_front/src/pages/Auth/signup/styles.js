@@ -7,7 +7,7 @@ export const layout = css`
   margin-top: 5rem;
   padding: 2rem;
   width: 100%;
-  max-width: 600px; 
+  max-width: 600px;
   min-width: 300px; 
   margin-left: auto;
   margin-right: auto;
@@ -104,6 +104,16 @@ export const signupButton = css`
 
   &:hover {
     background-color: #673ab7;
+  }
+
+  &:disabled {
+    background-color: #d1d5db;
+    color: #9ca3af;
+    cursor: default;
+    
+    &:hover {
+      background-color: #d1d5db;
+    }
   }
 `;
 

@@ -4,6 +4,7 @@ import useCategoryQuery from '../../../queries/useCategoryQuery.jsx';
 import * as s from './styles.js';
 import React, { useEffect, useState } from 'react';
 import { reqSignup } from '../../../api/authApi.js';
+import toast, { Toaster } from 'react-hot-toast';
 
 function Signup(props) {
   const navigate = useNavigate();
@@ -12,7 +13,6 @@ function Signup(props) {
   const name = searchParams.get("name");
   const provider = searchParams.get("provider");
   const providerId = searchParams.get("providerId");
-  console.log(providerId)
   const categories = useCategoryQuery();
   const categoryList = (categories.data?.data || []).filter(category => category.categoryName !== '전체');
   
@@ -52,26 +52,39 @@ function Signup(props) {
   }) 
 
   const [ error, setError ] = useState({
-    nickName: false,
-    fullName: false,
-    birthDate: false,
+    nickName: true,
+    fullName: true,
+    birthDate: true,
   });
 
   useEffect(() => {
-      const isEmptyValue = !!Object.values(inputValue).filter(value => !String(value || "").trim()).length;
-      const isError = !!Object.values(error).filter(value => !!value).length;
-      const isCategoryEmpty = !selectedCategory;
+    // 필수 필드들이 비어있는지 체크
+  const requiredFields = ['nickName', 'fullName', 'birthDate'];
+  const hasEmptyRequiredField = requiredFields.some(field => 
+    !String(inputValue[field] || "").trim()
+  );
+    // 카테고리가 선택되지 않았는지 체크
+  const isCategoryEmpty = !Number.isInteger(inputValue.categoryId);
+  const isEmptyValue = !Object.entries(inputValue)
+  .filter(([key]) => key !== 'categoryId') // categoryId 제외
+  .some(([_, value]) => !String(value || '').trim());
+  console.log(Object.entries(inputValue))
+  const isError = !!Object.values(error).filter(value => !!value).length;
 
-      setButtonDisabled(isEmptyValue || isError || isCategoryEmpty);
+  console.log("isEmptyValue", isEmptyValue);
+  console.log("isError", isError);
+  console.log("isCategoryEmpty", isCategoryEmpty);
 
-      const errorEntries = Object.entries(error);
-      errorEntries.forEach(([key, value]) => {
-          setHelpText(prev => ({
-              ...prev,
-              [key]: !value ? "" : SIGNUP_REGEX_ERROR_MESSAGE[key],
-          }));
-      });
-    }, [error, inputValue, selectedCategory]);
+  setButtonDisabled(hasEmptyRequiredField || isEmptyValue || isError || isCategoryEmpty);
+
+  const errorEntries = Object.entries(error);
+  errorEntries.forEach(([key, value]) => {
+    setHelpText(prev => ({
+      ...prev,
+      [key]: !value ? "" : SIGNUP_REGEX_ERROR_MESSAGE[key],
+    }));
+  });
+}, [error, inputValue, selectedCategory]);
 
   const handleToggleCategoryOnClik = () => {
     setIsCategoryOpen((prev) => !prev);
@@ -81,7 +94,6 @@ function Signup(props) {
   }
 
   const handleCategoryOnChange = (e, category) => {
-      console.log(category)
       setSelectedCategory(category.categoryId);
       setIsCategoryOpen(false);
       setInputValue(prev => ({
@@ -91,13 +103,17 @@ function Signup(props) {
   }
 
   const handleSignupRegOnClick = async () => {
-  try {
+    try {
     const response = await reqSignup(inputValue);
-    console.log("회원가입 성공", response);
-    navigate("/oauth2/login")
-    window.location.href = `http://localhost:8080/oauth2/authorization/${provider}`;
+    toast.success("회원가입 완료!");
+    setTimeout(() => {
+          navigate("/oauth2/login")
+          window.location.href = `http://localhost:8080/oauth2/authorization/${provider}`;
+      }, 1200)
   } catch (error) {
-    alert("회원가입 실패", error);
+    const errorMessage = error.response.data.body.nickName
+    console.log(errorMessage)
+    toast.error(errorMessage);
   }
 }
 
@@ -180,7 +196,10 @@ function Signup(props) {
         </div>
         <div css={s.dropdownContainer}>
               <button css={s.dropdownButton} onClick={handleToggleCategoryOnClik}>
-                  {selectedCategory || '카테고리설정'}
+                  {selectedCategory
+                      ? categoryList.find(category => category.categoryId === selectedCategory)?.categoryName
+                      : '카테고리설정'
+                  }
               </button>
               {isCategoryOpen && (
                   <div css={s.dropdownMenu}>
@@ -203,7 +222,10 @@ function Signup(props) {
           </div>
         </div>
       <div css={s.buttonContainer}>
-        <button css={s.signupButton} onClick={handleSignupRegOnClick}>회원가입</button>
+        <button css={s.signupButton} disabled={buttonDisabled} onClick={handleSignupRegOnClick}>
+          회원가입
+          <Toaster />
+        </button>
       </div>
     </div>
   );  
