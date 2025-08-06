@@ -5,9 +5,16 @@ import NotFound from '../pages/NotFound/NotFound';
 import Mypage from '../pages/Mypage/Mypage';
 import Signup from '../pages/Auth/signup/Signup';
 import Oauth2Redirect from '../Oauth2/Oauth2Redirect';
+import Loading from '../Loading/Loading';
+import usePrincipalQuery from '../queries/usePrincipalQuery';
 
 function RootRoute(props) {
+
+    const principalQuery = usePrincipalQuery();
    
+    if (!principalQuery.isFetched) {
+        return <Loading />
+    }
 
     return (
         <MainLayout>

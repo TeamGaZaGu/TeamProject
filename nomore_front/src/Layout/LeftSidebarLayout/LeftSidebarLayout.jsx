@@ -1,6 +1,6 @@
 /** @jsxImportSource @emotion/react */
 import * as s from './styles';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Oauth2 from '../../Oauth2/Oauth2';
 import { IoHomeSharp } from 'react-icons/io5';
 import { HiUsers } from 'react-icons/hi';
@@ -9,6 +9,7 @@ import useCategoryQuery from '../../queries/useCategoryQuery';
 import { BiRun } from 'react-icons/bi';
 import MypageButton from '../Mypage/MypageButton';
 import usePrincipalQuery from '../../queries/usePrincipalQuery';
+import { reqSearch } from '../../api/searchApi';
 
 function LeftSidebarLayout(props) {
 
@@ -26,12 +27,12 @@ function LeftSidebarLayout(props) {
         }
     }
 
-    console.log(principalQuery.isSuccess)
-
     return (
         <div css={s.leftSideBar}>
-            <div>
-                {principalQuery.isFetched && principalQuery.isSuccess ? <MypageButton /> : <Oauth2 />}
+            <div css={s.loginContainer}>
+                <div>
+                    {principalQuery.isFetched && principalQuery.isSuccess ? <MypageButton /> : <Oauth2 />}
+                </div>
             </div>
             <div css={s.sideMenu}>
                 <button><IoHomeSharp />홈</button>

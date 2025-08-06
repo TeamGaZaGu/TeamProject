@@ -48,48 +48,117 @@ function Mypage(props) {
     console.log(mypageModify)
 
     return (
-        <div>
-            <h1>마이페이지</h1>
-            <div>
-                <h3>프로필 이미지</h3>
-                <img alt="미리보기" width="120" />
+        <div css={s.layout}>
+            <h1 css={s.pageTitle}>마이페이지</h1>
+            
+            {/* 프로필 이미지 섹션 */}
+            <div css={s.profileSection}>
+                <div css={s.profileImage}>
+                    <img 
+                        src={mypageModify.profileImgPath || "/default-profile.png"} 
+                        alt="프로필 이미지" 
+                        style={{
+                            width: '100%', 
+                            height: '100%', 
+                            borderRadius: '50%', 
+                            objectFit: 'cover'
+                        }}
+                        onError={(e) => {
+                            e.target.style.display = 'none';
+                            e.target.nextSibling.style.display = 'flex';
+                        }}
+                    />
+                    <div style={{
+                        display: 'none',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '2rem',
+                        color: '#666'
+                    }}>
+                        👤
+                    </div>
+                </div>
                 <input
                     type="file"
                     accept="image/*"
                     name='imgPath'
+                    style={{ display: 'none' }}
+                    id="profileImageInput"
                 />
-                <button>이미지 업로드</button>
+                <label htmlFor="profileImageInput">
+                    <button 
+                        css={s.profileImageUpload}
+                        type="button"
+                        onClick={() => document.getElementById('profileImageInput').click()}
+                    >
+                        이미지 업로드
+                    </button>
+                </label>
             </div>
-            <div>
-                <input type="text" name='nickName' value={mypageModify.nickName} placeholder="닉네임" onChange={handleMypageModifyOnChange}/>
-            </div>
-            <div>
-                <input type="text" name='introduction' value={mypageModify.introduction} placeholder='한줄 소개' onChange={handleMypageModifyOnChange} />
-            </div>
-            <div css={s.dropdownContainer}>
-                <button css={s.dropdownButton} onClick={handleToggleCategoryOnClick}>
-                    {selectedCategory || '관심 카테고리'}
-                </button>
-                {isCategoryOpen && (
-                    <div css={s.dropdownMenu}>
-                        {categoryList.map((category, index) => (
-                            <div key={index} css={s.dropdownItem}>
-                                <label>
-                                    <input
-                                        type="radio"
-                                        name='category'
-                                        value={category.categoryName}
-                                        checked={selectedCategory === category.categoryName}
-                                        onChange={handleCategoryOnChange}
-                                    />
-                                    {category.categoryName}
-                                </label>
+
+            {/* 입력 필드 컨테이너 */}
+            <div css={s.infoContainer}>
+                {/* 닉네임 */}
+                <div css={s.infoItem}>
+                    <label css={s.infoLabel}>닉네임</label>
+                    <input 
+                        css={s.inputStyle}
+                        type="text" 
+                        name='nickName' 
+                        value={mypageModify.nickName} 
+                        placeholder="닉네임을 입력해주세요" 
+                        onChange={handleMypageModifyOnChange}
+                    />
+                </div>
+
+                {/* 한줄 소개 */}
+                <div css={s.infoItem}>
+                    <label css={s.infoLabel}>한줄 소개</label>
+                    <input 
+                        css={s.inputStyle}
+                        type="text" 
+                        name='introduction' 
+                        value={mypageModify.introduction} 
+                        placeholder='자신을 한줄로 소개해보세요' 
+                        onChange={handleMypageModifyOnChange} 
+                    />
+                </div>
+
+                {/* 관심 카테고리 */}
+                <div css={s.infoItem}>
+                    <label css={s.infoLabel}>관심 카테고리</label>
+                    <div css={s.dropdownContainer}>
+                        <button css={s.dropdownButton} onClick={handleToggleCategoryOnClick}>
+                            {selectedCategory || '관심 카테고리를 선택해주세요'}
+                        </button>
+                        {isCategoryOpen && (
+                            <div css={s.dropdownMenu}>
+                                {categoryList.map((category, index) => (
+                                    <div key={index} css={s.dropdownItem}>
+                                        <label>
+                                            <input
+                                                type="radio"
+                                                name='category'
+                                                value={category.categoryName}
+                                                checked={selectedCategory === category.categoryName}
+                                                onChange={handleCategoryOnChange}
+                                            />
+                                            {category.categoryName}
+                                        </label>
+                                    </div>
+                                ))}
                             </div>
-                        ))}
+                        )}
                     </div>
-                )}
+                </div>
             </div>
-            <button>개인정보수정</button>
+
+            {/* 버튼 컨테이너 */}
+            <div css={s.buttonContainer}>
+                <button css={s.saveButton}>
+                    개인정보수정
+                </button>
+            </div>
         </div>
     );  
 }
