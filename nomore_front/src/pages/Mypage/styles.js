@@ -36,22 +36,41 @@ export const profileSection = css`
   width: 100%;
 `;
 
+// 수정된 프로필 이미지 스타일
 export const profileImage = css`
   width: 100px;
   height: 100px;
   border-radius: 50%;
-  background-color: #e0e0e0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 2rem;
-  color: #666;
+  border: 2px solid #e0e0e0;
+  overflow: hidden;
   margin-bottom: 1rem;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-
-  &:hover {
-    background-color: #d0d0d0;
+  position: relative;
+  background-color: #f5f5f5;
+  
+  & > img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    display: block !important;
+    border-radius: 0 !important;
+    position: relative !important;
+    z-index: 1 !important;
+  }
+  
+  /* 이미지 로드 실패시 플레이스홀더 */
+  & .placeholder {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: #666;
+    background-color: #f5f5f5;
+    z-index: 0;
   }
 `;
 
@@ -63,6 +82,7 @@ export const profileImageUpload = css`
   border-radius: 0.5rem;
   cursor: pointer;
   font-size: 0.9rem;
+  transition: background-color 0.2s ease;
 
   &:hover {
     background-color: #673ab7;
@@ -279,6 +299,7 @@ export const dangerButton = css`
 export const dropdownContainer = css`
   position: relative;
   display: inline-block;
+  width: 100%;
 `;
 
 export const dropdownButton = css`
