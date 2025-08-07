@@ -7,8 +7,14 @@ import com.korit.nomoreback.dto.moim.*;
 import com.korit.nomoreback.security.model.PrincipalUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -17,27 +23,17 @@ public class MoimService {
     private final MoimMapper moimMapper;
     private final MoimRoleMapper moimRoleMapper;
     private final PrincipalUtil principalUtil;
+    private final FileService fileService;
 
-    private Moim toEntity(MoimCreateDto dto) {
+    public void createMoim(MoimCreateDto dto) {
 
-        Moim moim = dto.toEntity();
-        moim.setUserId(principalUtil.getPrincipalUser().getUser().getUserId());
-        return moim;
+        Moim moimEntity = dto.toEntity();
 
-    }
+        final String UPLOAD_PATH = "/profile";
+        String profileImgPath = UPLOAD_PATH + "/" + fileService.uploadFile(dto.getMoimImg(), UPLOAD_PATH);
+        moimEntity.setMoimImgPath(profileImgPath);
 
-    public void createMoim(MoimCreateDto dto, Integer userId) {
-
-        Moim createMoim = toEntity(dto);
-
-        moimMapper.createMoim(createMoim);
-        MoimRoleDto roleDto = new MoimRoleDto();
-        roleDto.setMoimRole("OWNER");
-        roleDto.setMoimId(createMoim.getMoimId());
-        moimRoleMapper.insertMoimRole(roleDto);
-
-    }
-
+        moimMapper.createMoim(moimEntity);
 
     public void joinMoim(Integer moimId, Integer userId) {
 
