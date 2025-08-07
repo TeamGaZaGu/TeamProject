@@ -15,7 +15,7 @@ public class UserService {
 
     private final UserMapper userMapper;
 
-    public void updateProfile(int userId, UserProfileUpdateReqDto reqDto, MultipartFile profileImg) {
+    public void updateProfile(Integer userId, UserProfileUpdateReqDto reqDto, MultipartFile profileImg) {
         String profileImgPath = null;
 
         if (profileImg != null && !profileImg.isEmpty()) {
@@ -33,7 +33,7 @@ public class UserService {
 
             try {
                 profileImg.transferTo(saveFile);
-                profileImgPath = "/upload/profile/" + newFileName;
+                profileImgPath = "/profile/" + newFileName;
             } catch (Exception e) {
                 throw new RuntimeException("프로필 이미지 저장 실패", e);
             }
