@@ -17,6 +17,7 @@
             WHERE moim_id = #{moimId} AND user_id = #{userId}
         )
     </select>
+
     <select id="findRoleByUserAndMoimId" resultType="com.korit.nomoreback.dto.moim.MoimRoleDto">
         SELECT
             moim_role

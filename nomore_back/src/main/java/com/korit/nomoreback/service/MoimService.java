@@ -31,9 +31,9 @@ public class MoimService {
 
         Moim moimEntity = dto.toEntity();
 
-        final String UPLOAD_PATH = "/profile";
-        String profileImgPath = UPLOAD_PATH + "/" + fileService.uploadFile(dto.getMoimImg(), UPLOAD_PATH);
-        moimEntity.setMoimImgPath(profileImgPath);
+        final String UPLOAD_PATH = "/moim";
+        String moimImgPath = UPLOAD_PATH + "/" + fileService.uploadFile(dto.getMoimImg(), UPLOAD_PATH);
+        moimEntity.setMoimImgPath(moimImgPath);
 
         moimMapper.createMoim(moimEntity);
 
