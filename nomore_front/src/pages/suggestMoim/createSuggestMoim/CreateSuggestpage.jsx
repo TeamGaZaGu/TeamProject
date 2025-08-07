@@ -2,12 +2,16 @@
 import { reqDistrict } from '../../../api/searchApi';
 import { reqCreateSuggestMoim } from '../../../api/suggestApi';
 import useCategoryQuery from '../../../queries/useCategoryQuery';
+import usePrincipalQuery from '../../../queries/usePrincipalQuery';
 import * as s from './styles';
 import React, { useEffect, useRef, useState } from 'react';
 
 function CreateSuggestpage(props) {
+    const principalQuery = usePrincipalQuery();
+    const userId = principalQuery.data.data.user.userId
     const [ inputValue, setInputValue ] = useState({
         title: "",
+        userId: userId,
         discription: "",
         maxMembers: "",
         districtId: "",
@@ -130,10 +134,11 @@ function CreateSuggestpage(props) {
         const formData = new FormData();
         
         formData.append("title", title);
+        formData.append("userId", userId);
         formData.append("discription", inputValue.discription);
-        formData.append("maxMember", maxMembers);
-        formData.append("districtId", districtId);
-        formData.append("categoryId", categoryId);
+        formData.append("maxMember", Number(maxMembers));
+        formData.append("districtId", Number(districtId));
+        formData.append("categoryId", Number(categoryId));
 
         if (inputValue.moimImgFile) {
             formData.append("moimImg", inputValue.moimImgFile);
