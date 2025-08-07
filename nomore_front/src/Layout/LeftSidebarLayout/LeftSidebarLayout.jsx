@@ -29,7 +29,7 @@ function LeftSidebarLayout(props) {
     }
 
     const handleSuggestOnClick = () => {
-        navigate("/suggest/search")
+        navigate("/suggest/find")
     }
 
     return (
