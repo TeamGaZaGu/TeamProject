@@ -15,5 +15,7 @@ public interface MoimMapper {
     void increaseMoimCount(@Param("moimId") Integer moimId);
     int updateMoim(Moim moim);
     int deleteMoimById(@Param("moimId") Integer moimId);
+    List<Moim> findMoimByUserId(@Param("userId") Integer userId);
+    List<Moim> findMoimByCategoryId(@Param("categoryId") Integer categoryId);
 
 }

@@ -54,8 +54,8 @@
             moim_id,
             moim_title,
             moim_discription,
-            moim_max_member,
-            moim_moim_img_path
+            moim_member_count,
+            moim_img_path
         FROM
             moim_tb
         WHERE
@@ -64,11 +64,42 @@
 
     <select id="findAll" resultType="com.korit.nomoreback.domain.moim.Moim">
         select
-            *
+            moim_id,
+            moim_title,
+            moim_discription,
+            moim_member_count,
+            moim_img_path
         from
             moim_tb
     </select>
 
+    <select id="findMoimByUserId" resultType="com.korit.nomoreback.domain.moim.Moim">
+        SELECT
+            m.moim_id,
+            m.moim_title,
+            m.moim_discription,
+            m.moim_member_count,
+            m.moim_img_path
+        FROM
+            moim_tb m
+        JOIN
+            user_tb u ON m.category_id = u.category_id
+        WHERE
+            u.user_id = #{userId}
+    </select>
+
+    <select id="findMoimByCategoryId" resultType="com.korit.nomoreback.domain.moim.Moim">
+        SELECT
+            moim_id,
+            moim_title,
+            moim_discription,
+            moim_member_count,
+            moim_img_path
+        FROM
+            moim_tb
+        WHERE
+            (#{categoryId} = 1 OR category_id = #{categoryId})
+    </select>
 
 
 </mapper>
