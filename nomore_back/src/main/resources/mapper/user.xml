@@ -21,8 +21,7 @@
     <insert id="insert" useGeneratedKeys="true" keyProperty="userId">
         insert into user_tb
         values (default, #{nickName}, #{fullName}, #{birthDate},
-        #{email}, #{profileImgPath}, #{introduction}, #{gender}, #{categoryId}, #{provider},#{providerId},
-        #{age})
+        #{email}, #{profileImgPath}, #{introduction}, #{gender}, #{categoryId}, #{provider},#{providerId})
     </insert>
 
     <select id="findByProviderId" resultType="com.korit.nomoreback.domain.user.User">
