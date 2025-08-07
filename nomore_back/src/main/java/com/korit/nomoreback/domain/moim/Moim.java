@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -19,9 +20,9 @@ public class Moim {
     private String discription;
     private Integer memberCount;
     private Integer maxMember;
-    private LocalDate date;
-    private LocalTime time;
     private String moimImgPath;
+
+
 
     private Integer districtId;
     private Integer categoryId;
