@@ -20,7 +20,7 @@ public class AuthController {
 
     @PostMapping("/auth/signup")
     public ResponseEntity<?> signin(@RequestBody @Valid SignupReqDto dto) throws BindException {
-        authService.signin(dto);
+        authService.signup(dto);
         return ResponseEntity.ok("회원가입 완료");
     }
 }

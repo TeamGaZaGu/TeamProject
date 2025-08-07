@@ -3,6 +3,7 @@ package com.korit.nomoreback.service;
 import com.korit.nomoreback.domain.user.User;
 import com.korit.nomoreback.domain.user.UserMapper;
 import com.korit.nomoreback.dto.auth.SignupReqDto;
+import com.korit.nomoreback.security.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,10 +16,11 @@ import org.springframework.validation.FieldError;
 @RequiredArgsConstructor
 public class AuthService {
 
+    private final JwtUtil jwtUtil;
     private final UserMapper userMapper;
 
     @Transactional(rollbackFor = Exception.class)
-    public void signin(SignupReqDto dto) throws BindException {
+    public User signup(SignupReqDto dto) throws BindException {
         User foundUser = userMapper.findByNicName(dto.getNickName());
         if (foundUser != null) {
             BindingResult bindingResult = new BeanPropertyBindingResult(foundUser, "");
@@ -26,6 +28,10 @@ public class AuthService {
             bindingResult.addError(fieldError);
             throw new BindException(bindingResult);
         }
-        userMapper.insert(dto.toEntity());
+
+        User signupUser = dto.toEntity();
+        userMapper.insert(signupUser);
+        jwtUtil.generateAccessToken(signupUser);
+        return signupUser;
     }
 }

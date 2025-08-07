@@ -5,4 +5,4 @@ export const reqDistrict = () => api.get("/api/search/district");
 
 export const reqCategory = () => api.get("/api/search/category");
 
-export const reqSearch = (data) => api.get("/api/search", data);
+export const reqSearch = (data) => api.get("/api/moim/find", data);

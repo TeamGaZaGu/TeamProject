@@ -2,6 +2,7 @@
 import * as s from './styles';
 import React, { useState } from 'react';
 import useCategoryQuery from '../../queries/useCategoryQuery';
+import api from "../../api/axios";
 
 function Mypage(props) {
 
@@ -45,8 +46,36 @@ function Mypage(props) {
         }))
     }
 
-    console.log(mypageModify)
+    const [profileImageFile, setProfileImageFile] = useState(null);
 
+    const handleProfileImageChange = (e) => {
+    setProfileImageFile(e.target.files[0]);
+    };
+
+
+    const handleSaveOnclick = async () => {
+    const formData = new FormData();
+    const choice = categoryList.find(prev => prev.categoryName === selectedCategory)
+    console.log(choice)
+    formData.append("nickName", mypageModify.nickName);
+    formData.append("introduction", mypageModify.introduction);
+    formData.append("categoryId", choice.categoryId); 
+    if (profileImageFile) {
+        formData.append("profileImg", profileImageFile);
+    }
+
+    console.log(formData);
+
+    try {
+        await api.put("/api/user/profile", formData, {
+            headers: { "Content-Type": "multipart/form-data" }
+        });
+        alert("수정 완료!");
+    } catch (e) {
+        alert("수정 실패!");
+    }
+};
+    
     return (
         <div css={s.layout}>
             <h1 css={s.pageTitle}>마이페이지</h1>
@@ -84,6 +113,7 @@ function Mypage(props) {
                     name='imgPath'
                     style={{ display: 'none' }}
                     id="profileImageInput"
+                    onChange={handleProfileImageChange}
                 />
                 <label htmlFor="profileImageInput">
                     <button 
@@ -155,12 +185,11 @@ function Mypage(props) {
 
             {/* 버튼 컨테이너 */}
             <div css={s.buttonContainer}>
-                <button css={s.saveButton}>
+                <button css={s.saveButton} onClick={handleSaveOnclick}>
                     개인정보수정
                 </button>
             </div>
         </div>
     );  
 }
-
 export default Mypage;

@@ -1,0 +1,48 @@
+package com.korit.nomoreback.service;
+
+import com.korit.nomoreback.domain.user.UserMapper;
+import com.korit.nomoreback.dto.user.UserProfileUpdateReqDto;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
+import java.util.UUID;
+
+@Service
+@RequiredArgsConstructor
+public class UserService {
+
+    private final UserMapper userMapper;
+
+    public void updateProfile(int userId, UserProfileUpdateReqDto reqDto, MultipartFile profileImg) {
+        String profileImgPath = null;
+
+        if (profileImg != null && !profileImg.isEmpty()) {
+            String projectRoot = System.getProperty("user.dir");
+            String uploadDir = projectRoot + File.separator + "upload" + File.separator + "profile";
+
+            File uploadDirFile = new File(uploadDir);
+            if (!uploadDirFile.exists()) {
+                uploadDirFile.mkdirs();
+            }
+
+            String originalFileName = profileImg.getOriginalFilename();
+            String newFileName = UUID.randomUUID() + "_" + originalFileName;
+            File saveFile = new File(uploadDirFile, newFileName);
+
+            try {
+                profileImg.transferTo(saveFile);
+                profileImgPath = "/upload/profile/" + newFileName;
+            } catch (Exception e) {
+                throw new RuntimeException("프로필 이미지 저장 실패", e);
+            }
+        } else {
+            profileImgPath = userMapper.findProfileImgPathByUserId(userId);
+        }
+
+        reqDto.setProfileImgPath(profileImgPath);
+        reqDto.setUserId(userId);
+        userMapper.updateProfile(reqDto);
+    }
+}
