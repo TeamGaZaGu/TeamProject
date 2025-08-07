@@ -47,9 +47,7 @@ public class MoimController {
 
     @GetMapping("/find/categoryIdInUserId")
     public List<Moim> findMoimByCategoryIdInUserId() {
-
         return moimService.findMoimByCategoryIdInUserId();
-
     }
 
     @GetMapping("/find/{categoryId}")
