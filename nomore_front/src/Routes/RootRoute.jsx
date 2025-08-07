@@ -8,6 +8,7 @@ import Oauth2Redirect from '../Oauth2/Oauth2Redirect';
 import Loading from '../Loading/Loading';
 import usePrincipalQuery from '../queries/usePrincipalQuery';
 import SearchPage from '../pages/search/SearchPage';
+import SuggestRoute from './SuggestRoute';
 
 function RootRoute(props) {
 
@@ -20,6 +21,7 @@ function RootRoute(props) {
     return (
         <MainLayout>
             <Routes>
+                <Route path='/suggest/*' element={ <SuggestRoute /> } />
                 <Route path='/searchpage' element={ <SearchPage /> } />
                 <Route path='/oauth2/login' element={<Oauth2Redirect />} />
                 <Route path='/auth/signup' element={ <Signup /> } />

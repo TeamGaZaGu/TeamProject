@@ -10,9 +10,10 @@ import { BiRun } from 'react-icons/bi';
 import MypageButton from '../Mypage/MypageButton';
 import usePrincipalQuery from '../../queries/usePrincipalQuery';
 import { reqSearch } from '../../api/searchApi';
+import { useNavigate } from 'react-router-dom';
 
 function LeftSidebarLayout(props) {
-
+    const navigate = useNavigate();
     const principalQuery = usePrincipalQuery();
     const categoryQuery = useCategoryQuery();
     const categories = categoryQuery.data?.data || [];
@@ -23,8 +24,12 @@ function LeftSidebarLayout(props) {
             const response = await reqSearch(findCategory.categoryId);
             console.log("카테고리 모임 불러오기 성공", response);
         } catch (error) {
-            console.error("실패", error);
+            console.error("카테고리 모임 불러오기 실패", error);
         }
+    }
+
+    const handleSuggestOnClick = () => {
+        navigate("/suggest/search")
     }
 
     return (
@@ -36,7 +41,7 @@ function LeftSidebarLayout(props) {
             </div>
             <div css={s.sideMenu}>
                 <button><IoHomeSharp />홈</button>
-                <button><HiUsers />추천모임</button>
+                <button onClick={handleSuggestOnClick}><HiUsers />추천모임</button>
                 <button><BsCalendar2EventFill />정모일정</button>
             </div>
             <div css={s.category}>

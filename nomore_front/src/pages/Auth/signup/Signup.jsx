@@ -19,6 +19,7 @@ function Signup(props) {
   const [ selectedCategory, setSelectedCategory ] = useState();
   const [ isCategoryOpen, setIsCategoryOpen ] = useState(false); 
   const [ buttonDisabled, setButtonDisabled ] = useState(true);
+  
   const SIGNUP_REGEX = {
     nickName: /^[a-zA-Z0-9가-힣]{2,15}$/,
     fullName: /^[가-힣]{2,10}$/,
