@@ -2,7 +2,9 @@ package com.korit.nomoreback.controller;
 
 import com.korit.nomoreback.domain.moim.Moim;
 import com.korit.nomoreback.dto.moim.MoimCreateDto;
+import com.korit.nomoreback.dto.moim.MoimListRespDto;
 import com.korit.nomoreback.dto.moim.MoimModifyDto;
+import com.korit.nomoreback.dto.moim.MoimSearchReqDto;
 import com.korit.nomoreback.security.model.PrincipalUtil;
 import com.korit.nomoreback.service.MoimService;
 import lombok.RequiredArgsConstructor;
@@ -69,5 +71,21 @@ public class MoimController {
         moimService.deleteMoimById(moimId, userId);
 
         return ResponseEntity.ok("삭제 완");
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<MoimListRespDto>> searchMoim(
+            @RequestParam(required = false) Integer districtId,
+            @RequestParam(required = false) Integer categoryId,
+            @RequestParam(required = false) String keyword
+    ) {
+        MoimSearchReqDto searchReqDto = new MoimSearchReqDto();
+        searchReqDto.setDistrictId(districtId);
+        searchReqDto.setCategoryId(categoryId);
+        searchReqDto.setKeyword(keyword);
+
+        List<MoimListRespDto> moimList = moimService.searchMoim(searchReqDto);
+        System.out.println("검색 파라미터: " + searchReqDto);
+        return ResponseEntity.ok(moimList);
     }
 }

@@ -3,9 +3,7 @@ package com.korit.nomoreback.service;
 import com.korit.nomoreback.domain.moim.Moim;
 import com.korit.nomoreback.domain.moim.MoimMapper;
 import com.korit.nomoreback.domain.moimRole.MoimRoleMapper;
-import com.korit.nomoreback.dto.moim.MoimCreateDto;
-import com.korit.nomoreback.dto.moim.MoimModifyDto;
-import com.korit.nomoreback.dto.moim.MoimRoleDto;
+import com.korit.nomoreback.dto.moim.*;
 import com.korit.nomoreback.security.model.PrincipalUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -27,7 +25,6 @@ public class MoimService {
         return moim;
 
     }
-
 
     public void createMoim(MoimCreateDto dto, Integer userId) {
 
@@ -110,5 +107,8 @@ public class MoimService {
         }
     }
 
-
+    public List<MoimListRespDto> searchMoim(MoimSearchReqDto searchReqDto) {
+        System.out.println(moimMapper.searchMoim(searchReqDto));
+        return moimMapper.searchMoim(searchReqDto);
+    }
 }
