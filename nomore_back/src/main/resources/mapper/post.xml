@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.korit.nomoreback.domain.post.PostMapper">
+
+    <insert id="registerForum" useGeneratedKeys="true" keyProperty="postId">
+        insert into forum_tb (
+            post_title,
+            post_content,
+            post_created_at,
+            moim_id,
+            post_category_id,
+            user_id
+        ) values (
+        #{postTitle},
+        #{postContent},
+        NOW(),
+        #{moimId},
+        #{postCategoryId},
+        #{userId}
+        )
+    </insert>
+</mapper>
