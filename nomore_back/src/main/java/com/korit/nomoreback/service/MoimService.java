@@ -91,4 +91,24 @@ public class MoimService {
         return moimMapper.findAll();
     }
 
+    public List<Moim> findMoimByCategoryIdInUserId() {
+        Integer userId = principalUtil.getPrincipalUser().getUser().getUserId();
+
+        if (userId == null) {
+            throw new IllegalArgumentException("로그인 필요");
+        }
+
+        return moimMapper.findMoimByUserId(userId);
+    }
+
+    public List<Moim> findMoimByCategoryId(Integer categoryId) {
+
+        if (categoryId == 1){
+            return moimMapper.findAll();
+        }else {
+            return moimMapper.findMoimByCategoryId(categoryId);
+        }
+    }
+
+
 }

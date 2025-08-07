@@ -18,11 +18,11 @@
         <result property="provider" column="provider" />
         <result property="providerId" column="provider_id" />
     </resultMap>
+
     <insert id="insert" useGeneratedKeys="true" keyProperty="userId">
         insert into user_tb
         values (default, #{nickName}, #{fullName}, #{birthDate},
-        #{email}, #{profileImgPath}, #{introduction}, #{gender}, #{categoryId}, #{provider},#{providerId},
-        #{age})
+        #{email}, #{profileImgPath}, #{introduction}, #{gender}, #{categoryId}, #{provider},#{providerId})
     </insert>
 
     <select id="findByProviderId" resultType="com.korit.nomoreback.domain.user.User">
@@ -33,6 +33,7 @@
         where
             provider_id = #{providerId}
     </select>
+
     <select id="findById" resultType="com.korit.nomoreback.domain.user.User">
         select
             ut.user_id,
@@ -51,6 +52,7 @@
         where
             ut.user_id = #{userId}
     </select>
+
     <select id="findByNicName" resultType="com.korit.nomoreback.domain.user.User">
         select
             *
@@ -59,4 +61,5 @@
         where
             nick_name = #{nickName}
     </select>
+
 </mapper>

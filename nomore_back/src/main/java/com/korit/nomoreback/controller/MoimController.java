@@ -44,6 +44,17 @@ public class MoimController {
         return moimService.findAll();
     }
 
+    @GetMapping("/find/categoryIdInUserId")
+    public List<Moim> findMoimByCategoryIdInUserId() {
+
+        return moimService.findMoimByCategoryIdInUserId();
+    }
+
+    @GetMapping("/find/{categoryId}")
+    public List<Moim> findMoimByCategoryId(@PathVariable Integer categoryId) {
+        return moimService.findMoimByCategoryId(categoryId);
+    }
+
     @PatchMapping("/{moimId}")
     public ResponseEntity<?> updateMoim(@PathVariable Integer moimId, @RequestBody MoimModifyDto dto) {
         dto.setMoimId(moimId);
