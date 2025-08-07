@@ -10,10 +10,7 @@
         INSERT INTO moim_tb (
             moim_title,
             moim_discription,
-            moim_member_count,
             moim_max_member,
-            moim_date,
-            moim_time,
             moim_image_path,
             district_id,
             category_id,
@@ -21,10 +18,7 @@
         ) VALUES (
             #{title},
             #{discription},
-            #{memberCount},
             #{maxMember},
-            #{date},
-            #{time},
             #{moimImgPath},
             #{districtId},
             #{categoryId},
@@ -38,20 +32,73 @@
         where moim_id = #{moimId}
     </update>
 
+    <update id="updateMoim">
+        UPDATE moim_tb
+        <set>
+            <if test="title != null">moim_title = #{title},</if>
+            <if test="discription != null">moim_discription = #{discription},</if>
+            <if test="maxMember != null">moim_max_member = #{maxMember},</if>
+            <if test="moimImgPath != null">moim_img_path = #{moimImgPath},</if>
+        </set>
+        WHERE moim_id = #{moimId}
+    </update>
+
+    <delete id="deleteMoimById" parameterType="int">
+        DELETE FROM moim_tb
+        WHERE moim_id = #{moimId}
+    </delete>
+
+
+    <select id="findByMoimId" resultType="com.korit.nomoreback.domain.moim.Moim">
+        SELECT
+            moim_id,
+            moim_title,
+            moim_discription,
+            moim_member_count,
+            moim_img_path
+        FROM
+            moim_tb
+        WHERE
+            moim_id = #{moimId}
+    </select>
+
     <select id="findAll" resultType="com.korit.nomoreback.domain.moim.Moim">
         select
-            *
+            moim_id,
+            moim_title,
+            moim_discription,
+            moim_member_count,
+            moim_img_path
         from
             moim_tb
     </select>
 
-    <select id="findByMoimId" resultType="com.korit.nomoreback.domain.moim.Moim">
-            select
-                *
-            from
-                moim_tb
-            where
-                moim_id = #{moimId}
+    <select id="findMoimByUserId" resultType="com.korit.nomoreback.domain.moim.Moim">
+        SELECT
+            m.moim_id,
+            m.moim_title,
+            m.moim_discription,
+            m.moim_member_count,
+            m.moim_img_path
+        FROM
+            moim_tb m
+        JOIN
+            user_tb u ON m.category_id = u.category_id
+        WHERE
+            u.user_id = #{userId}
+    </select>
+
+    <select id="findMoimByCategoryId" resultType="com.korit.nomoreback.domain.moim.Moim">
+        SELECT
+            moim_id,
+            moim_title,
+            moim_discription,
+            moim_member_count,
+            moim_img_path
+        FROM
+            moim_tb
+        WHERE
+            (#{categoryId} = 1 OR category_id = #{categoryId})
     </select>
 
 
