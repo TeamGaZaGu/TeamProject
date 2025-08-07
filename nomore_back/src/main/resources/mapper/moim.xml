@@ -10,10 +10,7 @@
         INSERT INTO moim_tb (
             moim_title,
             moim_discription,
-            moim_member_count,
             moim_max_member,
-            moim_date,
-            moim_time,
             moim_image_path,
             district_id,
             category_id,
@@ -21,10 +18,7 @@
         ) VALUES (
             #{title},
             #{discription},
-            #{memberCount},
             #{maxMember},
-            #{date},
-            #{time},
             #{moimImgPath},
             #{districtId},
             #{categoryId},
@@ -38,6 +32,36 @@
         where moim_id = #{moimId}
     </update>
 
+    <update id="updateMoim">
+        UPDATE moim_tb
+        <set>
+            <if test="title != null">moim_title = #{title},</if>
+            <if test="discription != null">moim_discription = #{discription},</if>
+            <if test="maxMember != null">moim_max_member = #{maxMember},</if>
+            <if test="moimImgPath != null">moim_img_path = #{moimImgPath},</if>
+        </set>
+        WHERE moim_id = #{moimId}
+    </update>
+
+    <delete id="deleteMoimById" parameterType="int">
+        DELETE FROM moim_tb
+        WHERE moim_id = #{moimId}
+    </delete>
+
+
+    <select id="findByMoimId" resultType="com.korit.nomoreback.domain.moim.Moim">
+        SELECT
+            moim_id,
+            moim_title,
+            moim_discription,
+            moim_max_member,
+            moim_moim_img_path
+        FROM
+            moim_tb
+        WHERE
+            moim_id = #{moimId}
+    </select>
+
     <select id="findAll" resultType="com.korit.nomoreback.domain.moim.Moim">
         select
             *
@@ -45,14 +69,6 @@
             moim_tb
     </select>
 
-    <select id="findByMoimId" resultType="com.korit.nomoreback.domain.moim.Moim">
-            select
-                *
-            from
-                moim_tb
-            where
-                moim_id = #{moimId}
-    </select>
 
 
 </mapper>

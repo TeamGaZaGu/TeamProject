@@ -4,6 +4,7 @@ import com.korit.nomoreback.domain.moim.Moim;
 import com.korit.nomoreback.domain.moim.MoimMapper;
 import com.korit.nomoreback.domain.moimRole.MoimRoleMapper;
 import com.korit.nomoreback.dto.moim.MoimCreateDto;
+import com.korit.nomoreback.dto.moim.MoimModifyDto;
 import com.korit.nomoreback.dto.moim.MoimRoleDto;
 import com.korit.nomoreback.security.model.PrincipalUtil;
 import lombok.RequiredArgsConstructor;
@@ -65,6 +66,25 @@ public class MoimService {
 
         moimMapper.increaseMoimCount(moimId);
 
+    }
+
+    public void modifyMoim(MoimModifyDto modifyDto) {
+        Moim originMoim = moimMapper.findByMoimId(modifyDto.getMoimId());
+        Moim moim = modifyDto.modify(originMoim);
+        moimMapper.updateMoim(moim);
+    }
+
+    public void deleteMoimById(Integer moimId, Integer userId) {
+
+        MoimRoleDto roleDto = moimRoleMapper.findRoleByUserAndMoimId(userId, moimId);
+
+        String role = roleDto.getMoimRole();
+
+        if (roleDto == null || !"OWNER".equals(role)){
+            throw new IllegalArgumentException("권한 없는 사용자");
+        }
+
+        moimMapper.deleteMoimById(moimId);
     }
 
     public List<Moim> findAll() {

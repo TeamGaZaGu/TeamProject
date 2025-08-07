@@ -8,4 +8,5 @@ import org.apache.ibatis.annotations.Param;
 public interface MoimRoleMapper {
     int insertMoimRole(MoimRoleDto moimRoleDto);
     boolean isMoimIdAndUserId(@Param("moimId")Integer moimId, @Param("userId") Integer userId);
+    MoimRoleDto findRoleByUserAndMoimId(@Param("userId") Integer userId, @Param("moimId") Integer moimId);
 }
