@@ -11,10 +11,7 @@ import java.time.LocalTime;
 public class MoimCreateDto {
     private String title;
     private String discription;
-    private Integer memberCount;
     private Integer maxMember;
-    private LocalDate date;
-    private LocalTime time;
     private Integer districtId;
     private Integer categoryId;
     private Integer userId;
@@ -24,10 +21,7 @@ public class MoimCreateDto {
         return Moim.builder()
                 .title(title)
                 .discription(discription)
-                .memberCount(memberCount)
                 .maxMember(maxMember)
-                .date(this.getDate())
-                .time(this.getTime())
                 .moimImgPath(moimImgPath)
                 .districtId(districtId)
                 .categoryId(categoryId)
