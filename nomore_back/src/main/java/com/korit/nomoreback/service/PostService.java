@@ -25,7 +25,9 @@ public class PostService {
 
         Post post = dto.toEntity();
 
-        final String UPLOAD_PATH = "/profile";
+
+
+        final String UPLOAD_PATH = "/post";
         String postImgPath = UPLOAD_PATH + "/" + fileService.uploadFile(dto.getPostImgPath(), UPLOAD_PATH);
         post.setPostImgPath(postImgPath);
 

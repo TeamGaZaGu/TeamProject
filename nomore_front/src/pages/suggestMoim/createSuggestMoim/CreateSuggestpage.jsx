@@ -11,7 +11,6 @@ function CreateSuggestpage(props) {
     const userId = principalQuery.data.data.user.userId
     const [ inputValue, setInputValue ] = useState({
         title: "",
-        userId: userId,
         discription: "",
         maxMembers: "",
         districtId: "",

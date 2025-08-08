@@ -20,8 +20,7 @@ public class PostRegisterDto {
     public Post toEntity(){
         return Post.builder()
                 .postTitle(postTitle)
-                .postTitle(postTitle)
-                .createdAt(createdAt)
+                .createdAt(LocalDateTime.now())
                 .moimId(moimId)
                 .moimCategoryId(moimCategoryId)
                 .userId(userId)
