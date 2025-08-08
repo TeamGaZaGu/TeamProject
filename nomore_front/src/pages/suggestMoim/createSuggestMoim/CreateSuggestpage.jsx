@@ -1,12 +1,14 @@
 /** @jsxImportSource @emotion/react */
+import { useNavigate } from 'react-router-dom';
 import { reqDistrict } from '../../../api/searchApi';
-import { reqCreateSuggestMoim } from '../../../api/suggestApi';
+import { reqCreateSuggestMoim } from '../../../api/moimApi';
 import useCategoryQuery from '../../../queries/useCategoryQuery';
 import usePrincipalQuery from '../../../queries/usePrincipalQuery';
 import * as s from './styles';
 import React, { useEffect, useRef, useState } from 'react';
 
 function CreateSuggestpage(props) {
+    const navigate = useNavigate();
     const principalQuery = usePrincipalQuery();
     const userId = principalQuery.data.data.user.userId
     const [ inputValue, setInputValue ] = useState({
@@ -53,7 +55,7 @@ function CreateSuggestpage(props) {
         reader.readAsDataURL(file);
         setInputValue(prev => ({
             ...prev,
-            moimImgFile: file  // 👈 File 객체 저장
+            moimImgFile: file,
         }));
     };
 
@@ -150,6 +152,7 @@ function CreateSuggestpage(props) {
         try {
             await reqCreateSuggestMoim(formData);
             alert("모임 생성 성공!")
+            navigate("/")
         } catch (error) {
             console.error("모임 생성 실패:", error);
             alert("모임 생성 실패")

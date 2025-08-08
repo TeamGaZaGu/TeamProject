@@ -1,6 +1,9 @@
 import React from 'react';
+import { useLocation, useSearchParams } from 'react-router-dom';
 
-function descriptionSuggestPage(props) {
+function DescriptionSuggestPage(props) {
+    const [ searchParam ] = useSearchParams();
+    
     return (
         <div>
             
@@ -8,4 +11,4 @@ function descriptionSuggestPage(props) {
     );
 }
 
-export default descriptionSuggestPage;
+export default DescriptionSuggestPage;
