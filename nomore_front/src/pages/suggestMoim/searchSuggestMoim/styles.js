@@ -47,3 +47,56 @@ export const moimCard = css`
     text-overflow: ellipsis;
   }
 `;
+
+export const loginContainer = css`
+  text-align: center;
+  padding: 40px;
+  background-color: #f9f9f9;
+`;
+
+export const loginBox = css`
+  display: inline-block;
+  padding: 30px;
+  border-radius: 15px;
+  background-color: #7a51c2;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+`;
+
+export const googleLogin = css`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  color: black;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  width: 250px;
+  cursor: pointer;
+
+  img {
+    width: 20px;
+    margin-right: 10px;
+  }
+`;
+
+export const kakaoLogin = css`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fee500;
+  color: #3c1e1e;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  border-radius: 8px;
+  width: 250px;
+  cursor: pointer;
+  
+  img {
+    width: 20px;
+    margin-right: 10px;
+  }
+`;
