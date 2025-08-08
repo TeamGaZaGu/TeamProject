@@ -35,20 +35,87 @@
             created_at
         )
         values (
-        #{forumId},
-        #{parentCommentId},
-        #{parentUserId},
-        #{userId},
-        #{forumComment},
-        now()
+            #{forumId},
+            #{parentCommentId},
+            #{parentUserId},
+            #{userId},
+            #{forumComment},
+            now()
         )
 
     </insert>
 
-    <select id="findAllByForumId" resultType="com.korit.nomoreback.domain.forum.ForumComment">
+    <select id="findAllByForumId" resultMap="CommentMap">
+        with recursive comment_tb as (
+            select
+                forum_comment_id,
+                forum_id,
+                parent_comment_id,
+                parent_user_id,
+                user_id,
+                forum_comment,
+                created_at,
+                0 as level,
+                cast(lpad(forum_comment_id, 5, '0') as char(1000)) as path
+            from
+                forum_comment_tb
+            where
+                forum_id = #{forumId}
+                and parent_comment_id is null
 
+            union all
 
+            select
+                fct.forum_comment_id,
+                fct.forum_id,
+                fct.parent_comment_id,
+                fct.parent_user_id,
+                fct.parent_id,
+                fct.user_id,
+                fct.forum_comment,
+                fct.created_at,
+                ct.level + 1,
+                cast(concat(ct.path, ',', lpad(fct.forum_comment_id, 5, '0')) as char(1000)) as path
+            from
+                forum_comment_tb fct
+                join comment_tb ct on(ct.forum_comment_id = fct.parent_comment_id)
+            where
+                fct.forum_id = #{forumId}
+        )
+        select
+            dense_rank() over(order by substr(ct.path, 1, 5)) as order_number,
+            ct.forum_comment_id,
+            ct.forum_id,
+            ct.parent_comment_id,
+            ct.parent_user_id,
+            put.nickname as parent_username,
+            ct.user_id as ct_user_id,
 
+            ut.user_id,
+            ut.nickname,
+            ut.profile_img_path,
+
+            ct.content,
+            ct.created_at,
+            ct.`level`,
+            ct.`path`
+        from
+            comment_tb ct
+            left outer join user_tb ut on(ut.user_id = ct.user_id)
+            left outer join user_tb put on (put.user_id = ct.parent_user_id)
+        order by
+            order_number desc,
+            `path`
+
+    </select>
+
+    <select id="getCountByForumId" resultType="java.lang.Integer">
+        select
+            count(*)
+        from
+            forum_comment_tb
+        where
+            forum_id = #{forumId}
     </select>
 
 </mapper>
