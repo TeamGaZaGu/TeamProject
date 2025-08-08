@@ -49,6 +49,7 @@ export const controlSection = css`
   flex: 1;
   max-width: 800px;
   margin: 0 auto;
+  overflow: hidden;
 `;
 
 // 드롭다운 컨테이너
@@ -159,6 +160,7 @@ export const searchButton = css`
   justify-content: center;
   transition: background-color 0.2s ease;
   border-radius: 0 11px 11px 0;
+  height: 4.56rem;
 
   &:hover {
     background-color: #1d4ed8;

@@ -3,7 +3,7 @@ import * as s from './styles.js';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useCategoryQuery from '../../../queries/useCategoryQuery';
-import { reqfindSuggestMoim } from '../../../api/suggestApi';
+import { reqfindSuggestMoim } from '../../../api/moimApi.js';
 import usePrincipalQuery from '../../../queries/usePrincipalQuery.jsx';
 import { FcGoogle } from 'react-icons/fc';
 import { SiKakaotalk } from 'react-icons/si';
@@ -36,7 +36,7 @@ function FindSuggestPage(props) {
     }
 
     const handleMoimOnClick = (moimId) => {
-        navigate("/", moimId)
+        navigate(`/suggest/description?moimId=${moimId}`);
     }
 
     if(principalQuery.isFetched && principalQuery.isSuccess) {
