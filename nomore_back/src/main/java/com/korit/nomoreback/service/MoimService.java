@@ -3,20 +3,12 @@ package com.korit.nomoreback.service;
 import com.korit.nomoreback.domain.moim.Moim;
 import com.korit.nomoreback.domain.moim.MoimMapper;
 import com.korit.nomoreback.domain.moimRole.MoimRoleMapper;
-import com.korit.nomoreback.dto.moim.MoimCreateDto;
-import com.korit.nomoreback.dto.moim.MoimModifyDto;
-import com.korit.nomoreback.dto.moim.MoimRoleDto;
+import com.korit.nomoreback.dto.moim.*;
 import com.korit.nomoreback.security.model.PrincipalUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -25,22 +17,25 @@ public class MoimService {
     private final MoimMapper moimMapper;
     private final MoimRoleMapper moimRoleMapper;
     private final PrincipalUtil principalUtil;
-    private final FileService fileService;
 
-    public void createMoim(MoimCreateDto dto) {
+    private Moim toEntity(MoimCreateDto dto) {
 
-        Moim moimEntity = dto.toEntity();
+        Moim moim = dto.toEntity();
+        moim.setUserId(principalUtil.getPrincipalUser().getUser().getUserId());
+        return moim;
 
         final String UPLOAD_PATH = "/moim";
         String moimImgPath = UPLOAD_PATH + "/" + fileService.uploadFile(dto.getMoimImg(), UPLOAD_PATH);
         moimEntity.setMoimImgPath(moimImgPath);
 
-        moimMapper.createMoim(moimEntity);
+        Moim createMoim = toEntity(dto);
 
+        moimMapper.createMoim(createMoim);
         MoimRoleDto roleDto = new MoimRoleDto();
         roleDto.setMoimRole("OWNER");
-        roleDto.setMoimId(moimEntity.getMoimId());
+        roleDto.setMoimId(createMoim.getMoimId());
         moimRoleMapper.insertMoimRole(roleDto);
+
     }
 
 
@@ -112,5 +107,8 @@ public class MoimService {
         }
     }
 
-
+    public List<MoimListRespDto> searchMoim(MoimSearchReqDto searchReqDto) {
+        System.out.println(moimMapper.searchMoim(searchReqDto));
+        return moimMapper.searchMoim(searchReqDto);
+    }
 }

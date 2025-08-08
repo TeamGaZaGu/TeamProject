@@ -32,3 +32,5 @@ mybatis:
     map-underscore-to-camel-case: true
   type-aliases-package: com.korit.nomoreback.domain.entity
 
+
+

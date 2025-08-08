@@ -78,7 +78,7 @@ function HeaderLayout(props) {
     const combinedSearchEmpty = {
         districtId: "",
         categoryId: "",
-        search: "",
+        keyword: "",
     }
 
     const [ combinedSearch, setCombinedSearch ] = useState(combinedSearchEmpty);
@@ -87,14 +87,15 @@ function HeaderLayout(props) {
         setSearchInputValue(e.target.value);
         setCombinedSearch(prev => ({
             ...prev,
-            search: searchInputValue,
+            keyword: e.target.value,
         }))
     }
     
     const handleSearchInputOnClick = async () => {
         try {
             const response = await reqSearch(combinedSearch);
-            navigate("/searchpage")
+            console.log(response)
+            navigate("/searchpage", {state: response.data})
         } catch (error) {
             console.error("검색 실패", error);
         }
