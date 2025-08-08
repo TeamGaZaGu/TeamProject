@@ -14,12 +14,13 @@
             post_category_id,
             user_id
         ) values (
-        #{postTitle},
-        #{postContent},
-        NOW(),
-        #{moimId},
-        #{postCategoryId},
-        #{userId}
+            #{postTitle},
+            #{postContent},
+            #{createdAt},
+            #{moimId},
+            #{postCategoryId},
+            #{userId}
         )
     </insert>
+
 </mapper>
