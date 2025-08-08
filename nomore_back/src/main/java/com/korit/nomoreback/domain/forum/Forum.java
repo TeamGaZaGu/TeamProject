@@ -1,4 +1,4 @@
-package com.korit.nomoreback.domain.post;
+package com.korit.nomoreback.domain.forum;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,11 +11,11 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Post {
-    private Integer postId;
-    private String postTitle;
-    private String postContent;
-    private String postImgPath;
+public class Forum {
+    private Integer forumId;
+    private String forumTitle;
+    private String forumContent;
+    private String forumImgPath;
     private LocalDateTime createdAt;
 
     private Integer moimId;
