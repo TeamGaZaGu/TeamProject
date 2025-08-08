@@ -17,25 +17,22 @@ public class MoimService {
     private final MoimMapper moimMapper;
     private final MoimRoleMapper moimRoleMapper;
     private final PrincipalUtil principalUtil;
+    private final FileService fileService;
 
-    private Moim toEntity(MoimCreateDto dto) {
+    public void createMoim(MoimCreateDto dto) {
 
-        Moim moim = dto.toEntity();
-        moim.setUserId(principalUtil.getPrincipalUser().getUser().getUserId());
-        return moim;
+        Moim moimEntity = dto.toEntity();
 
         final String UPLOAD_PATH = "/moim";
         String moimImgPath = UPLOAD_PATH + "/" + fileService.uploadFile(dto.getMoimImg(), UPLOAD_PATH);
         moimEntity.setMoimImgPath(moimImgPath);
 
-        Moim createMoim = toEntity(dto);
+        moimMapper.createMoim(moimEntity);
 
-        moimMapper.createMoim(createMoim);
         MoimRoleDto roleDto = new MoimRoleDto();
         roleDto.setMoimRole("OWNER");
-        roleDto.setMoimId(createMoim.getMoimId());
+        roleDto.setMoimId(moimEntity.getMoimId());
         moimRoleMapper.insertMoimRole(roleDto);
-
     }
 
 
@@ -64,6 +61,13 @@ public class MoimService {
         moimMapper.increaseMoimCount(moimId);
 
     }
+
+    public void findMoim (Integer moimId) {
+        moimMapper.findByMoimId(moimId);
+    }
+
+
+
 
     public void modifyMoim(MoimModifyDto modifyDto) {
         Moim originMoim = moimMapper.findByMoimId(modifyDto.getMoimId());
