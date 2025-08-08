@@ -45,6 +45,15 @@ public class MoimController {
         return ResponseEntity.ok("가입 완");
     }
 
+    @GetMapping("/{moimId}/select")
+    public ResponseEntity<?> selectMoim(@PathVariable Integer moimId) {
+
+        moimService.findMoim(moimId);
+
+        return ResponseEntity.ok("찾았다");
+    }
+
+
     @GetMapping("/find")
     public List<Moim> findAllMoims() {
         return moimService.findAll();
