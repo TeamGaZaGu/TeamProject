@@ -26,7 +26,11 @@ public class MoimController {
 
         Integer userId = principalUtil.getPrincipalUser().getUser().getUserId();
 
-        moimService.createMoim(dto, userId);
+
+        dto.setUserId(userId);
+
+        moimService.createMoim(dto);
+
 
         return ResponseEntity.ok("신규 생성 완");
     }
@@ -48,7 +52,6 @@ public class MoimController {
 
     @GetMapping("/find/categoryIdInUserId")
     public List<Moim> findMoimByCategoryIdInUserId() {
-
         return moimService.findMoimByCategoryIdInUserId();
     }
 

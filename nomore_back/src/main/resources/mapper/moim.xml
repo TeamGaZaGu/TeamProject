@@ -4,7 +4,14 @@
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.korit.nomoreback.domain.moim.MoimMapper">
-
+    <resultMap id="MoimResultMap" type="com.korit.nomoreback.domain.moim.Moim">
+        <id property="moimId" column="moim_id" />
+        <result property="title" column="moim_title" />
+        <result property="discription" column="moim_discription" />
+        <result property="memberCount" column="moim_member_count" />
+        <result property="maxMember" column="moim_max_member" />
+        <result property="moimImgPath" column="moim_img_path" />
+    </resultMap>
 
     <insert id="createMoim" useGeneratedKeys="true" keyProperty="moimId">
         INSERT INTO moim_tb (
@@ -12,7 +19,7 @@
             moim_discription,
             moim_max_member,
             moim_member_count,
-            moim_image_path,
+            moim_img_path,
             district_id,
             category_id,
             user_id
@@ -75,13 +82,14 @@
             moim_tb
     </select>
 
-    <select id="findMoimByUserId" resultType="com.korit.nomoreback.domain.moim.Moim">
+    <select id="findMoimByUserId" resultMap="MoimResultMap">
         SELECT
             m.moim_id,
             m.moim_title,
             m.moim_discription,
             m.moim_member_count,
-            m.moim_img_path
+            m.moim_img_path,
+            m.category_id
         FROM
             moim_tb m
         JOIN

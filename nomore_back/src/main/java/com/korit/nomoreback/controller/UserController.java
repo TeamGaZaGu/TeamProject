@@ -22,7 +22,6 @@ public class UserController {
             @ModelAttribute UserProfileUpdateReqDto userProfileUpdateReqDto,
             @RequestParam(value = "profileImg", required = false) MultipartFile profileImg
     ) {
-
         userService.updateProfile(principal.getUser().getUserId(), userProfileUpdateReqDto, profileImg);
         System.out.println(userProfileUpdateReqDto);
         return ResponseEntity.ok().build();

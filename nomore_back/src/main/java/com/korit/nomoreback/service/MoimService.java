@@ -24,9 +24,9 @@ public class MoimService {
         moim.setUserId(principalUtil.getPrincipalUser().getUser().getUserId());
         return moim;
 
-    }
-
-    public void createMoim(MoimCreateDto dto, Integer userId) {
+        final String UPLOAD_PATH = "/moim";
+        String moimImgPath = UPLOAD_PATH + "/" + fileService.uploadFile(dto.getMoimImg(), UPLOAD_PATH);
+        moimEntity.setMoimImgPath(moimImgPath);
 
         Moim createMoim = toEntity(dto);
 
