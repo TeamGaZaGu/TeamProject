@@ -25,6 +25,7 @@ public class ForumComment {
     private String forumComment;
     private LocalDateTime createdAt;
 
+    private Integer moimId;
 
 
 }

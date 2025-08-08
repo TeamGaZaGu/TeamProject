@@ -9,5 +9,6 @@ public interface ForumCommentMapper {
 
     int insert(ForumComment forumComment);
     List<ForumComment> findAllByForumId(Integer forumId);
+    int getCountByForumId(Integer forumId);
 
 }

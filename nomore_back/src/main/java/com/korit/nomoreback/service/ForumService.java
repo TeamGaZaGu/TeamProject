@@ -1,8 +1,10 @@
 package com.korit.nomoreback.service;
 
 import com.korit.nomoreback.domain.forum.Forum;
+import com.korit.nomoreback.domain.forum.ForumCommentMapper;
 import com.korit.nomoreback.domain.forum.ForumMapper;
 import com.korit.nomoreback.domain.postRole.PostRoleMapper;
+import com.korit.nomoreback.dto.forum.ForumCommentRegDto;
 import com.korit.nomoreback.dto.forum.ForumRegisterDto;
 import com.korit.nomoreback.dto.forum.ForumRoleDto;
 import com.korit.nomoreback.security.model.PrincipalUtil;
@@ -17,7 +19,7 @@ public class ForumService {
     private final PrincipalUtil principalUtil;
     private final FileService fileService;
     private final PostRoleMapper postRoleMapper;
-
+    private final ForumCommentMapper forumCommentMapper;
 
 
     public void registerForum(ForumRegisterDto dto) {
@@ -37,5 +39,17 @@ public class ForumService {
         postRoleMapper.insertPostRole(roleDto);
 
     }
+
+    public Integer registerComment(ForumCommentRegDto dto) {
+
+        Integer userId = principalUtil.getPrincipalUser().getUser().getUserId();
+
+        forumCommentMapper.insert(dto.toEntity(userId));
+
+        return forumCommentMapper.getCountByForumId(dto.getForumId());
+    }
+
+
+
 
 }
