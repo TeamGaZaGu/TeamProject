@@ -94,8 +94,8 @@ function HeaderLayout(props) {
     const handleSearchInputOnClick = async () => {
         try {
             const response = await reqSearch(combinedSearch);
-            console.log(response);
-            navigate("/searchpage", response)
+            console.log(response)
+            navigate("/searchpage", {state: response.data})
         } catch (error) {
             console.error("검색 실패", error);
         }

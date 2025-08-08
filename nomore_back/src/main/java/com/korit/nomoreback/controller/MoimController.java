@@ -6,13 +6,10 @@ import com.korit.nomoreback.dto.moim.MoimListRespDto;
 import com.korit.nomoreback.dto.moim.MoimModifyDto;
 import com.korit.nomoreback.dto.moim.MoimSearchReqDto;
 import com.korit.nomoreback.security.model.PrincipalUtil;
-import com.korit.nomoreback.service.FileService;
 import com.korit.nomoreback.service.MoimService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -24,12 +21,14 @@ public class MoimController {
     private final MoimService moimService;
     private final PrincipalUtil principalUtil;
 
-    @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> create(@ModelAttribute MoimCreateDto dto) {
+    @PostMapping("/register")
+    public ResponseEntity<?> create(@RequestBody MoimCreateDto dto) {
 
-        moimService.createMoim(dto);
+        Integer userId = principalUtil.getPrincipalUser().getUser().getUserId();
 
-        return ResponseEntity.ok("신규 생성 완료");
+        moimService.createMoim(dto, userId);
+
+        return ResponseEntity.ok("신규 생성 완");
     }
 
     @PostMapping("/{moimId}/join")
@@ -51,7 +50,6 @@ public class MoimController {
     public List<Moim> findMoimByCategoryIdInUserId() {
 
         return moimService.findMoimByCategoryIdInUserId();
-
     }
 
     @GetMapping("/find/{categoryId}")

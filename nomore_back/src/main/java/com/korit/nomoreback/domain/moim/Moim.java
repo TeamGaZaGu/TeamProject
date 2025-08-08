@@ -23,7 +23,6 @@ public class Moim {
     private String moimImgPath;
 
 
-
     private Integer districtId;
     private Integer categoryId;
     private Integer userId;

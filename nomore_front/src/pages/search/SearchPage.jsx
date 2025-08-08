@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { use } from 'react';
 import useSearchQuery from '../../queries/useSearchQuery';
+import { useLocation } from 'react-router-dom';
 
 function SearchPage(props) {
-    const searchQuery = useSearchQuery();
-    const searchMoim = searchQuery.data || []
-    console.log(searchMoim)
+
+    const location = useLocation();
+    const searchMoim = location.state;
 
      return (
         <div style={{ padding: 24 }}>
