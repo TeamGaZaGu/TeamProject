@@ -14,9 +14,7 @@ function Mypage(props) {
     const [ categoryList, setCategoryList ] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState('');
     const [isCategoryOpen, setIsCategoryOpen] = useState(false);
-    
-    const selectCategory = categories.map(prev => prev.categoryId === user.categoryId);
-    console.log(selectCategory)
+    const oldCategory = categories.find(prev => prev.categoryId === user.categoryId)
 
     const handleToggleCategoryOnClick = () => {
         setIsCategoryOpen((prev) => !prev);
@@ -34,8 +32,9 @@ function Mypage(props) {
     const mypageInputEmpty = {
         nickName: user.nickName,
         introduction: user.introduction,
-        category: selectCategory.categoryName,
     }
+
+    
 
     const [ mypageModify, setMypageModify ] = useState(mypageInputEmpty);
 
@@ -184,7 +183,7 @@ function Mypage(props) {
                     <label css={s.infoLabel}>관심 카테고리</label>
                     <div css={s.dropdownContainer}>
                         <button css={s.dropdownButton} onClick={handleToggleCategoryOnClick}>
-                            {selectedCategory || mypageModify.category}
+                            {selectedCategory || oldCategory?.categoryName}
                         </button>
                         {isCategoryOpen && (
                             <div css={s.dropdownMenu}>
