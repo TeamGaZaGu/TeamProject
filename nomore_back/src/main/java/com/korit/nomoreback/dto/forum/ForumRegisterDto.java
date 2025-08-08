@@ -1,25 +1,25 @@
-package com.korit.nomoreback.dto.post;
+package com.korit.nomoreback.dto.forum;
 
-import com.korit.nomoreback.domain.post.Post;
+import com.korit.nomoreback.domain.forum.Forum;
 import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 
 @Data
-public class PostRegisterDto {
-    private Integer postId;
-    private String postTitle;
-    private String postContent;
+public class ForumRegisterDto {
+    private Integer forumId;
+    private String forumTitle;
+    private String forumContent;
     private LocalDateTime createdAt;
-    private MultipartFile postImgPath;
+    private MultipartFile forumImgPath;
     private Integer moimId;
     private Integer moimCategoryId;
     private Integer userId;
 
-    public Post toEntity(){
-        return Post.builder()
-                .postTitle(postTitle)
+    public Forum toEntity(){
+        return Forum.builder()
+                .forumTitle(forumTitle)
                 .createdAt(LocalDateTime.now())
                 .moimId(moimId)
                 .moimCategoryId(moimCategoryId)
