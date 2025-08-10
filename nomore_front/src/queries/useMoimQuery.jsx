@@ -7,3 +7,5 @@ function useMoimQuery() {
         queryFn: async () => await reqfindAllMoim(),
     });
 }
+
+export default useMoimQuery;
