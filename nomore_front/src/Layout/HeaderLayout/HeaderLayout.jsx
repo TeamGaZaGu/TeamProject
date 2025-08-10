@@ -1,14 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { IoIosSearch } from "react-icons/io";
 /** @jsxImportSource @emotion/react */
 import * as s from './styles';
 import { reqCategory, reqDistrict, reqSearch } from '../../api/searchApi';
-import { category } from '../LeftSidebarLayout/styles';
 import useCategoryQuery from '../../queries/useCategoryQuery';
 import { useNavigate } from 'react-router-dom';
 
 function HeaderLayout(props) {
-
     const navigate = useNavigate();
 
     const handleLogoOnClick = () => {
@@ -16,17 +14,21 @@ function HeaderLayout(props) {
     }
 
     /** 지역 함수 */
-    const [ districtList, setDistrictList ] = useState([]);
+    const [districtList, setDistrictList] = useState([]);
     const [selectedDistrict, setSelectedDistrict] = useState('');
     const [isDistrictOpen, setIsDistrictOpen] = useState(false);
 
     const handleToggleDistrictOnClick = async () => {
-        setIsDistrictOpen((prev) => !prev);
+        const newDistrictState = !isDistrictOpen;
+        setIsDistrictOpen(newDistrictState);
+        
+        // 다른 드롭다운 닫기
         if (isCategoryOpen) {
             setIsCategoryOpen(false);
         }
 
-        if (districtList.length === 0) {
+        // 드롭다운이 열리고 데이터가 없을 때만 API 호출
+        if (newDistrictState && districtList.length === 0) {
             try {
                 const response = await reqDistrict();
                 setDistrictList(response?.data);
@@ -38,64 +40,69 @@ function HeaderLayout(props) {
     
     const handleDistrictOnChange = (e) => {
         setSelectedDistrict(e.target.value);
-        const findDistrict = districtList.find(prev => prev.districtName === e.target.value)
+        const findDistrict = districtList.find(prev => prev.districtName === e.target.value);
         setCombinedSearch(prev => ({
             ...prev,
             districtId: findDistrict.districtId
-        }))
+        }));
         setIsDistrictOpen(false);
     }
 
     /** 카테고리 함수 */
     const categoryQuery = useCategoryQuery();
-    const [ categoryList, setCategoryList ] = useState([]);
+    const [categoryList, setCategoryList] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState('');
     const [isCategoryOpen, setIsCategoryOpen] = useState(false);
 
-    const handleToggleCategoryOnClick = () => {
-        setIsCategoryOpen((prev) => !prev);
-        if (isCategoryOpen) {
-            setIsCategoryOpen(false);
+    // 카테고리 데이터를 useEffect로 처리
+    useEffect(() => {
+        if (categoryQuery?.data?.data) {
+            setCategoryList(categoryQuery.data.data);
         }
+    }, [categoryQuery?.data]);
 
-        if (categoryList.length === 0) {
-            const response = categoryQuery;
-            setCategoryList(response?.data?.data);
+    const handleToggleCategoryOnClick = () => {
+        const newCategoryState = !isCategoryOpen;
+        setIsCategoryOpen(newCategoryState);
+        
+        // 다른 드롭다운 닫기
+        if (isDistrictOpen) {
+            setIsDistrictOpen(false);
         }
     }
 
     const handleCategoryOnChange = (e) => {
         setSelectedCategory(e.target.value);
-        const findCategory = categoryList.find(prev => prev.categoryName === e.target.value)
+        const findCategory = categoryList.find(prev => prev.categoryName === e.target.value);
         setCombinedSearch(prev => ({
             ...prev,
             categoryId: findCategory.categoryId
-        }))
+        }));
         setIsCategoryOpen(false);
     }
 
-    const [ searchInputValue, setSearchInputValue ] = useState("");
+    const [searchInputValue, setSearchInputValue] = useState("");
     const combinedSearchEmpty = {
         districtId: "",
         categoryId: "",
         keyword: "",
     }
 
-    const [ combinedSearch, setCombinedSearch ] = useState(combinedSearchEmpty);
+    const [combinedSearch, setCombinedSearch] = useState(combinedSearchEmpty);
     
     const handleSearchInputOnChange = (e) => {
         setSearchInputValue(e.target.value);
         setCombinedSearch(prev => ({
             ...prev,
             keyword: e.target.value,
-        }))
+        }));
     }
     
     const handleSearchInputOnClick = async () => {
         try {
             const response = await reqSearch(combinedSearch);
-            console.log(response)
-            navigate("/searchpage", {state: response.data})
+            console.log(response);
+            navigate("/searchpage", {state: response.data});
         } catch (error) {
             console.error("검색 실패", error);
         }
