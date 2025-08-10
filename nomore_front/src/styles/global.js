@@ -11,19 +11,19 @@ export const global = css`
         font-style: normal;
         background-color: #f3f4f5;
     }
-
+    
     html, body, #root {
         margin: 0;
         padding: 0;
         width: 100%;
         height: 100vh;
         overflow: hidden;
-
+        
         &::-webkit-scrollbar {
             width: 0;
         }
     }
-
+    
     #root {
         font-size: 1.4rem;
     }
