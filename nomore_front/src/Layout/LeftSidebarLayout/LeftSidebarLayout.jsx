@@ -28,6 +28,10 @@ function LeftSidebarLayout(props) {
         }
     }
 
+    const handleHometOnClick = () => {
+        navigate("/")
+    }
+
     const handleSuggestOnClick = () => {
         navigate("/suggest/find")
     }
@@ -40,7 +44,7 @@ function LeftSidebarLayout(props) {
                 </div>
             </div>
             <div css={s.sideMenu}>
-                <button><IoHomeSharp />홈</button>
+                <button onClick={handleHometOnClick}><IoHomeSharp />홈</button>
                 <button onClick={handleSuggestOnClick}><HiUsers />추천모임</button>
                 <button><BsCalendar2EventFill />정모일정</button>
             </div>
