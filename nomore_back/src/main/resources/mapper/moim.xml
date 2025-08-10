@@ -71,13 +71,9 @@
             moim_id = #{moimId}
     </select>
 
-    <select id="findAll" resultType="com.korit.nomoreback.domain.moim.Moim">
+    <select id="findAll" resultMap="MoimResultMap">
         select
-            moim_id,
-            moim_title,
-            moim_discription,
-            moim_member_count,
-            moim_img_path
+            *
         from
             moim_tb
     </select>

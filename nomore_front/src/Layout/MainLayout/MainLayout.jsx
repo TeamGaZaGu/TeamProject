@@ -4,14 +4,13 @@ import LeftSidebarLayout from '../LeftSidebarLayout/LeftSidebarLayout';
 import * as s from './styles';
 
 function MainLayout({ children }) {
-
   return (
-    <div>
-      <div>
-          <HeaderLayout />
+    <div css={s.containerStyle}>
+      <div css={s.headerStyle}>
+        <HeaderLayout />
       </div>
       <div css={s.body}>
-        <div>
+        <div css={s.sidebarStyle}>
           <LeftSidebarLayout />
         </div>
         <div css={s.main}>
