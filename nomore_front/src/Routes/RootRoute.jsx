@@ -9,6 +9,7 @@ import Loading from '../Loading/Loading';
 import usePrincipalQuery from '../queries/usePrincipalQuery';
 import SearchPage from '../pages/search/SearchPage';
 import SuggestRoute from './SuggestRoute';
+import CatogoryPage from '../pages/CategoryPage/CatogoryPage';
 
 function RootRoute(props) {
 
@@ -26,6 +27,7 @@ function RootRoute(props) {
                 <Route path='/oauth2/login' element={<Oauth2Redirect />} />
                 <Route path='/auth/signup' element={ <Signup /> } />
                 <Route path='/mypage' element={ <Mypage /> } />
+                <Route path='/category/*' element={ <CatogoryPage /> } />
                 <Route path='/' element={ <Home />} />
                 <Route path='*' element={ <NotFound /> } /> 
             </Routes>
