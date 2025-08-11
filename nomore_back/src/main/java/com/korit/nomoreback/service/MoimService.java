@@ -59,11 +59,10 @@ public class MoimService {
         moimRoleMapper.insertMoimRole(roleDto);
 
         moimMapper.increaseMoimCount(moimId);
-
     }
 
-    public void findMoim (Integer moimId) {
-        moimMapper.findByMoimId(moimId);
+    public Moim findMoim (Integer moimId) {
+        return moimMapper.findByMoimId(moimId);
     }
 
 
