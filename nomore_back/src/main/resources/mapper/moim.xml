@@ -11,6 +11,9 @@
         <result property="memberCount" column="moim_member_count" />
         <result property="maxMember" column="moim_max_member" />
         <result property="moimImgPath" column="moim_img_path" />
+        <result property="categoryId" column="category_id" />
+        <result property="districtId" column="mt_district_id" />
+        <result property="districtName" column="district_name" />
     </resultMap>
 
     <insert id="createMoim" useGeneratedKeys="true" keyProperty="moimId">
@@ -73,9 +76,21 @@
 
     <select id="findAll" resultMap="MoimResultMap">
         select
-            *
+            mt.moim_id,
+            mt.moim_title,
+            mt.moim_discription,
+            mt.moim_member_count,
+            mt.moim_max_member,
+            mt.district_id as mt_district_id,
+            mt.category_id,
+            mt.user_id,
+            mt.moim_img_path,
+
+            dt.district_id,
+            dt.district_name
         from
-            moim_tb
+            moim_tb mt
+            join district_tb dt on(dt.district_id = mt.district_id)
     </select>
 
     <select id="findMoimByUserId" resultMap="MoimResultMap">

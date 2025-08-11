@@ -22,8 +22,9 @@ public class Moim {
     private Integer maxMember;
     private String moimImgPath;
 
-
     private Integer districtId;
+    private String districtName;
+
     private Integer categoryId;
     private Integer userId;
 }
