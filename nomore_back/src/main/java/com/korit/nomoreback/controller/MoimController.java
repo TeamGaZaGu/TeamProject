@@ -24,13 +24,9 @@ public class MoimController {
 
     @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> create(@ModelAttribute MoimCreateDto dto) {
-
         Integer userId = principalUtil.getPrincipalUser().getUser().getUserId();
-
         dto.setUserId(userId);
-
         moimService.createMoim(dto);
-
         return ResponseEntity.ok("신규 생성 완료");
     }
 

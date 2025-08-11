@@ -32,6 +32,7 @@ public class MoimService {
         MoimRoleDto roleDto = new MoimRoleDto();
         roleDto.setMoimRole("OWNER");
         roleDto.setMoimId(moimEntity.getMoimId());
+        roleDto.setUserId(moimEntity.getUserId());
         moimRoleMapper.insertMoimRole(roleDto);
     }
 
