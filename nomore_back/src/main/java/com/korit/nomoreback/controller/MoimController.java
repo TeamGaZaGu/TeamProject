@@ -46,10 +46,7 @@ public class MoimController {
 
     @GetMapping("/{moimId}/select")
     public ResponseEntity<?> selectMoim(@PathVariable Integer moimId) {
-
-        moimService.findMoim(moimId);
-
-        return ResponseEntity.ok("찾았다");
+        return ResponseEntity.ok(moimService.findMoim(moimId));
     }
 
 

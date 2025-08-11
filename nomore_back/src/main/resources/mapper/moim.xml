@@ -58,13 +58,17 @@
     </delete>
 
 
-    <select id="findByMoimId" resultType="com.korit.nomoreback.domain.moim.Moim">
+    <select id="findByMoimId" resultMap="MoimResultMap">
         SELECT
             moim_id,
             moim_title,
             moim_discription,
             moim_member_count,
-            moim_img_path
+            moim_max_member,
+            moim_img_path,
+            district_id,
+            category_id,
+            user_id
         FROM
             moim_tb
         WHERE
