@@ -4,6 +4,8 @@ import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { reqJoinMoim, reqSelectMoim } from '../../../api/moimApi';
 import useCategoryQuery from '../../../queries/useCategoryQuery.jsx';
+import { IoChatbubbleEllipsesOutline, IoClipboard } from 'react-icons/io5';
+import { RiHome7Fill } from 'react-icons/ri';
 
 function DescriptionSuggestPage(props) {
     const [ searchParam ] = useSearchParams();
@@ -11,9 +13,10 @@ function DescriptionSuggestPage(props) {
 
     const [ moim, setMoim ] = useState("");
     const categoryQuery = useCategoryQuery();
-    const categories = categoryQuery?.data?.data || []
-
+    const categories = categoryQuery?.data?.data || [];
     const getCategory = categories.find(category => category.categoryId === moim.categoryId)
+    
+    console.log(moim)
 
     useEffect(() => {
         const fetchMoim = async () => {
@@ -38,9 +41,9 @@ function DescriptionSuggestPage(props) {
     return (
         <div css={s.container}>
             <div css={s.header}>
-                <button css={s.homeButton}>Home</button>
-                    <button css={s.headerButton}>게시판</button>
-                    <button css={s.headerButton}>💬</button>
+                <button css={s.homeButton}><RiHome7Fill />Home</button>
+                    <button css={s.headerButton}><IoClipboard />게시판</button>
+                    <button css={s.headerButton}><IoChatbubbleEllipsesOutline />채팅</button>
             </div>
 
             <div css={s.mainContent}>
@@ -49,7 +52,7 @@ function DescriptionSuggestPage(props) {
                     <div css={s.moimTextInfo}>
                     <h1 css={s.moimTitle}>{moim.title}</h1>
                     <div css={s.moimMeta}>
-                        <span>{getCategory.categoryEmoji}{getCategory.categoryName}</span> · <span>{moim.districtId}</span> · <span>{moim.memberCount}/{moim.maxMember}</span>
+                        <span>{getCategory?.categoryEmoji}{getCategory?.categoryName}</span> · <span>{moim.districtName}</span> · <span>{moim.memberCount}/{moim.maxMember}</span>
                     </div>
                 </div>
             </div>
@@ -61,7 +64,6 @@ function DescriptionSuggestPage(props) {
                     </div>
                 </div>
 
-                {/* 모임 멤버 섹션 */}
                 <div css={s.section}>
                     <h2 css={s.sectionTitle}>모임 멤버</h2>
                     <div css={s.memberSection}>
@@ -76,7 +78,6 @@ function DescriptionSuggestPage(props) {
                 </div>
             </div>
 
-            {/* 하단 가입 버튼 */}
             <div css={s.bottomActions}>
                 <button css={s.joinButton} onClick={handleJoinMoimOnClick}>
                     모임 가입하기
