@@ -18,22 +18,16 @@ function LeftSidebarLayout(props) {
     const categoryQuery = useCategoryQuery();
     const categories = categoryQuery.data?.data || [];
     
-    const handleCategoryOnChange = async (e) => {
-        const findCategory = categories.find(prev => prev.categoryName === e.target.value);
-        try {
-            const response = await reqSearch(findCategory.categoryId);
-            console.log("카테고리 모임 불러오기 성공", response);
-        } catch (error) {
-            console.error("카테고리 모임 불러오기 실패", error);
-        }
-    }
-
     const handleHometOnClick = () => {
         navigate("/")
     }
 
     const handleSuggestOnClick = () => {
         navigate("/suggest/find")
+    }
+
+    const handleCategoryOnClick = (categoryId) => {
+        navigate(`/category/?categoryId=${categoryId}`);
     }
 
     return (
@@ -50,14 +44,13 @@ function LeftSidebarLayout(props) {
             </div>
             <div css={s.category}>
                 <h3>카테고리</h3>
-                {categories.map((category, index) => (
-                <div key={index}>
+                {categories.map((category) => (
+                <div key={category.categoryId} onClick={() => handleCategoryOnClick(category.categoryId)}>
                     <label>
                         <input
                             type="radio"
                             name="category"
                             value={category.categoryName}
-                            onChange={handleCategoryOnChange}
                         />
                         <span>{category.categoryEmoji} {category.categoryName}</span>
                     </label>
