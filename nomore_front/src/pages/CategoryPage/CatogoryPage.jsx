@@ -19,7 +19,11 @@ function CatogoryPage(props) {
     const moimList = moimQuery?.data?.data;
     
     // find → filter로 변경하고 타입 비교 주의
-    const categoryMoim = moimList?.filter(moim => moim.categoryId === categoryId);
+    let categoryMoim = moimList?.filter(moim => moim.categoryId === categoryId);
+
+    if (categoryId === 1) {
+        categoryMoim = moimList;
+    }
     
     console.log('categoryId from URL:', categoryId);
     console.log('filtered moims:', categoryMoim);
