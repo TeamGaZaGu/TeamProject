@@ -50,6 +50,7 @@ public class SecurityConfig {
             auth.requestMatchers("/image/**").permitAll();
             auth.requestMatchers("/api/search/**").permitAll();
             auth.requestMatchers("/").permitAll();
+            auth.requestMatchers("/category/**").permitAll();
             auth.anyRequest().authenticated();
         });
 

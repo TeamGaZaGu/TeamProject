@@ -1,6 +1,6 @@
 import api from "./axios";
 
-export const reqfindAllMoim = async () => await pi.get("/api/moim/find")
+export const reqfindAllMoim = async () => await api.get("/api/moim/find")
 
 export const reqCreateSuggestMoim = async (data) => await api.post("/api/moim/register", data)
 

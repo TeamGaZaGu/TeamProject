@@ -16,6 +16,8 @@ function Home(props) {
     const moimQuery = useMoimQuery();
     const moimList = moimQuery?.data?.data;
 
+    console.log(moimQuery);
+
     const handleMoimOnClick = (moimId) => {
         navigate(`/suggest/description?moimId=${moimId}`);
     }
@@ -23,7 +25,11 @@ function Home(props) {
     return (
             <div css={s.containerStyle}>
                 {categoryList?.map((category) => {
-                    const filteredMoims = moimList?.filter(moim => moim.categoryId === category.categoryId) || [];
+                    let filteredMoims = moimList?.filter(moim => moim.categoryId === category.categoryId) || [];
+                    
+                    if (category.categoryId === 1) {
+                        filteredMoims = moimList;
+                    }
 
                     return (
                         <div key={category.categoryId} css={s.categoryContainerStyle}>
@@ -31,7 +37,7 @@ function Home(props) {
                                 {category.categoryEmoji} {category.categoryName}
                             </div>
                             <div>
-                                {filteredMoims.length === 0 ? (
+                                {filteredMoims?.length === 0 ? (
                                     <div css={s.noMoimStyle}>
                                         <div className="icon">📭</div>
                                         <h3>해당 카테고리에 맞는 모임이 없습니다.</h3>
@@ -39,7 +45,7 @@ function Home(props) {
                                     </div>
                                 ) : (
                                     <ul css={s.gridContainerStyle}>
-                                        {filteredMoims.map((moim) => {
+                                        {filteredMoims?.map((moim) => {
                                             // 필드명 수정
                                             const isAvailable = moim.memberCount < moim.maxMember;
                                             const hasImage = moim.moimImgPath && moim.moimImgPath !== '';
