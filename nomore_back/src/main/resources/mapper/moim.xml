@@ -12,7 +12,7 @@
         <result property="maxMember" column="moim_max_member" />
         <result property="moimImgPath" column="moim_img_path" />
         <result property="categoryId" column="category_id" />
-        <result property="districtId" column="mt_district_id" />
+        <result property="districtId" column="district_id" />
         <result property="districtName" column="district_name" />
     </resultMap>
 

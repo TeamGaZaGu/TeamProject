@@ -2,20 +2,18 @@
 import * as s from './styles.js';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import useCategoryQuery from '../../../queries/useCategoryQuery';
+import useCategoryQuery from '../../../queries/useCategoryQuery.jsx';
 import { reqfindSuggestMoim } from '../../../api/moimApi.js';
 import usePrincipalQuery from '../../../queries/usePrincipalQuery.jsx';
 import { FcGoogle } from 'react-icons/fc';
 import { SiKakaotalk } from 'react-icons/si';
 
-function FindSuggestPage(props) {
+function CheckSuggestMoim(props) {
     const principalQuery = usePrincipalQuery();
     const navigate = useNavigate();
     const [moimList, setMoimList] = useState([]);
     const categoryQuery = useCategoryQuery();
     const categories = categoryQuery?.data?.data || []
-
-    
 
     useEffect(() => {
         const fetchData = async () => {
@@ -87,4 +85,4 @@ function FindSuggestPage(props) {
     );
 }
 
-export default FindSuggestPage;
+export default CheckSuggestMoim;

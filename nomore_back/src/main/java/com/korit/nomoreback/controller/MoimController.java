@@ -62,7 +62,8 @@ public class MoimController {
     }
 
     @PatchMapping("/{moimId}")
-    public ResponseEntity<?> updateMoim(@PathVariable Integer moimId, @RequestBody MoimModifyDto dto) {
+    public ResponseEntity<?> updateMoim(@PathVariable Integer moimId, @ModelAttribute MoimModifyDto dto) {
+        System.out.println(dto);
         dto.setMoimId(moimId);
         moimService.modifyMoim(dto);
         return ResponseEntity.ok("수정 완");

@@ -1,13 +1,16 @@
 /** @jsxImportSource @emotion/react */
 import * as s from './styles.js';
 import React, { useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { reqJoinMoim, reqSelectMoim } from '../../../api/moimApi';
 import useCategoryQuery from '../../../queries/useCategoryQuery.jsx';
 import { IoChatbubbleEllipsesOutline, IoClipboard } from 'react-icons/io5';
 import { RiHome7Fill } from 'react-icons/ri';
+import { FaPen, FaTrashAlt } from 'react-icons/fa';
 
 function DescriptionSuggestPage(props) {
+    const navigate = useNavigate();
+    
     const [ searchParam ] = useSearchParams();
     const moimId = searchParam.get("moimId")
 
@@ -15,8 +18,6 @@ function DescriptionSuggestPage(props) {
     const categoryQuery = useCategoryQuery();
     const categories = categoryQuery?.data?.data || [];
     const getCategory = categories.find(category => category.categoryId === moim.categoryId)
-    
-    console.log(moim)
 
     useEffect(() => {
         const fetchMoim = async () => {
@@ -38,12 +39,23 @@ function DescriptionSuggestPage(props) {
         reqJoinMoim(moimId)
     }
 
+    const handleModifyOnClick = () => {
+        navigate(`/suggest/modify?moimId=${moimId}`)
+    }
+    
+
     return (
         <div css={s.container}>
             <div css={s.header}>
-                <button css={s.homeButton}><RiHome7Fill />Home</button>
-                    <button css={s.headerButton}><IoClipboard />게시판</button>
-                    <button css={s.headerButton}><IoChatbubbleEllipsesOutline />채팅</button>
+                <div>
+                    <button css={s.unClick}><RiHome7Fill />Home</button>
+                    <button css={s.unClick}><IoClipboard />게시판</button>
+                    <button css={s.unClick}><IoChatbubbleEllipsesOutline />채팅</button>
+                </div>
+                <div>
+                    <button css={s.Transaction} onClick={handleModifyOnClick}><FaPen />수정</button>
+                    <button css={s.Transaction}><FaTrashAlt />삭제</button>
+                </div>
             </div>
 
             <div css={s.mainContent}>

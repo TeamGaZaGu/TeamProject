@@ -9,3 +9,5 @@ export const reqfindSuggestMoim = async () => await api.get("/api/moim/find/cate
 export const reqSelectMoim = async (moimId) => await api.get(`/api/moim/${moimId}/select`)
 
 export const reqJoinMoim = async (moimId) => await api.post(`/api/moim/${moimId}/join`)
+
+export const reqModifyMoim = async (data, moimId) => await api.patch(`/api/moim/${moimId}`, data)

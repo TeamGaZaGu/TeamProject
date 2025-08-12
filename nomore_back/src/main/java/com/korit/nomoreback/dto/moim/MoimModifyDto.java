@@ -10,6 +10,8 @@ public class MoimModifyDto {
     private String title;
     private String discription;
     private Integer maxMember;
+    private Integer districtId;
+    private Integer categoryId;
     private String moimImgPath;
 
     public Moim modify(Moim modifyMoim) {
