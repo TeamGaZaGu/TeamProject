@@ -7,6 +7,7 @@ export const container = css`
 
 export const header = css`
     display: flex;
+    justify-content: space-between;
     align-items: center;
     padding: 12px 16px;
     background-color: #ffffff;
@@ -16,7 +17,7 @@ export const header = css`
     z-index: 100;
 `;
 
-export const homeButton = css`
+export const click = css`
     background: none;
     border: none;
     font-size: 24px;
@@ -35,11 +36,26 @@ export const headerActions = css`
     gap: 8px;
 `;
 
-export const headerButton = css`
+export const unClick = css`
     background: none;
     border: none;
     font-size: 20px;
     cursor: pointer;
+    padding: 8px;
+    color: #666;
+    border-radius: 50%;
+    
+    &:hover {
+        background-color: #f1f3f4;
+    }
+`;
+
+export const Transaction = css`
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    margin-left: 3rem;
     padding: 8px;
     color: #666;
     border-radius: 50%;
