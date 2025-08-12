@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 
@@ -17,6 +18,7 @@ public class Forum {
     private String forumContent;
     private String forumImgPath;
     private LocalDateTime createdAt;
+    private Integer forumCategoryId;
 
     private Integer moimId;
     private Integer moimCategoryId;

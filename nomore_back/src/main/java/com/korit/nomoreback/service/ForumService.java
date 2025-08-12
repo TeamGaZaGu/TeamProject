@@ -3,6 +3,7 @@ package com.korit.nomoreback.service;
 import com.korit.nomoreback.domain.forum.Forum;
 import com.korit.nomoreback.domain.forum.ForumCommentMapper;
 import com.korit.nomoreback.domain.forum.ForumMapper;
+import com.korit.nomoreback.domain.forum.ForumRoleMapper;
 import com.korit.nomoreback.domain.postRole.PostRoleMapper;
 import com.korit.nomoreback.dto.forum.ForumCommentRegDto;
 import com.korit.nomoreback.dto.forum.ForumRegisterDto;
@@ -20,6 +21,7 @@ public class ForumService {
     private final FileService fileService;
     private final PostRoleMapper postRoleMapper;
     private final ForumCommentMapper forumCommentMapper;
+    private final ForumRoleMapper forumRoleMapper;
 
 
     public void registerForum(ForumRegisterDto dto) {
@@ -31,12 +33,14 @@ public class ForumService {
         forum.setForumImgPath(postImgPath);
 
         postMapper.registerForum(forum);
+        Integer userId = dto.getUserId();
 
         ForumRoleDto roleDto = new ForumRoleDto();
-
         roleDto.setForumRoleName("OWNER");
-        roleDto.setPostId(dto.getForumId());
-        postRoleMapper.insertPostRole(roleDto);
+        roleDto.setForumId(forum.getForumId());  // 새로 생성된 forumId 사용
+        roleDto.setUserId(userId);                // 역할 부여 대상 유저 ID 필수
+
+        forumRoleMapper.insertForumRole(roleDto);
 
     }
 

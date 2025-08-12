@@ -14,16 +14,18 @@ public class ForumRegisterDto {
     private LocalDateTime createdAt;
     private MultipartFile forumImgPath;
     private Integer moimId;
-    private Integer moimCategoryId;
     private Integer userId;
+    private Integer forumCategoryId;
 
     public Forum toEntity(){
         return Forum.builder()
                 .forumTitle(forumTitle)
+                .forumContent(forumContent)
                 .createdAt(LocalDateTime.now())
                 .moimId(moimId)
-                .moimCategoryId(moimCategoryId)
                 .userId(userId)
+                .forumImgPath(String.valueOf(forumImgPath))
+                .forumCategoryId(forumCategoryId)
                 .build();
     }
 }

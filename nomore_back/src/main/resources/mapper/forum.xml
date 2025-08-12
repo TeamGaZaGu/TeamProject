@@ -5,21 +5,23 @@
 
 <mapper namespace="com.korit.nomoreback.domain.forum.ForumMapper">
 
-    <insert id="registerForum" useGeneratedKeys="true" keyProperty="postId">
+    <insert id="registerForum" useGeneratedKeys="true" keyProperty="forumId">
         insert into forum_tb (
-            post_title,
-            post_content,
-            post_created_at,
+            forum_title,
+            forum_content,
+            forum_created_at,
             moim_id,
-            post_category_id,
-            user_id
+            user_id,
+            forum_img_path,
+            forum_category_id
         ) values (
-            #{postTitle},
-            #{postContent},
+            #{forumTitle},
+            #{forumContent},
             #{createdAt},
             #{moimId},
-            #{postCategoryId},
-            #{userId}
+            #{userId},
+            #{forumImgPath},
+            #{forumCategoryId}
         )
     </insert>
 
