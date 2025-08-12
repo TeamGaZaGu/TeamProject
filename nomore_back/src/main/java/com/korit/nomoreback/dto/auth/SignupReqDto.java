@@ -32,6 +32,7 @@ public class SignupReqDto {
                 .categoryId(categoryId)
                 .provider(provider)
                 .providerId(providerId)
+                .userRole("ROLE_USER")
                 .build();
     }
 }

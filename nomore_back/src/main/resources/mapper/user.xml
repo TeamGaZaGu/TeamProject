@@ -17,13 +17,15 @@
         <result property="categoryId" column="category_id" />
         <result property="provider" column="provider" />
         <result property="providerId" column="provider_id" />
+        <result property="userRole" column="user_role" />
     </resultMap>
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="userId">
         insert into user_tb
         values (default, #{nickName}, #{fullName}, #{birthDate},
-        #{email}, #{profileImgPath}, #{introduction}, #{gender}, #{categoryId}, #{provider},#{providerId})
+        #{email}, #{profileImgPath}, #{introduction}, #{gender}, #{categoryId}, #{provider},#{providerId}, #{userRole})
     </insert>
+
     <update id="updateProfile">
         UPDATE user_tb
         SET
@@ -55,7 +57,8 @@
             ut.gender,
             ut.category_id,
             ut.provider,
-            ut.provider_id
+            ut.provider_id,
+            ut.user_role
         from
             user_tb ut
         where
@@ -74,6 +77,13 @@
         select profile_img_path
         from user_tb
         where user_id = #{userId}
+    </select>
+
+    <select id="allUser" resultMap="UserMap">
+        select
+            *
+        from
+            user_tb
     </select>
 
 </mapper>

@@ -22,4 +22,5 @@ public class User {
     private Integer categoryId;
     private String provider;
     private String providerId;
+    private String userRole;
 }
