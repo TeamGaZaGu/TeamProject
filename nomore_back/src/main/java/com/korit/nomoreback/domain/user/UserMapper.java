@@ -3,8 +3,12 @@ package com.korit.nomoreback.domain.user;
 import com.korit.nomoreback.dto.user.UserProfileUpdateReqDto;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
+
 @Mapper
 public interface UserMapper {
+
+    List<User> allUser();
 
     User findByProviderId(String providerId);
     User findByNicName(String nickName);

@@ -1,0 +1,1 @@
+export const reqAllUser = async () => await api.get("/api/user/admin");

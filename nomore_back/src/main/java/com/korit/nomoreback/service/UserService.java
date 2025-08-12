@@ -1,5 +1,6 @@
 package com.korit.nomoreback.service;
 
+import com.korit.nomoreback.domain.user.User;
 import com.korit.nomoreback.domain.user.UserMapper;
 import com.korit.nomoreback.dto.user.UserProfileUpdateReqDto;
 import lombok.RequiredArgsConstructor;
@@ -7,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -14,6 +16,10 @@ import java.util.UUID;
 public class UserService {
 
     private final UserMapper userMapper;
+
+    public List<User> allUser() {
+        return userMapper.allUser();
+    }
 
     public void updateProfile(Integer userId, UserProfileUpdateReqDto reqDto, MultipartFile profileImg) {
         String profileImgPath = null;
