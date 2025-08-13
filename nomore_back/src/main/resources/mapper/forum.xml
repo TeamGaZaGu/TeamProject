@@ -37,7 +37,7 @@
         <result property="path" column="path"/>
     </resultMap>
 
-    <insert id="registerForum" useGeneratedKeys="true" keyProperty="forumId">
+    <insert id="registerForum" useGeneratedKeys="true" keyProperty="forumId" keyColumn="forum_id">
         INSERT INTO forum_tb (
             forum_title,
             forum_content,

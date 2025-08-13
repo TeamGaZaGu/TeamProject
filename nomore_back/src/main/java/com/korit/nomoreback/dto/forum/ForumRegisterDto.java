@@ -16,6 +16,8 @@ public class ForumRegisterDto {
     private String forumTitle;
     private String forumContent;
     private LocalDateTime createdAt;
+
+
     private List<MultipartFile> forumImages;  // 여러장 이미지 업로드용
 
     private Integer moimId;  // id만 받는 경우도 가능
