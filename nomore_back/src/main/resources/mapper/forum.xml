@@ -4,25 +4,96 @@
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.korit.nomoreback.domain.forum.ForumMapper">
+    <resultMap id="forumMap" type="com.korit.nomoreback.domain.forum.Forum">
+        <id property="forumId" column="forum_id"/>
+        <result property="forumTitle" column="forum_title"/>
+        <result property="forumContent" column="forum_content"/>
+        <result property="createdAt" column="created_at"/>
+        <association property="moim" resultMap="moimMap"/>
+        <association property="forumCategory" resultMap="forumCategoryMap"/>
+        <association property="user" resultMap="userMap"/>
+        <collection property="forumImgList" resultMap="forumImgMap"/>
+    </resultMap>
+
+    <resultMap id="moimMap" type="com.korit.nomoreback.domain.moim.Moim">
+        <id property="moimId" column="moim_id"/>
+    </resultMap>
+
+    <resultMap id="forumCategoryMap" type="com.korit.nomoreback.domain.forum.ForumCategory">
+        <id property="forumCategoryId" column="forum_category_id"/>
+        <result property="forumCategoryName" column="forum_category_name"/>
+    </resultMap>
+
+    <resultMap id="userMap" type="com.korit.nomoreback.domain.user.User">
+        <id property="userId" column="user_id"/>
+        <result property="username" column="username"/>
+        <result property="profileImgPath" column="profile_img_path"/>
+    </resultMap>
+
+    <resultMap id="forumImgMap" type="com.korit.nomoreback.domain.forum.ForumImg">
+        <id property="forumImgId" column="forum_img_id"/>
+        <result property="forumId" column="forum_id"/>
+        <result property="seq" column="seq"/>
+        <result property="path" column="path"/>
+    </resultMap>
 
     <insert id="registerForum" useGeneratedKeys="true" keyProperty="forumId">
-        insert into forum_tb (
+        INSERT INTO forum_tb (
             forum_title,
             forum_content,
             forum_created_at,
             moim_id,
             user_id,
-            forum_img_path,
             forum_category_id
-        ) values (
+        ) VALUES (
             #{forumTitle},
             #{forumContent},
             #{createdAt},
-            #{moimId},
-            #{userId},
-            #{forumImgPath},
-            #{forumCategoryId}
+            #{moim.moimId},
+            #{user.userId},
+            #{forumCategory.forumCategoryId}
         )
     </insert>
+
+    <select id="findByForumId" resultMap="forumMap" parameterType="map">
+        select
+            f.forum_id,
+            f.forum_title,
+            f.forum_content,
+            f.forum_created_at,
+            f.moim_id,
+            f.forum_category_id,
+
+            u.user_id,
+            u.username,
+            u.profile_img_path,
+
+            fi.forum_img_id,
+            fi.seq,
+            fi.path,
+
+            fc.forum_category_id,
+            fc.category_name,
+
+            ifnull(flc.like_count, 0) as like_count,
+            ifnull(flt.id, 0) as is_like
+
+        from forum_tb f
+            join user_tb u on u.user_id = f.user_id
+            left join forum_img_tb fi on fi.forum_id = f.forum_id
+            join forum_category_tb fc on fc.forum_category_id = f.forum_category_id
+
+        left join (
+            select forum_id, count(*) as like_count
+            from forum_like_tb
+            group by forum_id
+            ) flc on flc.forum_id = f.forum_id
+
+        left join forum_like_tb flt on flt.forum_id = f.forum_id and flt.user_id = #{userId}
+
+        where f.forum_id = #{forumId}
+    </select>
+
+
 
 </mapper>

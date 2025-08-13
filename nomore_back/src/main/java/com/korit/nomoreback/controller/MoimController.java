@@ -61,15 +61,16 @@ public class MoimController {
         return moimService.findMoimByCategoryId(categoryId);
     }
 
-    @PatchMapping("/{moimId}")
+    @PatchMapping(value = "/{moimId}/modify", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> updateMoim(@PathVariable Integer moimId, @ModelAttribute MoimModifyDto dto) {
         System.out.println(dto);
         dto.setMoimId(moimId);
         moimService.modifyMoim(dto);
+        System.out.println(dto);
         return ResponseEntity.ok("수정 완");
     }
 
-    @DeleteMapping("/{moimId}")
+    @DeleteMapping("/{moimId}/delete")
     public ResponseEntity<?> remove(@PathVariable Integer moimId) {
         Integer userId = principalUtil.getPrincipalUser().getUser().getUserId();
 

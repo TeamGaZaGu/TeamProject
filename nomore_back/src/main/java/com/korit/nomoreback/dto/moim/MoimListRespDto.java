@@ -1,6 +1,7 @@
 package com.korit.nomoreback.dto.moim;
 
 import lombok.Data;
+import org.springframework.web.multipart.MultipartFile;
 
 @Data
 public class MoimListRespDto {
@@ -15,5 +16,5 @@ public class MoimListRespDto {
     private String categoryName;
     private Integer userId;
     private String nickName;
-    private String moimImagePath;
+    private MultipartFile moimImagePath;
 }

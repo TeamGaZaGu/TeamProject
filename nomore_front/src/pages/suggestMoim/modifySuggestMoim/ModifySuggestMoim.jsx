@@ -12,15 +12,16 @@ function ModifySuggestMoim(props) {
     const moimId = searchParam.get("moimId");
     const [ moim, setMoim ] = useState("");
     
-    const [ inputValue, setInputValue ] = useState({
-        title: "",
-        discription: "",
-        maxMembers: "",
-        districtId: "",
-        districtName: "",
-        categoryId: "",
-        moimImgPath: "",
-    })
+    const [inputValue, setInputValue] = useState({
+    title: "",
+    discription: "",
+    maxMembers: "",
+    districtId: "",
+    districtName: "",
+    categoryId: "",
+    moimImgPath: "",
+    moimImgFile: null,  // 추가
+});
 
     const categoryQuery = useCategoryQuery();
     const categories = categoryQuery?.data?.data || [];
@@ -62,7 +63,8 @@ function ModifySuggestMoim(props) {
                 setSelectedCategory(getCategory.categoryName);
                 setSelectedDistrict(moimData.districtName);
                 setSelectedMaxMembers(moimData.maxMember);
-                setPreviewImg(`http://localhost:8080/image${moimData.moimImgPath}`);
+                setPreviewImg(`http://localhost:8080/image/${moimData.moimImgPath}`);
+;
             } catch (err) {
                 console.error(err);
             }
@@ -161,34 +163,30 @@ function ModifySuggestMoim(props) {
     }
 
     const handleCreateSuggestMoimOnClick = async () => {
-        const { title, maxMembers, districtId, categoryId } = inputValue;
+    const { title, maxMember, districtId, categoryId, discription, moimImgFile } = inputValue;
 
-        const formData = new FormData();
-        
+    const formData = new FormData();
+
         formData.append("title", title);
-        formData.append("discription", inputValue.discription);
-        formData.append("maxMember", Number(maxMembers));
-        formData.append("districtId", Number(districtId));
-        formData.append("categoryId", Number(categoryId));
+        formData.append("discription", discription);
+        formData.append("maxMember", maxMember ? Number(maxMember) : 0);  // NaN 방지
+        formData.append("districtId", districtId ? Number(districtId) : 0);
+        formData.append("categoryId", categoryId ? Number(categoryId) : 0);
 
-        if (inputValue.moimImgFile) {
-            formData.append("moimImg", inputValue.moimImgFile);
-        }
+    if (moimImgFile) {
+        formData.append("moimImgPath", moimImgFile);
+    }
 
-        for (let pair of formData.entries()) {
-            console.log(pair[0], pair[1]);
-        }
+    try {
+        await reqModifyMoim(formData, moimId);
+        alert("모임 수정 성공!");
+        navigate(`/suggest/description?moimId=${moimId}`);
+    } catch (error) {
+        console.error("모임 수정 실패:", error);
+        alert("모임 수정 실패");
+    }
+};
 
-        try {
-            console.log(formData)
-            await reqModifyMoim(formData, moimId);
-            alert("모임 수정 성공!")
-            navigate(`/suggest/description?moimId=${moimId}`)
-        } catch (error) {
-            console.error("모임 수정 실패:", error);
-            alert("모임 수정 실패")
-        }
-    };
 
     if (categoryQuery.isFetched && categoryQuery.isSuccess) {
         return (

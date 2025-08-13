@@ -9,9 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ForumImg {
-    private Integer forumImgId;
-    private Integer forumId;
-    private Integer seq;
-    private String path;
+public class ForumCategory {
+    private Integer forumCategoryId;
+    private String forumCategoryName;
 }

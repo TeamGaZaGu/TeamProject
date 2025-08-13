@@ -50,11 +50,12 @@ public class JwtUtil {
     public Claims getClaims(String token) {
         try {
             return Jwts.parser().setSigningKey(KEY).build()
-                    .parseClaimsJws(token).getPayload();
+                    .parseClaimsJws(token).getBody();
         } catch (JwtException jwtException) {
             return null;
         }
     }
+
 
 }
 
