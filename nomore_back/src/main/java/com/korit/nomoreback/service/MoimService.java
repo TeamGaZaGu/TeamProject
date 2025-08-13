@@ -7,6 +7,7 @@ import com.korit.nomoreback.dto.moim.*;
 import com.korit.nomoreback.security.model.PrincipalUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -70,9 +71,22 @@ public class MoimService {
 
 
     public void modifyMoim(MoimModifyDto modifyDto) {
+
         Moim originMoim = moimMapper.findByMoimId(modifyDto.getMoimId());
+        final String UPLOAD_PATH = "/moim";
+
+        MultipartFile newImgFile = modifyDto.getMoimImgPath();
+        if (newImgFile != null && !newImgFile.isEmpty()) {
+            if (originMoim.getMoimImgPath() != null) {
+                fileService.deleteFile(originMoim.getMoimImgPath());
+            }
+            String savedFileName = UPLOAD_PATH + "/" + fileService.uploadFile(modifyDto.getMoimImgPath(), UPLOAD_PATH);
+            originMoim.setMoimImgPath(savedFileName); // 저장된 파일명만 넣기
+        }
+
         Moim moim = modifyDto.modify(originMoim);
         moimMapper.updateMoim(moim);
+
     }
 
     public void deleteMoimById(Integer moimId, Integer userId) {

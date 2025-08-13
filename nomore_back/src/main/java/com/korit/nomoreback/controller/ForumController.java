@@ -1,5 +1,6 @@
 package com.korit.nomoreback.controller;
 
+import com.korit.nomoreback.domain.forum.Forum;
 import com.korit.nomoreback.dto.forum.ForumCommentRegDto;
 import com.korit.nomoreback.dto.forum.ForumRegisterDto;
 import com.korit.nomoreback.security.model.PrincipalUtil;
@@ -27,8 +28,6 @@ public class ForumController {
         return ResponseEntity.ok("게시글작성");
     }
 
-
-
     @PostMapping(value = "/forum/{forumId}/comment", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> registerComment(@PathVariable Integer moimId,
                                              @PathVariable Integer forumId,
@@ -37,6 +36,25 @@ public class ForumController {
         dto.setForumId(forumId);
         forumService.registerComment(dto);
         return ResponseEntity.ok("댓글달기");
+    }
+
+    @GetMapping("/{forumId}  ")
+    public ResponseEntity<?> getForum(@PathVariable Integer moimId, @PathVariable Integer forumId) {
+        Forum forum = forumService.getForumById(forumId);
+        return ResponseEntity.ok(forum);
+    }
+
+    @PostMapping("/{forumId}/like")
+    public ResponseEntity<?> like(@PathVariable Integer moimId,
+                                  @PathVariable Integer forumId) {
+        forumService.like(forumId);
+        return ResponseEntity.ok("좋아요");
+    }
+    @DeleteMapping("/{forumId}/dislike")
+    public ResponseEntity<?> dislike(@PathVariable Integer moimId,
+                                     @PathVariable Integer forumId) {
+        forumService.dislike(forumId);
+        return ResponseEntity.ok("좋아요 삭제 요청 완료");
     }
 
 }

@@ -5,5 +5,21 @@
 
 <mapper namespace="com.korit.nomoreback.domain.forum.ForumLikeMapper">
 
+    <insert id="insertLike">
+        insert into forum_like_tb (id, forum_id, user_id)
+        values (default, #{forumId}, #{userId})
+    </insert>
+
+    <delete id="deleteLike">
+        delete from forum_like_tb
+        where forum_id = #{forumId}
+        and user_id = #{userId}
+    </delete>
+
+    <select id="getLikeCount" resultType="java.lang.Integer">
+        select count(*)
+        from forum_like_tb
+        where forum_id = #{forumId}
+    </select>
 
 </mapper>
