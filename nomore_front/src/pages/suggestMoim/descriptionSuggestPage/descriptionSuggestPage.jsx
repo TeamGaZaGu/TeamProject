@@ -2,14 +2,16 @@
 import * as s from './styles.js';
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { reqJoinMoim, reqSelectMoim } from '../../../api/moimApi';
+import { reqDeleteMoim, reqJoinMoim, reqSelectMoim } from '../../../api/moimApi';
 import useCategoryQuery from '../../../queries/useCategoryQuery.jsx';
 import { IoChatbubbleEllipsesOutline, IoClipboard } from 'react-icons/io5';
 import { RiHome7Fill } from 'react-icons/ri';
 import { FaPen, FaTrashAlt } from 'react-icons/fa';
+import { QueryClient, useQueryClient } from '@tanstack/react-query';
 
 function DescriptionSuggestPage(props) {
     const navigate = useNavigate();
+    const queryClient = useQueryClient();
     
     const [ searchParam ] = useSearchParams();
     const moimId = searchParam.get("moimId")
@@ -42,6 +44,13 @@ function DescriptionSuggestPage(props) {
     const handleModifyOnClick = () => {
         navigate(`/suggest/modify?moimId=${moimId}`)
     }
+
+    const handleDeleteOnClick = async () => {
+        await reqDeleteMoim(moimId)
+        queryClient.invalidateQueries(["moimpage"])
+        alert("모임 삭제 성공")
+        await navigate("/")
+    }
     
 
     return (
@@ -54,7 +63,7 @@ function DescriptionSuggestPage(props) {
                 </div>
                 <div>
                     <button css={s.Transaction} onClick={handleModifyOnClick}><FaPen />수정</button>
-                    <button css={s.Transaction}><FaTrashAlt />삭제</button>
+                    <button css={s.Transaction} onClick={handleDeleteOnClick}><FaTrashAlt />삭제</button>
                 </div>
             </div>
 

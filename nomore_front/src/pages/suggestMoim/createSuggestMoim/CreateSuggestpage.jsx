@@ -6,9 +6,11 @@ import useCategoryQuery from '../../../queries/useCategoryQuery';
 import usePrincipalQuery from '../../../queries/usePrincipalQuery';
 import * as s from './styles';
 import React, { useEffect, useRef, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 
 function CreateSuggestpage(props) {
     const navigate = useNavigate();
+    const queryClient = useQueryClient();
     const principalQuery = usePrincipalQuery();
     const userId = principalQuery.data.data.user.userId
     const [ inputValue, setInputValue ] = useState({
@@ -152,10 +154,11 @@ function CreateSuggestpage(props) {
         try {
             await reqCreateSuggestMoim(formData);
             alert("모임 생성 성공!")
+            queryClient.invalidateQueries(["moimpage"])
             navigate("/")
         } catch (error) {
-            console.error("모임 생성 실패:", error);
             alert("모임 생성 실패")
+            throw (error)
         }
     };
 

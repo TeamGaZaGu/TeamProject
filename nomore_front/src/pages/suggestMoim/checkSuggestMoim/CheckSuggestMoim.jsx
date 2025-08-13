@@ -40,9 +40,9 @@ function CheckSuggestMoim(props) {
     if(principalQuery.isFetched && principalQuery.isSuccess) {
         return (
             <div>
-                <div css={s.layout} onClick={handleCreateMoimOnClick}>
+                <div css={s.layout}>
                     <h2>추천모임</h2>
-                    <button>모임 만들기</button>
+                    <button onClick={handleCreateMoimOnClick}>모임 만들기</button>
                 </div>
                <div css={s.moimContainer}>
                 {
