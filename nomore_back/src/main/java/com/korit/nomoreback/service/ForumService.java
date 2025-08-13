@@ -8,6 +8,7 @@ import com.korit.nomoreback.dto.forum.ForumRoleDto;
 import com.korit.nomoreback.security.model.PrincipalUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
@@ -27,11 +28,12 @@ public class ForumService {
     private final ForumImgMapper forumImgMapper;
 
 
+    @Transactional
     public void registerForum(ForumRegisterDto dto) {
 
         Forum forum = dto.toEntity();
-
         forumMapper.registerForum(forum);
+        System.out.println("새로 생성된 forumId = " + forum.getForumId());
 
         final String UPLOAD_PATH = "/forum";
         List<MultipartFile> imageFiles = dto.getForumImages();  // DTO에서 여러 MultipartFile 받는 필드로 변경 필요
@@ -51,6 +53,7 @@ public class ForumService {
 
                 forumImgs.add(forumImg);
             }
+            System.out.println("이미지 저장 리스트: " + forumImgs);
 
             forumImgMapper.insertMany(forumImgs);
         }

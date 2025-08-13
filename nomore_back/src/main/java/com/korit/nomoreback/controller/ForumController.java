@@ -24,6 +24,8 @@ public class ForumController {
         Integer userId = principalUtil.getPrincipalUser().getUser().getUserId();
         dto.setMoimId(moimId);
         dto.setUserId(userId);
+        System.out.println("이미지 저장 리스트: " + dto);
+
         forumService.registerForum(dto);
         return ResponseEntity.ok("게시글작성");
     }
@@ -38,11 +40,13 @@ public class ForumController {
         return ResponseEntity.ok("댓글달기");
     }
 
-    @GetMapping("/{forumId}  ")
+    @GetMapping("/{forumId}")
     public ResponseEntity<?> getForum(@PathVariable Integer moimId, @PathVariable Integer forumId) {
         Forum forum = forumService.getForumById(forumId);
         return ResponseEntity.ok(forum);
     }
+
+
 
     @PostMapping("/{forumId}/like")
     public ResponseEntity<?> like(@PathVariable Integer moimId,

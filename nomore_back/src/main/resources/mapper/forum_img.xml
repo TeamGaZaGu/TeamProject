@@ -5,16 +5,16 @@
 
 <mapper namespace="com.korit.nomoreback.domain.forum.ForumImgMapper">
 
-    <insert id="insert">
-        insert into forum_img_tb ( seq, feed_id, path )
-        values (#{seq}, #{feedId}, #{path})
+    <insert id="insertImg">
+        insert into forum_img_tb ( forum_id, seq,  path )
+        values ( #{forumId}, #{seq},  #{path})
     </insert>
 
     <insert id="insertMany">
-        insert into forum_img_tb( seq, feed_id, path )
+        insert into forum_img_tb( forum_id, seq,  path )
         values
-        <foreach item="feedImg" collection="feedImgs" separator=",">
-            (#{feedImg.seq}, #{feedImg.feedId}, #{feedImg.path})
+        <foreach item="forumImg" collection="list" separator=",">
+            (#{forumImg.forumId}, #{forumImg.seq},  #{forumImg.path})
         </foreach>
     </insert>
 
