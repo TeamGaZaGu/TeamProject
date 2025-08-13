@@ -12,7 +12,7 @@ import java.util.List;
 
 @Data
 public class ForumRegisterDto {
-    private Integer forumId;
+
     private String forumTitle;
     private String forumContent;
     private LocalDateTime createdAt;
