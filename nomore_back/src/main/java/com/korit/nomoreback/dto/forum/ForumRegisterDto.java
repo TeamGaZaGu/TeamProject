@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 @Data
 public class ForumRegisterDto {
-    private Integer forumId;
+
     private String forumTitle;
     private String forumContent;
     private LocalDateTime createdAt;

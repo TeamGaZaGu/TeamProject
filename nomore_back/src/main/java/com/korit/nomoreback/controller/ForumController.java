@@ -20,6 +20,7 @@ public class ForumController {
     @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> registerForum(@PathVariable Integer moimId ,
                                         @ModelAttribute ForumRegisterDto dto) {
+        System.out.println(dto);
         Integer userId = principalUtil.getPrincipalUser().getUser().getUserId();
         dto.setMoimId(moimId);
         dto.setUserId(userId);

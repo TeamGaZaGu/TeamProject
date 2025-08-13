@@ -11,6 +11,7 @@ import SearchPage from '../pages/search/SearchPage';
 import SuggestRoute from './SuggestRoute';
 import CatogoryPage from '../pages/CategoryPage/CatogoryPage';
 import UserManagement from '../pages/UserManagement/UserManagement';
+import ForumRoute from './ForumRoute';
 
 function RootRoute(props) {
 
@@ -24,6 +25,7 @@ function RootRoute(props) {
         <MainLayout>
             <Routes>
                 <Route path='/suggest/*' element={ <SuggestRoute /> } />
+                <Route path='/forum/*' element={ <ForumRoute /> } />
                 <Route path='/searchpage' element={ <SearchPage /> } />
                 <Route path='/oauth2/login' element={<Oauth2Redirect />} />
                 <Route path='/auth/signup' element={ <Signup /> } />
