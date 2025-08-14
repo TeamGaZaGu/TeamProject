@@ -1,5 +1,6 @@
 package com.korit.nomoreback.domain.moim;
 
+import com.korit.nomoreback.domain.user.User;
 import com.korit.nomoreback.dto.moim.MoimListRespDto;
 import com.korit.nomoreback.dto.moim.MoimModifyDto;
 import com.korit.nomoreback.dto.moim.MoimSearchReqDto;
@@ -22,4 +23,5 @@ public interface MoimMapper {
 
     List<MoimListRespDto> searchMoim(MoimSearchReqDto searchReqDto);
 
+    List<User> moimUserList(Integer moimId);
 }

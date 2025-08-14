@@ -33,6 +33,7 @@ function UserManagement(props) {
         
         if (!isConfirmed) {
             return;
+            
         }
 
         if (isBlocked) {
