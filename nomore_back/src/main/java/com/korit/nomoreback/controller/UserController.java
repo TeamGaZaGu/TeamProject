@@ -19,11 +19,24 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
+    private final UserMapper userMapper;
 
     @GetMapping("/admin")
     public ResponseEntity<List<User>> allUser() {
         System.out.println(userService.allUser());
         return ResponseEntity.ok(userService.allUser());
+    }
+
+    @PutMapping("/siteBlockUser")
+    public ResponseEntity<?> blockUser(@RequestParam Integer userId) {
+        userService.blockUser(userId);
+        return ResponseEntity.ok("회원 사이트 차단 완료");
+    }
+
+    @PutMapping("/siteUnBlockUser")
+    public ResponseEntity<?> unBlockUser(@RequestParam Integer userId) {
+        userService.unBlockUser(userId);
+        return ResponseEntity.ok("회원 사이트 차단해제 완료");
     }
 
     @PutMapping("/profile")
@@ -36,4 +49,6 @@ public class UserController {
         System.out.println(userProfileUpdateReqDto);
         return ResponseEntity.ok().build();
     }
+
+
 }

@@ -12,13 +12,22 @@ import SuggestRoute from './SuggestRoute';
 import CatogoryPage from '../pages/CategoryPage/CatogoryPage';
 import UserManagement from '../pages/UserManagement/UserManagement';
 import ForumRoute from './ForumRoute';
+import BenUserPage from '../pages/BenUserPage/BenUserPage';
 
 function RootRoute(props) {
-
     const principalQuery = usePrincipalQuery();
+    const userRole = principalQuery?.data?.data?.user?.userRole;
    
     if (!principalQuery.isFetched) {
         return <Loading />
+    }
+
+    if (userRole === 'ROLE_BEN') {
+        return (
+            <MainLayout>
+                <BenUserPage />
+            </MainLayout>
+        );
     }
 
     return (
@@ -33,7 +42,7 @@ function RootRoute(props) {
                 <Route path='/category/*' element={ <CatogoryPage /> } />
                 <Route path='/userManagement' element={ <UserManagement /> } />
                 <Route path='/' element={ <Home />} />
-                <Route path='*' element={ <NotFound /> } /> 
+                <Route path='*' element={ <NotFound /> } />
             </Routes>
         </MainLayout>
     );

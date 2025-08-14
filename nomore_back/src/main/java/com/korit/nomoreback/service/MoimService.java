@@ -3,6 +3,7 @@ package com.korit.nomoreback.service;
 import com.korit.nomoreback.domain.moim.Moim;
 import com.korit.nomoreback.domain.moim.MoimMapper;
 import com.korit.nomoreback.domain.moimRole.MoimRoleMapper;
+import com.korit.nomoreback.domain.user.User;
 import com.korit.nomoreback.dto.moim.*;
 import com.korit.nomoreback.security.model.PrincipalUtil;
 import lombok.RequiredArgsConstructor;
@@ -128,5 +129,9 @@ public class MoimService {
     public List<MoimListRespDto> searchMoim(MoimSearchReqDto searchReqDto) {
         System.out.println(moimMapper.searchMoim(searchReqDto));
         return moimMapper.searchMoim(searchReqDto);
+    }
+
+    public List<User> moimUserList(Integer moimId) {
+        return moimMapper.moimUserList(moimId);
     }
 }

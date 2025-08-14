@@ -8,7 +8,10 @@ import java.util.List;
 @Mapper
 public interface ForumMapper {
     int registerForum(Forum forum);
-    Forum findByForumId(@Param("forumId")Integer forumId, @Param("userId")Integer userId );
+    Forum findByForumIdAndUserId(@Param("forumId")Integer forumId, @Param("userId")Integer userId );
+    Forum findByForumId(@Param("forumId") Integer forumId);
+    int modifyForum(Forum forum);
+    int deleteForum(@Param("forumId") Integer forumId);
 
 
     List<ForumCategory> getFourumCategories();

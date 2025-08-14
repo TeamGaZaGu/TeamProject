@@ -20,6 +20,7 @@ public class Forum {
     private String forumTitle;
     private String forumContent;
     private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
 
     private Moim moim;
