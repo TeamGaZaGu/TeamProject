@@ -3,6 +3,8 @@ package com.korit.nomoreback.domain.forum;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 @Mapper
 public interface ForumMapper {
     int registerForum(Forum forum);
@@ -11,4 +13,6 @@ public interface ForumMapper {
     int modifyForum(Forum forum);
     int deleteForum(@Param("forumId") Integer forumId);
 
+
+    List<ForumCategory> getFourumCategories();
 }

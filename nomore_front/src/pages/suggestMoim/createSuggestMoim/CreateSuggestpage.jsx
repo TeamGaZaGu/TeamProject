@@ -50,16 +50,19 @@ function CreateSuggestpage(props) {
         }
         const file = files[0];
         const reader = new FileReader();
+        console.log("reader",reader)
 
-        reader.onloadend = () => {
-            setPreviewImg(reader.result);
+        reader.onload = () => {  // FileReader 의 콜백함수 파일 읽기 완료 후 이 함수가 실행됨
+            setPreviewImg(reader.result); // 미리보기 이미지 상태 설정
         };
-        reader.readAsDataURL(file);
+        reader.readAsDataURL(file); // 이미지 파일을 읽어서 Data URL로 변환
         setInputValue(prev => ({
             ...prev,
             moimImgFile: file,
         }));
     };
+
+    console.log(inputValue)
 
     const handleToggleDistrictOnClick = async () => {
         setIsDistrictOpen((prev) => !prev);

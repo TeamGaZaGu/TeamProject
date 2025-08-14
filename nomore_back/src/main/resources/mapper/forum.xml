@@ -112,9 +112,15 @@
 
         where f.forum_id = #{forumId}
     </select>
+  
+    <select id="getFourumCategories" resultMap="forumCategoryMap">
+        select
+            *
+        from
+            forum_category_tb
+    </select>
 
     <select id="findByForumId" resultMap="forumMap">
-
         select
             forum_id,
             forum_title,
@@ -128,8 +134,5 @@
             forum_tb
         where
             forum_id = #{forumId}
-
     </select>
-
-
 </mapper>

@@ -20,7 +20,6 @@ public class ForumController {
     @PostMapping(value = "/{moimId}/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> registerForum(@PathVariable Integer moimId ,
                                         @ModelAttribute ForumRegisterDto dto) {
-        System.out.println(dto);
         Integer userId = principalUtil.getPrincipalUser().getUser().getUserId();
         dto.setMoimId(moimId);
         dto.setUserId(userId);
@@ -70,7 +69,12 @@ public class ForumController {
         forumService.modifyComment(modifyDto,forumId);
         return ResponseEntity.ok("댓글 수정 완료");
     }
-
+  
+    @GetMapping("/forumCategories")
+    public ResponseEntity<?> getFourumCategories() {
+        return ResponseEntity.ok(forumService.getFourumCategories());
+    }
+  
     @DeleteMapping("/{moimId}/{forumId}/comment/delete/{forumCommentId}")
     public ResponseEntity<?> deleteComment(@PathVariable Integer moimId,
                                            @PathVariable Integer forumId,
@@ -85,6 +89,7 @@ public class ForumController {
         forumService.like(forumId);
         return ResponseEntity.ok("좋아요");
     }
+  
     @DeleteMapping("/{moimId}/{forumId}/dislike")
     public ResponseEntity<?> dislike(@PathVariable Integer moimId,
                                      @PathVariable Integer forumId) {

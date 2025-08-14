@@ -53,7 +53,6 @@ public class ForumService {
 
             forumImgMapper.insertMany(forumImgs);
         }
-
     }
 
     public Forum getForumById(Integer forumId) {
@@ -82,7 +81,6 @@ public class ForumService {
         }
 
         throw new IllegalArgumentException("권한 없음");
-
     }
 
     public void deleteForum(Integer forumId,Integer moimId) {
@@ -104,6 +102,10 @@ public class ForumService {
         }
 
         throw new IllegalArgumentException("권한 없음");
+    }
+
+    public List<ForumCategory> getFourumCategories() {
+        return forumMapper.getFourumCategories();
     }
 
     public Integer registerComment(ForumCommentRegDto dto) {
