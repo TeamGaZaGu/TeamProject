@@ -1,6 +1,7 @@
     package com.korit.nomoreback.controller;
 
     import com.korit.nomoreback.domain.moim.Moim;
+    import com.korit.nomoreback.domain.user.User;
     import com.korit.nomoreback.dto.moim.MoimCreateDto;
     import com.korit.nomoreback.dto.moim.MoimListRespDto;
     import com.korit.nomoreback.dto.moim.MoimModifyDto;
@@ -93,5 +94,11 @@
             List<MoimListRespDto> moimList = moimService.searchMoim(searchReqDto);
             System.out.println("검색 파라미터: " + searchReqDto);
             return ResponseEntity.ok(moimList);
+        }
+
+        @GetMapping("/userList")
+        public ResponseEntity<List<User>> moimUserList(@RequestParam Integer moimId) {
+            System.out.println(moimService.moimUserList(moimId));
+            return ResponseEntity.ok(moimService.moimUserList(moimId));
         }
     }

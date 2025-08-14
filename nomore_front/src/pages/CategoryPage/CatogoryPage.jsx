@@ -43,7 +43,6 @@ function CatogoryPage(props) {
             ) : (
                 <ul css={s.gridContainerStyle}>
                     {categoryMoim.map((moim) => {
-                        // 필드명 수정
                         const isAvailable = moim.memberCount < moim.maxMember;
                         const hasImage = moim.moimImgPath && moim.moimImgPath !== '';
                         const imageUrl = hasImage ? `${baseURL}/image${moim.moimImgPath}` : null;

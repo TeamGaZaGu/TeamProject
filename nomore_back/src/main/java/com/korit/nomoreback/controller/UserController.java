@@ -27,16 +27,16 @@ public class UserController {
         return ResponseEntity.ok(userService.allUser());
     }
 
-    @PutMapping("/blockUser")
+    @PutMapping("/siteBlockUser")
     public ResponseEntity<?> blockUser(@RequestParam Integer userId) {
         userService.blockUser(userId);
-        return ResponseEntity.ok("회원 차단 완료");
+        return ResponseEntity.ok("회원 사이트 차단 완료");
     }
 
-    @PutMapping("/unBlockUser")
+    @PutMapping("/siteUnBlockUser")
     public ResponseEntity<?> unBlockUser(@RequestParam Integer userId) {
         userService.unBlockUser(userId);
-        return ResponseEntity.ok("회원 차단 완료");
+        return ResponseEntity.ok("회원 사이트 차단해제 완료");
     }
 
     @PutMapping("/profile")
@@ -49,5 +49,6 @@ public class UserController {
         System.out.println(userProfileUpdateReqDto);
         return ResponseEntity.ok().build();
     }
+
 
 }

@@ -200,15 +200,21 @@ export const memberCard = css`
     padding: 8px 0;
 `;
 
-export const memberAvatar = css`
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    background-color: #f8f9fa;
+export const profileImage = css`
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #e5e7eb;
+`;
+
+export const defaultAvatar = css`
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 20px;
+    color: white;
+    font-size: 1.5rem;
+    font-weight: bold;
 `;
 
 export const memberInfo = css`
@@ -262,4 +268,123 @@ export const joinButton = css`
     &:active {
         transform: translateY(1px);
     }
+`;
+
+export const modalOverlay = css`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+`;
+
+export const modalContent = css`
+  background: white;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 400px;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+`;
+
+export const modalHeader = css`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid #e5e7eb;
+  
+  h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #111827;
+  }
+`;
+
+export const closeButton = css`
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: #6b7280;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  &:hover {
+    color: #374151;
+  }
+`;
+
+export const modalBody = css`
+  padding: 20px;
+`;
+
+export const userProfile = css`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+`;
+
+export const modalProfileImage = css`
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 16px;
+  border: 3px solid #f3f4f6;
+`;
+
+export const userDetails = css`
+  width: 100%;
+`;
+
+export const userNameRow = css`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  
+  h4 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+    color: #111827;
+  }
+`;
+
+export const roleTag = css`
+  background-color: #f3f4f6;
+  color: #374151;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+`;
+
+export const userCategory = css`
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 8px;
+  text-align: center;
+`;
+
+
+export const userIntroduction = css`
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  padding: 12px;
+  background-color: #f9fafb;
+  border-radius: 8px;
 `;
