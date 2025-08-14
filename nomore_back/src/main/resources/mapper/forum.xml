@@ -93,7 +93,12 @@
 
         where f.forum_id = #{forumId}
     </select>
-
+    <select id="getFourumCategories" resultMap="forumCategoryMap">
+        select
+            *
+        from
+            forum_category_tb
+    </select>
 
 
 </mapper>

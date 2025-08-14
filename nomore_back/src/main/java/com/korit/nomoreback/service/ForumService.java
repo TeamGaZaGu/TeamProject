@@ -57,21 +57,15 @@ public class ForumService {
 
             forumImgMapper.insertMany(forumImgs);
         }
-
-        // 3) 역할 등록
-        Integer userId = dto.getUserId();
-
-        ForumRoleDto roleDto = new ForumRoleDto();
-        roleDto.setForumRoleName("OWNER");
-        roleDto.setForumId(forum.getForumId());
-        roleDto.setUserId(userId);
-
-        forumRoleMapper.insertForumRole(roleDto);
     }
 
     public Forum getForumById(Integer forumId) {
         Integer userId = principalUtil.getPrincipalUser().getUser().getUserId();
         return forumMapper.findByForumId(forumId, userId);
+    }
+
+    public List<ForumCategory> getFourumCategories() {
+        return forumMapper.getFourumCategories();
     }
 
     public Integer registerComment(ForumCommentRegDto dto) {

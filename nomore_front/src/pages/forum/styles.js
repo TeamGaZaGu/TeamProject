@@ -145,36 +145,7 @@ export const contentTextarea = css`
 export const imgbox = css`
   margin-bottom: 24px;
 
-  .image-counter {
-    font-size: 14px;
-    font-weight: 500;
-    color: #374151;
-    margin-bottom: 8px;
-  }
-
-  .image-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    align-items: flex-start;
-  }
-
-  .upload-button {
-    width: 100px;
-    height: 100px;
-    border: 2px dashed #d1d5db;
-    border-radius: 8px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    color: #6b7280;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    background: none;
-    font-size: 12px;
-
-    &:hover:not(:disabled) {
+  &:hover:not(:disabled) {
       color: #374151;
       border-color: #9ca3af;
     }
@@ -187,55 +158,80 @@ export const imgbox = css`
     span {
       margin-top: 4px;
     }
+`;
+
+export const imgCounter = css`
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 8px;
+`;
+
+export const imgContainer = css`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: flex-start;
+`;
+
+export const uploadButton = css`
+  width: 100px;
+  height: 100px;
+  border: 2px dashed #d1d5db;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: none;
+  font-size: 12px;
+`;
+
+export const previewImg = css`
+  position: relative;
+
+  &:hover > button {
+    opacity: 1;
   }
 
-  .image-preview {
-    position: relative;
+  & > img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+  }
 
-    &:hover .delete-button {
-      opacity: 1;
+  & > button {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    width: 24px;
+    height: 24px;
+    background-color: #ef4444;
+    color: white;
+    border-radius: 50%;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+
+    &:hover {
+      background-color: #dc2626;
     }
-
-    img {
-      width: 100px;
-      height: 100px;
-      object-fit: cover;
-      border-radius: 8px;
-      border: 1px solid #d1d5db;
-    }
-
-    .delete-button {
-      position: absolute;
-      top: -8px;
-      right: -8px;
-      width: 24px;
-      height: 24px;
-      background-color: #ef4444;
-      color: white;
-      border-radius: 50%;
-      border: none;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      opacity: 0;
-      transition: opacity 0.2s ease;
-
-      &:hover {
-        background-color: #dc2626;
-      }
-    }
   }
+`;
 
-  .error-message {
-    font-size: 14px;
-    color: #ef4444;
-    margin-top: 8px;
-  }
-
-  .hidden-input {
-    display: none;
-  }
+export const errorMessage = css`
+  font-size: 14px;
+  color: #ef4444;
+  margin-top: 8px;
 `;
 
 export const submitContainer = css`

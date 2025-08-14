@@ -21,7 +21,6 @@ public class ForumController {
     @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> registerForum(@PathVariable Integer moimId ,
                                         @ModelAttribute ForumRegisterDto dto) {
-        System.out.println(dto);
         Integer userId = principalUtil.getPrincipalUser().getUser().getUserId();
         dto.setMoimId(moimId);
         dto.setUserId(userId);
@@ -47,7 +46,10 @@ public class ForumController {
         return ResponseEntity.ok(forum);
     }
 
-
+    @GetMapping("/forumCategories")
+    public ResponseEntity<?> getFourumCategories() {
+        return ResponseEntity.ok(forumService.getFourumCategories());
+    }
 
     @PostMapping("/{forumId}/like")
     public ResponseEntity<?> like(@PathVariable Integer moimId,
