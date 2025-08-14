@@ -45,11 +45,11 @@ public class SecurityConfig {
         http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         http.authorizeHttpRequests(auth -> {
+            auth.requestMatchers("/").permitAll();
             auth.requestMatchers("/oauth2/**").permitAll();
             auth.requestMatchers("/api/auth/**").permitAll();
             auth.requestMatchers("/image/**").permitAll();
             auth.requestMatchers("/api/search/**").permitAll();
-            auth.requestMatchers("/").permitAll();
             auth.requestMatchers("/category/**").permitAll();
             auth.anyRequest().authenticated();
         });

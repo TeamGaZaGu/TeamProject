@@ -12,6 +12,7 @@ import usePrincipalQuery from '../../queries/usePrincipalQuery';
 import { reqSearch } from '../../api/searchApi';
 import { useNavigate } from 'react-router-dom';
 import { FaUserSlash } from 'react-icons/fa';
+import { reqAllUser } from '../../api/userApi';
 
 function LeftSidebarLayout(props) {
     const navigate = useNavigate();
@@ -32,8 +33,9 @@ function LeftSidebarLayout(props) {
         navigate(`/category/?categoryId=${categoryId}`);
     }
 
-    const handleUseManagementOnClick = () => {
-        navigate(`/userManagement`);
+    const handleUseManagementOnClick =  async () => {
+        const response =  await reqAllUser();
+        navigate(`/userManagement`, {state: response?.data});
     }
 
     return (
@@ -48,7 +50,7 @@ function LeftSidebarLayout(props) {
                 <button onClick={handleSuggestOnClick}><HiUsers />추천모임</button>
                 <button><BsCalendar2EventFill />정모일정</button>
                 {
-                    userRole === "USER_ADMIN" && (
+                    userRole === "ROLE_ADMIN" && (
                         <button onClick={handleUseManagementOnClick}><FaUserSlash />유저관리</button>
                     )
                 }
