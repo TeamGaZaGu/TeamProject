@@ -36,4 +36,5 @@ public class UserController {
         System.out.println(userProfileUpdateReqDto);
         return ResponseEntity.ok().build();
     }
+
 }
