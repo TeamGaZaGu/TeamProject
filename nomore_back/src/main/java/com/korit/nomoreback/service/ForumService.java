@@ -2,10 +2,7 @@ package com.korit.nomoreback.service;
 
 import com.korit.nomoreback.domain.forum.*;
 import com.korit.nomoreback.domain.moimRole.MoimRoleMapper;
-import com.korit.nomoreback.dto.forum.ForumCommentRegDto;
-import com.korit.nomoreback.dto.forum.ForumImgModifyDto;
-import com.korit.nomoreback.dto.forum.ForumModifyDto;
-import com.korit.nomoreback.dto.forum.ForumRegisterDto;
+import com.korit.nomoreback.dto.forum.*;
 import com.korit.nomoreback.security.model.PrincipalUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -117,6 +114,31 @@ public class ForumService {
 
         return forumCommentMapper.getCountByForumId(dto.getForumId());
     }
+
+    public void modifyComment (ForumCommentModifyDto modifyDto,Integer forumId) {
+        List<ForumComment> forumCommentList = forumCommentMapper.findAllByForumId(forumId);
+        Integer userId = principalUtil.getPrincipalUser().getUser().getUserId();
+        forumCommentList
+                .stream().filter(comment -> comment.getUserId().equals(userId))
+                .forEach(forumComment -> forumCommentMapper.modifyComment(modifyDto.toEntity(forumComment)));
+    }
+
+    public void deleteComment(Integer forumCommentId, Integer forumId) {
+        Integer userId = principalUtil.getPrincipalUser().getUser().getUserId();
+
+        ForumComment comment = forumCommentMapper.findByCommentId(forumCommentId);
+
+        if (comment == null || !comment.getForumId().equals(forumId)) {
+            throw new IllegalArgumentException("댓글이 존재하지 않거나 게시판이 다릅니다.");
+        }
+
+        if (!comment.getUserId().equals(userId)) {
+            throw new IllegalArgumentException("권한 없음");
+        }
+
+        forumCommentMapper.deleteComment(userId,forumCommentId);
+    }
+
 
     public void like(Integer forumId) {
         Integer userId = principalUtil.getPrincipalUser().getUser().getUserId();

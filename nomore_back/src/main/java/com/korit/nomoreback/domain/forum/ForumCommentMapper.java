@@ -1,6 +1,7 @@
 package com.korit.nomoreback.domain.forum;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -10,6 +11,9 @@ public interface ForumCommentMapper {
     int insert(ForumComment forumComment);
     List<ForumComment> findAllByForumId(Integer forumId);
     int getCountByForumId(Integer forumId);
+    int modifyComment(ForumComment forumComment);
+    int deleteComment(@Param("userId")Integer userId, @Param("forumCommentId") Integer forumCommentId);
+    ForumComment findByCommentId(@Param("forumCommentId") Integer forumCommentId);
 
 
 }
