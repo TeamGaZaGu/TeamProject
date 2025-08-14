@@ -10,6 +10,8 @@ import { FaPen, FaTrashAlt } from 'react-icons/fa';
 import { QueryClient, useQueryClient } from '@tanstack/react-query';
 import { baseURL } from '../../../api/axios.js';
 import { reqUserBlock } from '../../../api/userApi.js';
+import usePrincipalQuery from '../../../queries/usePrincipalQuery.jsx';
+import useUserBlockListQuery from '../../../queries/useUserBlockListQuery.jsx';
 
 function DescriptionSuggestPage(props) {
     const navigate = useNavigate();
@@ -29,6 +31,9 @@ function DescriptionSuggestPage(props) {
     const categoryQuery = useCategoryQuery();
     const categories = categoryQuery?.data?.data || [];
     const getCategory = categories.find(category => category.categoryId === moim.categoryId)
+
+    const principalQuery = usePrincipalQuery();
+    const userBlockListQuery = useUserBlockListQuery();
 
     useEffect(() => {
         const fetchMoim = async () => {
@@ -101,7 +106,6 @@ function DescriptionSuggestPage(props) {
         
         if (!isConfirmed) {
             return;
-            
         }
 
         try {

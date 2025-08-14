@@ -39,7 +39,6 @@ function UserManagement(props) {
         if (isBlocked) {
             try {
                 await reqUnBlockUser(userId);
-                // 차단해제 후 해당 사용자의 역할을 ROLE_USER로 업데이트
                 setAllUser(prevUsers => 
                     prevUsers.map(user => 
                         user.userId === userId 
@@ -53,7 +52,6 @@ function UserManagement(props) {
         } else {
             try {
                 await reqBlockUser(userId);
-                // 차단 후 해당 사용자의 역할을 ROLE_BEN으로 업데이트
                 setAllUser(prevUsers => 
                     prevUsers.map(user => 
                         user.userId === userId 
