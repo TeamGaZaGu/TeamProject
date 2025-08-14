@@ -19,11 +19,24 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
+    private final UserMapper userMapper;
 
     @GetMapping("/admin")
     public ResponseEntity<List<User>> allUser() {
         System.out.println(userService.allUser());
         return ResponseEntity.ok(userService.allUser());
+    }
+
+    @PutMapping("/blockUser")
+    public ResponseEntity<?> blockUser(@RequestParam Integer userId) {
+        userService.blockUser(userId);
+        return ResponseEntity.ok("회원 차단 완료");
+    }
+
+    @PutMapping("/unBlockUser")
+    public ResponseEntity<?> unBlockUser(@RequestParam Integer userId) {
+        userService.unBlockUser(userId);
+        return ResponseEntity.ok("회원 차단 완료");
     }
 
     @PutMapping("/profile")

@@ -10,6 +10,10 @@ public interface UserMapper {
 
     List<User> allUser();
 
+    void blockUser(Integer userId, String userRole);
+
+    void unBlockUser(Integer userId, String userRole);
+
     User findByProviderId(String providerId);
     User findByNicName(String nickName);
 

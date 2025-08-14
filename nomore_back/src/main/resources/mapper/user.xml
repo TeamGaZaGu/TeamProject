@@ -36,6 +36,23 @@
         WHERE user_id = #{userId}
     </update>
 
+    <update id="blockUser">
+        update user_tb
+        set
+            user_role = #{userRole}
+        where
+            user_id = #{userId}
+    </update>
+
+    <update id="unBlockUser">
+        update user_tb
+        set
+            user_role = #{userRole}
+        where
+            user_id = #{userId}
+    </update>
+
+
     <select id="findByProviderId" resultType="com.korit.nomoreback.domain.user.User">
         select
             *

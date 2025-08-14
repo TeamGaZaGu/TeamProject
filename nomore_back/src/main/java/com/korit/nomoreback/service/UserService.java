@@ -21,6 +21,16 @@ public class UserService {
         return userMapper.allUser();
     }
 
+    public void blockUser(Integer userId) {
+        String userRole = "ROLE_BEN";
+        userMapper.blockUser(userId, userRole);
+    }
+
+    public void unBlockUser(Integer userId) {
+        String userRole = "ROLE_USER";
+        userMapper.unBlockUser(userId, userRole);
+    }
+
     public void updateProfile(Integer userId, UserProfileUpdateReqDto reqDto, MultipartFile profileImg) {
         String profileImgPath = null;
 
