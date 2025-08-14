@@ -18,4 +18,37 @@
         </foreach>
     </insert>
 
+    <update id="modifyImg">
+        <foreach collection="imgList" item="img" separator=";">
+            update
+            forum_img_tb
+            <set>
+                <if test="img.seq != null">seq = #{img.seq},</if>
+                <if test="img.path != null">path = #{img.path}</if>
+            </set>
+            where
+            forum_img_id = #{img.forumImgId}
+        </foreach>
+    </update>
+
+    <delete id="deleteImg">
+        delete from forum_img_tb
+        where forum_img_id in
+        <foreach collection="imgIdList" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="findImgById" resultType="com.korit.nomoreback.domain.forum.ForumImg">
+        select
+            forum_img_id,
+            forum_id,
+            seq,
+            path
+        from
+            forum_img_tb
+        where
+            forum_id = #{forumId}
+    </select>
+
 </mapper>
