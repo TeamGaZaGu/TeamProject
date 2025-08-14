@@ -9,6 +9,7 @@
         <result property="forumTitle" column="forum_title"/>
         <result property="forumContent" column="forum_content"/>
         <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
         <association property="moim" resultMap="moimMap"/>
         <association property="forumCategory" resultMap="forumCategoryMap"/>
         <association property="user" resultMap="userMap"/>
@@ -26,7 +27,7 @@
 
     <resultMap id="userMap" type="com.korit.nomoreback.domain.user.User">
         <id property="userId" column="user_id"/>
-        <result property="username" column="username"/>
+        <result property="nickName" column="username"/>
         <result property="profileImgPath" column="profile_img_path"/>
     </resultMap>
 
@@ -55,7 +56,25 @@
         )
     </insert>
 
-    <select id="findByForumId" resultMap="forumMap" parameterType="map">
+    <update id="modifyForum">
+        update forum_tb
+        <set>
+            <if test="forumTitle != null">forum_title = #{forumTitle},</if>
+            <if test="forumContent != null">forum_content = #{forumContent},</if>
+            <if test="forumCategory != null and forumCategory.forumCategoryId != null">
+                forum_category_id = #{forumCategory.forumCategoryId}</if>
+            forum_updated_at = now()
+        </set>
+        where
+        forum_id = #{forumId}
+    </update>
+
+    <delete id="deleteForum">
+        delete from forum_tb
+        where forum_id = #{forumId}
+    </delete>
+
+    <select id="findByForumIdAndUserId" resultMap="forumMap" parameterType="map">
         select
             f.forum_id,
             f.forum_title,
@@ -94,6 +113,23 @@
         where f.forum_id = #{forumId}
     </select>
 
+    <select id="findByForumId" resultMap="forumMap">
+
+        select
+            forum_id,
+            forum_title,
+            forum_content,
+            forum_created_at,
+            forum_updated_at,
+            user_id,
+            moim_id,
+            forum_category_id
+        from
+            forum_tb
+        where
+            forum_id = #{forumId}
+
+    </select>
 
 
 </mapper>

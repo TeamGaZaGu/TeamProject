@@ -1,10 +1,11 @@
 package com.korit.nomoreback.service;
 
 import com.korit.nomoreback.domain.forum.*;
-import com.korit.nomoreback.domain.postRole.PostRoleMapper;
+import com.korit.nomoreback.domain.moimRole.MoimRoleMapper;
 import com.korit.nomoreback.dto.forum.ForumCommentRegDto;
+import com.korit.nomoreback.dto.forum.ForumImgModifyDto;
+import com.korit.nomoreback.dto.forum.ForumModifyDto;
 import com.korit.nomoreback.dto.forum.ForumRegisterDto;
-import com.korit.nomoreback.dto.forum.ForumRoleDto;
 import com.korit.nomoreback.security.model.PrincipalUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,12 +22,10 @@ public class ForumService {
     private final ForumMapper forumMapper;
     private final PrincipalUtil principalUtil;
     private final FileService fileService;
-    private final PostRoleMapper postRoleMapper;
     private final ForumCommentMapper forumCommentMapper;
-    private final ForumRoleMapper forumRoleMapper;
     private final ForumLikeMapper forumLikeMapper;
     private final ForumImgMapper forumImgMapper;
-
+    private final MoimRoleMapper moimRoleMapper;
 
     @Transactional
     public void registerForum(ForumRegisterDto dto) {
@@ -36,7 +35,7 @@ public class ForumService {
         System.out.println("새로 생성된 forumId = " + forum.getForumId());
 
         final String UPLOAD_PATH = "/forum";
-        List<MultipartFile> imageFiles = dto.getForumImages();  // DTO에서 여러 MultipartFile 받는 필드로 변경 필요
+        List<MultipartFile> imageFiles = dto.getForumImages();
 
         if (imageFiles != null && !imageFiles.isEmpty()) {
             List<ForumImg> forumImgs = new ArrayList<>();
@@ -58,20 +57,56 @@ public class ForumService {
             forumImgMapper.insertMany(forumImgs);
         }
 
-        // 3) 역할 등록
-        Integer userId = dto.getUserId();
-
-        ForumRoleDto roleDto = new ForumRoleDto();
-        roleDto.setForumRoleName("OWNER");
-        roleDto.setForumId(forum.getForumId());
-        roleDto.setUserId(userId);
-
-        forumRoleMapper.insertForumRole(roleDto);
     }
 
     public Forum getForumById(Integer forumId) {
         Integer userId = principalUtil.getPrincipalUser().getUser().getUserId();
-        return forumMapper.findByForumId(forumId, userId);
+        return forumMapper.findByForumIdAndUserId(forumId, userId);
+    }
+
+
+    public void modifyForum(ForumModifyDto forumModifyDto,ForumImgModifyDto forumImgModifyDto){
+
+        Integer userId = principalUtil.getPrincipalUser().getUser().getUserId();
+
+        Integer forumId = forumModifyDto.getForumId();
+
+        Forum forum = forumMapper.findByForumId(forumId);
+
+        Forum originForum = forumMapper.findByForumIdAndUserId(forumId,userId);
+
+        List<ForumImg> modifiedImgList = forumImgModifyDto.getImgList();
+
+        if (userId.equals(forum.getUser().getUserId()) ||
+                moimRoleMapper.findRoleByUserAndMoimId(userId,forum.getMoim().getMoimId()).equals("OWNER")){
+            forumMapper.modifyForum(forumModifyDto.modify(originForum));
+            forumImgMapper.modifyImg(modifiedImgList);
+            return;
+        }
+
+        throw new IllegalArgumentException("권한 없음");
+
+    }
+
+    public void deleteForum(Integer forumId,Integer moimId) {
+        Integer userId = principalUtil.getPrincipalUser().getUser().getUserId();
+
+        Forum forum = forumMapper.findByForumId(forumId);
+
+        List<ForumImg> forumImgs = forumImgMapper.findImgById(forumId);
+
+        List<Integer> imgIds = forumImgs.stream()
+                .map(ForumImg::getForumImgId)
+                .toList();
+
+        if (userId.equals(forum.getUser().getUserId()) ||
+                moimRoleMapper.findRoleByUserAndMoimId(userId,moimId).equals("OWNER")){
+            forumImgMapper.deleteImg(imgIds);
+            forumMapper.deleteForum(forumId);
+            return;
+        }
+
+        throw new IllegalArgumentException("권한 없음");
     }
 
     public Integer registerComment(ForumCommentRegDto dto) {
@@ -92,8 +127,5 @@ public class ForumService {
         Integer userId = principalUtil.getPrincipalUser().getUser().getUserId();
         forumLikeMapper.deleteLike(forumId, userId);
     }
-
-
-
 
 }

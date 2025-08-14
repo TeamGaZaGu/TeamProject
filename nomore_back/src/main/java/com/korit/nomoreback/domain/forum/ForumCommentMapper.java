@@ -11,4 +11,5 @@ public interface ForumCommentMapper {
     List<ForumComment> findAllByForumId(Integer forumId);
     int getCountByForumId(Integer forumId);
 
+
 }
