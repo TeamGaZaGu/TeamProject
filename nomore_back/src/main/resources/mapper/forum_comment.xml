@@ -42,8 +42,23 @@
             #{forumComment},
             now()
         )
-
     </insert>
+
+    <update id="modifyComment">
+        update forum_comment_tb
+        <set>
+            <if test="forumComment != null">forum_comment = #{forumComment},</if>
+            updated_at = now()
+        </set>
+        where
+            forum_comment_id = #{forumCommentId} and user_id = #{userId}
+    </update>
+
+    <delete id="deleteComment">
+        delete from forum_comment_tb
+        where
+            forum_id = #{forumId} and user_id = #{userId}
+    </delete>
 
     <select id="findAllByForumId" resultMap="CommentMap">
         with recursive comment_tb as (
@@ -117,5 +132,20 @@
         where
             forum_id = #{forumId}
     </select>
+
+    <select id="findByCommentId" resultType="com.korit.nomoreback.domain.forum.ForumComment">
+        select
+            forum_comment_id,
+            forum_id,
+            parent_comment_id,
+            parent_user_id,
+            user_id,
+            forum_comment,
+            created_at,
+            updated_at
+        from forum_comment_tb
+        where forum_comment_id = #{forumCommentId}
+    </select>
+
 
 </mapper>

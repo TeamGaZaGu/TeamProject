@@ -1,10 +1,7 @@
 package com.korit.nomoreback.controller;
 
 import com.korit.nomoreback.domain.forum.Forum;
-import com.korit.nomoreback.dto.forum.ForumCommentRegDto;
-import com.korit.nomoreback.dto.forum.ForumImgModifyDto;
-import com.korit.nomoreback.dto.forum.ForumModifyDto;
-import com.korit.nomoreback.dto.forum.ForumRegisterDto;
+import com.korit.nomoreback.dto.forum.*;
 import com.korit.nomoreback.security.model.PrincipalUtil;
 import com.korit.nomoreback.service.ForumService;
 import lombok.RequiredArgsConstructor;
@@ -33,16 +30,6 @@ public class ForumController {
         return ResponseEntity.ok("게시글작성");
     }
 
-    @PostMapping(value = "/{moimId}/forum/{forumId}/comment", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> registerComment(@PathVariable Integer moimId,
-                                             @PathVariable Integer forumId,
-                                             @ModelAttribute ForumCommentRegDto dto) {
-        dto.setMoimId(moimId);
-        dto.setForumId(forumId);
-        forumService.registerComment(dto);
-        return ResponseEntity.ok("댓글달기");
-    }
-
     @GetMapping("/{moimId}/{forumId}")
     public ResponseEntity<?> getForum(@PathVariable Integer moimId, @PathVariable Integer forumId) {
         Forum forum = forumService.getForumById(forumId);
@@ -64,6 +51,32 @@ public class ForumController {
                                          @PathVariable Integer forumId){
         forumService.deleteForum(forumId,moimId);
         return ResponseEntity.ok("삭제 완료");
+    }
+
+    @PostMapping(value = "/{moimId}/{forumId}/comment", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> registerComment(@PathVariable Integer moimId,
+                                             @PathVariable Integer forumId,
+                                             @ModelAttribute ForumCommentRegDto dto) {
+        dto.setMoimId(moimId);
+        dto.setForumId(forumId);
+        forumService.registerComment(dto);
+        return ResponseEntity.ok("댓글달기");
+    }
+
+    @PutMapping("/{moimId}/{forumId}/comment/modify")
+    public ResponseEntity<?> modifyComment(@PathVariable Integer moimId,
+                                           @PathVariable Integer forumId,
+                                           @ModelAttribute ForumCommentModifyDto modifyDto){
+        forumService.modifyComment(modifyDto,forumId);
+        return ResponseEntity.ok("댓글 수정 완료");
+    }
+
+    @DeleteMapping("/{moimId}/{forumId}/comment/delete/{forumCommentId}")
+    public ResponseEntity<?> deleteComment(@PathVariable Integer moimId,
+                                           @PathVariable Integer forumId,
+                                           @PathVariable Integer forumCommentId) {
+        forumService.deleteComment(forumCommentId,forumId);
+        return ResponseEntity.ok("댓글 삭제 완료");
     }
 
     @PostMapping("/{moimId}/{forumId}/like")
