@@ -2,15 +2,19 @@
 
     import com.korit.nomoreback.domain.moim.Moim;
     import com.korit.nomoreback.domain.user.User;
+    import com.korit.nomoreback.dto.moim.*;
+    import com.korit.nomoreback.dto.response.ResponseDto;
     import com.korit.nomoreback.dto.moim.MoimCreateDto;
     import com.korit.nomoreback.dto.moim.MoimListRespDto;
     import com.korit.nomoreback.dto.moim.MoimModifyDto;
     import com.korit.nomoreback.dto.moim.MoimSearchReqDto;
     import com.korit.nomoreback.security.model.PrincipalUtil;
+    import com.korit.nomoreback.service.MoimBanService;
     import com.korit.nomoreback.service.MoimService;
     import lombok.RequiredArgsConstructor;
     import org.springframework.http.MediaType;
     import org.springframework.http.ResponseEntity;
+    import org.springframework.security.core.Authentication;
     import org.springframework.web.bind.annotation.*;
 
     import java.util.List;
@@ -22,6 +26,7 @@
 
         private final MoimService moimService;
         private final PrincipalUtil principalUtil;
+        private final MoimBanService moimBanService;
 
         @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
         public ResponseEntity<?> create(@ModelAttribute MoimCreateDto dto) {
@@ -100,5 +105,23 @@
         public ResponseEntity<List<User>> moimUserList(@RequestParam Integer moimId) {
             System.out.println(moimService.moimUserList(moimId));
             return ResponseEntity.ok(moimService.moimUserList(moimId));
+        }
+
+        @PostMapping("/{moimId}/ban")
+        public ResponseEntity<ResponseDto<?>> banUser(
+                @PathVariable Integer moimId,  // Long → Integer
+                @RequestBody MoimBanReqDto dto) {
+
+            moimBanService.banUser(moimId, dto.getUserId(), dto.getReason());
+            return ResponseEntity.ok(ResponseDto.success("사용자를 모임에서 강퇴했습니다."));
+        }
+
+        @DeleteMapping("/{moimId}/ban")
+        public ResponseEntity<ResponseDto<?>> unbanUser(
+                @PathVariable Integer moimId,
+                @RequestParam Integer userId) {
+
+            moimBanService.unbanUser(moimId, userId);
+            return ResponseEntity.ok(ResponseDto.success("강퇴를 해제했습니다."));
         }
     }

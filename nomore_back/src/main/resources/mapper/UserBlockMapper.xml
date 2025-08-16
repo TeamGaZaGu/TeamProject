@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.korit.nomoreback.domain.user.UserBlockMapper">
+
+    <resultMap id="UserBlockResultMap" type="com.korit.nomoreback.domain.user.UserBlock">
+        <id     property="blockId"    column="block_id"/>
+        <result property="blockerId"  column="blocker_id"/>
+        <result property="blockedId"  column="blocked_id"/>
+    </resultMap>
+
+    <select id="findByBlockerIdAndBlockedId"
+            parameterType="map"
+            resultMap="UserBlockResultMap">
+        SELECT
+            block_id,
+            blocker_id,
+            blocked_id
+        FROM
+            user_block_tb
+        WHERE
+            blocker_id = #{blockerId}
+          AND
+            blocked_id = #{blockedId}
+            LIMIT 1
+    </select>
+
+    <insert id="insert"
+            parameterType="com.korit.nomoreback.domain.user.UserBlock"
+            useGeneratedKeys="true"
+            keyProperty="blockId"
+            keyColumn="block_id">
+        INSERT INTO user_block_tb
+            (blocker_id, blocked_id)
+        VALUES
+            (#{blockerId}, #{blockedId})
+    </insert>
+
+    <delete id="delete" parameterType="map">
+        DELETE FROM user_block_tb
+        WHERE blocker_id = #{blockerId}
+          AND blocked_id = #{blockedId}
+    </delete>
+
+    <select id="findBlockedUserIdsByBlockerId"
+            parameterType="int"
+            resultType="int">
+        SELECT
+            blocked_id
+        FROM
+            user_block_tb
+        WHERE
+            blocker_id = #{blockerId}
+        ORDER BY
+            block_id DESC
+    </select>
+
+    <select id="findBlockerIdsByBlockedId"
+            parameterType="int"
+            resultType="int">
+        SELECT
+            blocker_id
+        FROM
+            user_block_tb
+        WHERE
+            blocked_id = #{blockedId}
+        ORDER BY
+            block_id DESC
+    </select>
+
+    <select id="findBlockedUsersByBlockerId"
+            parameterType="int"
+            resultMap="UserBlockResultMap">
+        SELECT
+            block_id,
+            blocker_id,
+            blocked_id
+        FROM
+            user_block_tb
+        WHERE
+            blocker_id = #{blockerId}
+        ORDER BY
+            block_id DESC
+    </select>
+
+</mapper>
