@@ -4,6 +4,6 @@ export const reqRegisterForum = async (data, moimId) => await api.post(`/api/moi
     headers: {
     'Content-Type': 'multipart/form-data'
   }
-})
+});
 
-export const reqGetForumCategories = async (moimId) => await api.get(`/api/moims/${moimId}/forumCategories`)
+export const reqGetForumCategories = async () => await api.get("/api/moims/forumCategories");

@@ -16,15 +16,15 @@ function RegisterForum(props) {
     useEffect(() => {
         const fetchForumCategories = async () => {
             try {
-                const response = await reqGetForumCategories(moimId);
-                setForumCategory(response.data); // 또는 response
+                const response = await reqGetForumCategories();
+                setForumCategory(response?.data);
             } catch (error) {
                 console.error('카테고리 가져오기 실패:', error);
             }
         };
 
         fetchForumCategories();
-    }, [moimId]);
+    }, []);
 
     const [ forumValue, setForumValue ] = useState({
         forumTitle: "",
