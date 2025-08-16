@@ -12,7 +12,15 @@ public interface ForumMapper {
     Forum findByForumId(@Param("forumId") Integer forumId);
     int modifyForum(Forum forum);
     int deleteForum(@Param("forumId") Integer forumId);
-
+    List<Forum> findByMoimId(
+            @Param("moimId") Integer moimId,
+            @Param("userId") Integer userId
+    );
+    List<Forum> findByCategoryId(
+            @Param("moimId") Integer moimId,
+            @Param("categoryId") Integer categoryId,
+            @Param("userId") Integer userId
+    );
 
     List<ForumCategory> getFourumCategories();
 }

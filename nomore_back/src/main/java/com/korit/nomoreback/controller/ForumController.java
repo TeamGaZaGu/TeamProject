@@ -9,6 +9,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/moims")
 @RequiredArgsConstructor
@@ -33,6 +35,19 @@ public class ForumController {
     public ResponseEntity<?> getForum(@PathVariable Integer moimId, @PathVariable Integer forumId) {
         Forum forum = forumService.getForumById(forumId);
         return ResponseEntity.ok(forum);
+    }
+    @GetMapping("/{moimId}/forums")
+    public ResponseEntity<List<Forum>> getForumList(@PathVariable Integer moimId) {
+        List<Forum> forums = forumService.getForumsByMoimId(moimId);
+        return ResponseEntity.ok(forums);
+    }
+
+
+    @GetMapping("/{moimId}/forums/category/{categoryId}")
+    public ResponseEntity<List<Forum>> getForumListByCategory(@PathVariable Integer moimId,
+                                                              @PathVariable Integer categoryId) {
+        List<Forum> froms = forumService.getForumsByCategoryId(moimId, categoryId);
+        return ResponseEntity.ok(froms);
     }
 
     @PutMapping("/{moimId}/{forumId}/modify")
