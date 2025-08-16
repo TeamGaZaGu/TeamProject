@@ -2,8 +2,10 @@ package com.korit.nomoreback.controller;
 
 import com.korit.nomoreback.domain.user.User;
 import com.korit.nomoreback.domain.user.UserMapper;
+import com.korit.nomoreback.dto.response.ResponseDto;
 import com.korit.nomoreback.dto.user.UserProfileUpdateReqDto;
 import com.korit.nomoreback.security.model.PrincipalUser;
+import com.korit.nomoreback.service.UserBlockService;
 import com.korit.nomoreback.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +22,8 @@ public class UserController {
 
     private final UserService userService;
     private final UserMapper userMapper;
+    private final UserBlockService userBlockService;
+
 
     @GetMapping("/admin")
     public ResponseEntity<List<User>> allUser() {
@@ -27,16 +31,16 @@ public class UserController {
         return ResponseEntity.ok(userService.allUser());
     }
 
-    @PutMapping("/blockUser")
+    @PutMapping("/siteBlockUser")
     public ResponseEntity<?> blockUser(@RequestParam Integer userId) {
         userService.blockUser(userId);
-        return ResponseEntity.ok("회원 차단 완료");
+        return ResponseEntity.ok("회원 사이트 차단 완료");
     }
 
-    @PutMapping("/unBlockUser")
+    @PutMapping("/siteUnBlockUser")
     public ResponseEntity<?> unBlockUser(@RequestParam Integer userId) {
         userService.unBlockUser(userId);
-        return ResponseEntity.ok("회원 차단 완료");
+        return ResponseEntity.ok("회원 사이트 차단해제 완료");
     }
 
     @PutMapping("/profile")
@@ -48,6 +52,32 @@ public class UserController {
         userService.updateProfile(principal.getUser().getUserId(), userProfileUpdateReqDto, profileImg);
         System.out.println(userProfileUpdateReqDto);
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/userBlock")
+    public ResponseEntity<ResponseDto<?>> blockUser(
+            @RequestParam int userId) {
+        userBlockService.blockUser(userId);
+        return ResponseEntity.ok(ResponseDto.success("사용자를 차단했습니다."));
+    }
+
+    @DeleteMapping("/userBlock")
+    public ResponseEntity<ResponseDto<?>> unblockUser(
+            @RequestParam int userId) {
+        userBlockService.unblockUser(userId);
+        return ResponseEntity.ok(ResponseDto.success("사용자 차단을 해제했습니다."));
+    }
+
+    @GetMapping("/userBlock")
+    public ResponseEntity<ResponseDto<List<Integer>>> getBlockedUsers() {
+        List<Integer> blockedUserIds = userBlockService.getBlockedUserIds();
+        return ResponseEntity.ok(ResponseDto.success(blockedUserIds));
+    }
+
+    @GetMapping("/userBlock/status")
+    public ResponseEntity<ResponseDto<Boolean>> checkBlockStatus(@RequestParam int userId) {
+        boolean blocked = userBlockService.isBlocked(userId);
+        return ResponseEntity.ok(ResponseDto.success(blocked));
     }
 
 }

@@ -1,7 +1,7 @@
-import api from "./axios";
+import api from './axios';
 
-export const reqAllUser = async () => await api.get("/api/user/admin");
+export const reqAllUser = async () => api.get('/api/user/admin');
 
-export const reqBlockUser = async (userId) => await api.put(`/api/user/blockUser?userId=${userId}`)
+export const reqBlockUser = async (userId) => api.put(`/api/user/siteBlockUser?userId=${userId}`);
 
-export const reqUnBlockUser = async (userId) => await api.put(`/api/user/unBlockUser?userId=${userId}`)
+export const reqUnBlockUser = async (userId) => api.put(`/api/user/siteUnBlockUser?userId=${userId}`);
