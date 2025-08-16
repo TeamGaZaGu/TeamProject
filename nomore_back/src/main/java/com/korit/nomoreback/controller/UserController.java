@@ -54,6 +54,7 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
+
     @PostMapping("/userBlock")
     public ResponseEntity<ResponseDto<?>> blockUser(
             @RequestParam int userId) {
