@@ -21,6 +21,9 @@ public class Forum {
     private String forumContent;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private Integer likeCount;
+    private Integer commentCount;
+    private Integer isLike;
 
 
     private Moim moim;
