@@ -59,6 +59,15 @@ public class ForumService {
         Integer userId = principalUtil.getPrincipalUser().getUser().getUserId();
         return forumMapper.findByForumIdAndUserId(forumId, userId);
     }
+    public List<Forum> getForumsByMoimId(Integer moimId) {
+        Integer userId = principalUtil.getPrincipalUser().getUser().getUserId();
+        return forumMapper.findByMoimId(moimId, userId);
+    }
+
+    public List<Forum> getForumsByCategoryId(Integer moimId, Integer categoryId) {
+        Integer userId = principalUtil.getPrincipalUser().getUser().getUserId();
+        return forumMapper.findByCategoryId(moimId, categoryId, userId);
+    }
 
 
     public void modifyForum(ForumModifyDto forumModifyDto,ForumImgModifyDto forumImgModifyDto){
