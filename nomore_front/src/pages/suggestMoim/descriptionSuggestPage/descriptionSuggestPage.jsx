@@ -6,12 +6,15 @@ import { reqDeleteMoim, reqJoinMoim, reqMoimUserList, reqSelectMoim } from '../.
 import useCategoryQuery from '../../../queries/useCategoryQuery.jsx';
 import { IoChatbubbleEllipses, IoChatbubbleEllipsesOutline, IoClipboard, IoClipboardOutline, IoClose } from 'react-icons/io5';
 import { RiHome7Fill, RiHome7Line } from 'react-icons/ri';
-import { FaPen, FaTrashAlt } from 'react-icons/fa';
-import { QueryClient, useQueryClient } from '@tanstack/react-query';
+import { FaPen, FaRegComment, FaTrashAlt } from 'react-icons/fa';
+import { useQueryClient } from '@tanstack/react-query';
 import { baseURL } from '../../../api/axios.js';
 import { reqUserBlock } from '../../../api/userApi.js';
 import usePrincipalQuery from '../../../queries/usePrincipalQuery.jsx';
 import useUserBlockListQuery from '../../../queries/useUserBlockListQuery.jsx';
+import useForumQuery from '../../../queries/useForumQuery.jsx';
+import useForumCategoryQuery from '../../../queries/useForumCategoryQuery.jsx';
+import { BiLike } from 'react-icons/bi';
 
 function DescriptionSuggestPage(props) {
     const navigate = useNavigate();
@@ -30,10 +33,26 @@ function DescriptionSuggestPage(props) {
     
     const categoryQuery = useCategoryQuery();
     const categories = categoryQuery?.data?.data || [];
-    const getCategory = categories.find(category => category.categoryId === moim.categoryId)
+    const getCategory = categories.find(category => category.categoryId === moim.categoryId);
 
     const principalQuery = usePrincipalQuery();
     const userBlockListQuery = useUserBlockListQuery();
+
+    const forumQuery = useForumQuery(moimId);
+    const respForums = forumQuery?.data?.data || [];
+    
+
+    const forumCategoryQuery = useForumCategoryQuery();
+    const respForumCategories = forumCategoryQuery?.data?.data || [];
+    
+    const [ forumCategory, setForumCategory ] = useState("전체");
+    const categoriesWithAll = [{ forumCategoryId: 0, forumCategoryName: '전체' }, ...respForumCategories];
+
+    const filteredForums = forumCategory === "전체"
+        ? respForums
+        : respForums.filter(forum => forum.forumCategory.forumCategoryName === forumCategory);
+    console.log(filteredForums)
+
 
     useEffect(() => {
         const fetchMoim = async () => {
@@ -41,7 +60,6 @@ function DescriptionSuggestPage(props) {
                 const response = await reqSelectMoim(moimId);
                 setMoim(response.data);
             } catch (err) {
-                setError("모임 정보를 불러오는 데 실패했습니다.");
                 console.error(err);
             }
         };
@@ -113,6 +131,9 @@ function DescriptionSuggestPage(props) {
         } catch(error) {
             console.log('사용자 차단 실패:', error);
         }
+    }
+
+    const handleForumOnClick = (forumId) => {
         
     }
 
@@ -166,7 +187,7 @@ function DescriptionSuggestPage(props) {
             {activeTab === "home" && (
                 <div css={s.mainContent}>
                     <div css={s.moimInfo}>
-                        <img src={`http://localhost:8080/image${moim.moimImgPath}`} alt="모임 썸네일" />
+                        <img src={`${baseURL}/image${moim.moimImgPath}`} alt="모임 썸네일" />
                         <div css={s.moimTextInfo}>
                         <h1 css={s.moimTitle}>{moim.title}</h1>
                         <div css={s.moimMeta}>
@@ -209,7 +230,59 @@ function DescriptionSuggestPage(props) {
             )}
             {activeTab === "board" && (
                 <div>
-                    <button onClick={() => navigate(`/forum/create?moimId=${moimId}`)}>게시글 작성</button>
+                    <div css={s.forumCategoryContainer}>
+                        {categoriesWithAll.map((category) => (
+                            <button
+                                key={category.forumCategoryId}
+                                onClick={() => setForumCategory(category.forumCategoryName)}
+                                css={s.categoryButton(forumCategory === category.forumCategoryName)}
+                            >
+                                {category.forumCategoryName}
+                            </button>
+                        ))}
+                        <button css={s.createButton} onClick={() => navigate(`/forum/create?moimId=${moimId}`)}>게시글 작성</button>
+                    </div>
+                    <div css={s.forumGrid}>
+                        {
+                        filteredForums?.map((forum) => {
+                            const date = new Date(forum.forumCreatedAt);
+                            const formatted = new Intl.DateTimeFormat('ko-KR', {
+                                year: 'numeric',
+                                month: 'numeric',
+                                day: 'numeric',
+                                hour: 'numeric',
+                                minute: 'numeric',
+                                hour12: true,
+                                timeZone: 'Asia/Seoul'
+                            }).format(date);
+
+                            return (
+                                <div css={s.forumCard} onClick={() => navigate(`/forum/detail?forumId=${forum.forumId}`)} key={forum.forumId}>
+                                    <div css={s.forumHeader}>
+                                        <img
+                                            css={s.modalProfileImage}
+                                            src={`${baseURL}/image${forum.user.profileImgPath}`}
+                                            alt=""
+                                        />
+                                        <div css={s.userInfo}>
+                                            <h3 css={s.h3Tag}>{forum.user.nickName}</h3>
+                                            <p css={s.postMeta}>
+                                                {forum.forumCategory.forumCategoryName} · {formatted}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div css={s.forumBody}>
+                                        <h2 css={s.forumTitle}>{forum.forumTitle}</h2>
+                                        <p css={s.forumContent}>{forum.forumContent}</p>
+                                    </div>
+                                    <div css={s.forumFooter}>
+                                        <p><BiLike /></p>
+                                        <p><FaRegComment /></p>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
                 </div>
             )}
             {activeTab === "chat" && (

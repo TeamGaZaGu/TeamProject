@@ -25,20 +25,21 @@ public class ForumController {
         Integer userId = principalUtil.getPrincipalUser().getUser().getUserId();
         dto.setMoimId(moimId);
         dto.setUserId(userId);
-        System.out.println("이미지 저장 리스트: " + dto);
 
         forumService.registerForum(dto);
         return ResponseEntity.ok("게시글작성");
     }
 
-    @GetMapping("/{moimId}/{forumId}")
+    @GetMapping("/{forumId}")
     public ResponseEntity<?> getForum(@PathVariable Integer moimId, @PathVariable Integer forumId) {
         Forum forum = forumService.getForumById(forumId);
         return ResponseEntity.ok(forum);
     }
+
     @GetMapping("/{moimId}/forums")
     public ResponseEntity<List<Forum>> getForumList(@PathVariable Integer moimId) {
         List<Forum> forums = forumService.getForumsByMoimId(moimId);
+        System.out.println(forumService.getForumsByMoimId(moimId));
         return ResponseEntity.ok(forums);
     }
 

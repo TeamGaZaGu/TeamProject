@@ -11,7 +11,7 @@ export const header = css`
     align-items: center;
     padding: 12px 16px;
     background-color: #ffffff;
-    border-bottom: 1px solid #e9ecef;
+    border-bottom: 1px solid #ffffff;
     position: sticky;
     top: 0;
     z-index: 100;
@@ -235,6 +235,136 @@ export const memberName = css`
     color: #1a1a1a;
 `;
 
+
+export const forumCategoryContainer = css`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 1rem;
+  padding: 12px 20px;
+  background-color: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+  overflow-x: auto;
+`;
+
+export const categoryButton = (isActive) => css`
+  padding: 8px 16px;
+  border: 1px solid ${isActive ? '#38bdf8' : '#d1d5db'};
+  background-color: ${isActive ? '#e0f2fe' : '#ffffff'};
+  color: ${isActive ? '#0284c7' : '#374151'};
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 20px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease-in-out;
+
+  &:hover {
+    background-color: ${isActive ? '#bae6fd' : '#f3f4f6'};
+  }
+`;
+
+export const createButton = css`
+  margin-left: auto;
+  padding: 8px 16px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 20px;
+  cursor: pointer;
+  white-space: nowrap;
+
+  &:hover {
+    background-color: #0056b3;
+  }
+`;
+
+export const forumGrid = css`
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin: 0 1rem;
+`;
+
+export const forumCard = css`
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  height: 25rem;
+  cursor: pointer;
+`;
+
+export const forumHeader = css`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+`;
+
+export const userInfo = css`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 6rem;
+`;
+
+export const userName = css`
+  font-size: 16px;
+  font-weight: 600;
+  color: #111827;
+  margin: 0;
+`;
+
+export const h3Tag = css`
+  margin: 7px 0;
+`;
+
+export const postMeta = css`
+  font-size: 13px;
+  color: #6b7280;
+  margin-top: 2px;
+`;
+
+export const forumBody = css`
+  padding: 8px 0;
+`;
+
+export const forumTitle = css`
+  font-size: 2rem;
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: #1a1a1a;
+`;
+
+export const forumContent = css`
+  display: -webkit-box;
+  font-size: 14px;
+  line-height: 1.4;
+  color: #333;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -webkit-line-clamp: 2;   // 최대 줄 수 2줄
+  -webkit-box-orient: vertical; //	줄바꿈 기준을 수직으로 설정
+`;
+
+export const forumFooter = css`
+  display: flex;
+  gap: 16px;
+  margin-top: 12px;
+  font-size: 14px;
+  color: #4b5563;
+
+  svg {
+    vertical-align: middle;
+    margin-right: 4px;
+  }
+`;
+
 export const bottomActions = css`
     position: fixed;
     bottom: 0;
@@ -336,8 +466,8 @@ export const userProfile = css`
 `;
 
 export const modalProfileImage = css`
-  width: 80px;
-  height: 80px;
+  width: 6rem;
+  height: 6rem;
   border-radius: 50%;
   object-fit: cover;
   margin-bottom: 16px;
