@@ -3,28 +3,17 @@ import * as s from './styles';
 import React, { useState, useRef, useEffect } from 'react';
 import { Upload, X, Send, Box } from 'lucide-react';
 import { BsSendArrowUpFill } from 'react-icons/bs';
-import { reqGetForumCategories, reqRegisterForum } from '../../api/forumApi';
+import { reqGetForumCategories, reqRegisterForum } from '../../../api/forumApi';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { FiPlus, FiX } from 'react-icons/fi';
+import useForumCategoryQuery from '../../../queries/useForumCategoryQuery';
 
 function RegisterForum(props) {
     const navigate = useNavigate();
     const [ searchParam ] = useSearchParams();
     const moimId = searchParam.get("moimId");
-    const [ forumCategory, setForumCategory ] = useState([]);
-
-    useEffect(() => {
-        const fetchForumCategories = async () => {
-            try {
-                const response = await reqGetForumCategories();
-                setForumCategory(response?.data);
-            } catch (error) {
-                console.error('카테고리 가져오기 실패:', error);
-            }
-        };
-
-        fetchForumCategories();
-    }, []);
+    const forumCategoryQuery = useForumCategoryQuery();
+    const respForumCategories = forumCategoryQuery?.data?.data || [];
 
     const [ forumValue, setForumValue ] = useState({
         forumTitle: "",
@@ -119,7 +108,7 @@ function RegisterForum(props) {
                 required
                 >
                 <option value="">카테고리를 선택하세요</option>
-                {forumCategory.map(category => (
+                {respForumCategories.map(category => (
                     <option
                         key={category.forumCategoryId}
                         value={category.forumCategoryId}

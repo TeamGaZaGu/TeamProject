@@ -4,54 +4,55 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { reqDeleteMoim, reqJoinMoim, reqMoimUserList, reqSelectMoim } from '../../../api/moimApi';
 import useCategoryQuery from '../../../queries/useCategoryQuery.jsx';
-import { IoClipboard, IoClipboardOutline, IoClose } from 'react-icons/io5';
+import { IoChatbubbleEllipses, IoChatbubbleEllipsesOutline, IoClipboard, IoClipboardOutline, IoClose } from 'react-icons/io5';
 import { RiHome7Fill, RiHome7Line } from 'react-icons/ri';
-import { FaPen, FaTrashAlt } from 'react-icons/fa';
+import { FaPen, FaRegComment, FaTrashAlt } from 'react-icons/fa';
 import { useQueryClient } from '@tanstack/react-query';
 import { baseURL } from '../../../api/axios.js';
-import { reqUserBlock } from '../../../api/userBlockApi.js';
+import { reqUserBlock } from '../../../api/userApi.js';
 import usePrincipalQuery from '../../../queries/usePrincipalQuery.jsx';
 import useUserBlockListQuery from '../../../queries/useUserBlockListQuery.jsx';
-
-import {
-    useGetBlockedUsersQuery,
-    useBlockUserMutation,
-    useUnblockUserMutation,
-} from "../../../queries/useUserBlockQuery";
-import {
-    useGetMoimBannedUsersQuery,
-    useMoimBanUserMutation,
-    useMoimUnbanUserMutation,
-} from "../../../queries/useMoimBanQuery";
+import useForumQuery from '../../../queries/useForumQuery.jsx';
+import useForumCategoryQuery from '../../../queries/useForumCategoryQuery.jsx';
+import { BiLike } from 'react-icons/bi';
 
 function DescriptionSuggestPage(props) {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
-    const [searchParam] = useSearchParams();
+    const [ searchParam ] = useSearchParams();
     const moimId = searchParam.get("moimId")
 
     const [activeTab, setActiveTab] = useState("home");
 
-    const [moim, setMoim] = useState("");
-    const [userList, setUserList] = useState([]);
-
+    const [ moim, setMoim ] = useState("");
+    const [ userList, setUserList ] = useState([]);
+    
+    // 모달 상태 추가
     const [selectedUser, setSelectedUser] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
-
+    
     const categoryQuery = useCategoryQuery();
     const categories = categoryQuery?.data?.data || [];
-    const getCategory = categories.find(category => category.categoryId === moim.categoryId)
+    const getCategory = categories.find(category => category.categoryId === moim.categoryId);
 
     const principalQuery = usePrincipalQuery();
     const userBlockListQuery = useUserBlockListQuery();
 
-    const { data: blockedUserIds = [] } = useGetBlockedUsersQuery();
-    const blockUserMutation = useBlockUserMutation();
-    const unblockUserMutation = useUnblockUserMutation();
+    const forumQuery = useForumQuery(moimId);
+    const respForums = forumQuery?.data?.data || [];
+    
 
-    const { data: bannedUserIds = [] } = useGetMoimBannedUsersQuery(moimId);
-    const banUserMutation = useMoimBanUserMutation();
-    const unbanUserMutation = useMoimUnbanUserMutation();
+    const forumCategoryQuery = useForumCategoryQuery();
+    const respForumCategories = forumCategoryQuery?.data?.data || [];
+    
+    const [ forumCategory, setForumCategory ] = useState("전체");
+    const categoriesWithAll = [{ forumCategoryId: 0, forumCategoryName: '전체' }, ...respForumCategories];
+
+    const filteredForums = forumCategory === "전체"
+        ? respForums
+        : respForums.filter(forum => forum.forumCategory.forumCategoryName === forumCategory);
+    console.log(filteredForums)
+
 
     useEffect(() => {
         const fetchMoim = async () => {
@@ -59,7 +60,6 @@ function DescriptionSuggestPage(props) {
                 const response = await reqSelectMoim(moimId);
                 setMoim(response.data);
             } catch (err) {
-                setError("모임 정보를 불러오는 데 실패했습니다.");
                 console.error(err);
             }
         };
@@ -68,10 +68,11 @@ function DescriptionSuggestPage(props) {
             try {
                 const response = await reqMoimUserList(moimId);
                 setUserList(response?.data);
-            } catch (error) {
+            } catch(error) {
                 console.log(error);
             }
         }
+        
 
         if (moimId) {
             fetchMoim();
@@ -97,6 +98,7 @@ function DescriptionSuggestPage(props) {
     // 유저 정보 모달 열기
     const handleUserInformationOnClick = (userId) => {
         const user = userList.find(u => u.userId === userId);
+        console.log(user)
         if (user) {
             setSelectedUser(user);
             setIsModalOpen(true);
@@ -117,33 +119,60 @@ function DescriptionSuggestPage(props) {
     }
 
     const handleUserBlockOnClick = async (userId, nickName) => {
+        
         const isConfirmed = window.confirm(`"${nickName}" 님을 차단하시겠습니까?`);
-        if (!isConfirmed) return;
+        
+        if (!isConfirmed) {
+            return;
+        }
 
         try {
             await reqUserBlock(userId);
-        } catch (error) {
+        } catch(error) {
             console.log('사용자 차단 실패:', error);
         }
     }
+
 
     return (
         <div css={s.container}>
             <div css={s.header}>
                 <div>
-                    <button
+                    <button 
                         css={activeTab === "home" ? s.click : s.unClick}
                         onClick={() => setActiveTab("home")}
                     >
-                        {activeTab === "home" ? <RiHome7Fill /> : <RiHome7Line />}
+                        {
+                            activeTab === "home" ?
+                            <RiHome7Fill />
+                            :
+                            <RiHome7Line />
+                        }
                         Home
                     </button>
                     <button
                         css={activeTab === "board" ? s.click : s.unClick}
                         onClick={() => setActiveTab("board")}
                     >
-                        {activeTab === "board" ? <IoClipboard /> : <IoClipboardOutline />}
+                        {
+                            activeTab === "board" ?
+                            <IoClipboard />
+                            :
+                            <IoClipboardOutline />
+                        }
                         게시판
+                    </button>
+                    <button
+                        css={activeTab === "chat" ? s.click : s.unClick}
+                        onClick={() => setActiveTab("chat")}
+                    >
+                        {
+                            activeTab === "chat" ?
+                            <IoChatbubbleEllipses />
+                            :
+                            <IoChatbubbleEllipsesOutline />
+                        }
+                        채팅
                     </button>
                 </div>
                 <div>
@@ -151,18 +180,18 @@ function DescriptionSuggestPage(props) {
                     <button css={s.Transaction} onClick={handleDeleteOnClick}><FaTrashAlt />삭제</button>
                 </div>
             </div>
-
+            
             {activeTab === "home" && (
                 <div css={s.mainContent}>
                     <div css={s.moimInfo}>
-                        <img src={`http://localhost:8080/image${moim.moimImgPath}`} alt="모임 썸네일" />
+                        <img src={`${baseURL}/image${moim.moimImgPath}`} alt="모임 썸네일" />
                         <div css={s.moimTextInfo}>
-                            <h1 css={s.moimTitle}>{moim.title}</h1>
-                            <div css={s.moimMeta}>
-                                <span>{getCategory?.categoryEmoji}{getCategory?.categoryName}</span> · <span>{moim.districtName}</span> · <span>{moim.memberCount}/{moim.maxMember}</span>
-                            </div>
+                        <h1 css={s.moimTitle}>{moim.title}</h1>
+                        <div css={s.moimMeta}>
+                            <span>{getCategory?.categoryEmoji}{getCategory?.categoryName}</span> · <span>{moim.districtName}</span> · <span>{moim.memberCount}/{moim.maxMember}</span>
                         </div>
                     </div>
+                </div>
 
                     <div css={s.section}>
                         <h2 css={s.sectionTitle}>모임 소개</h2>
@@ -174,23 +203,23 @@ function DescriptionSuggestPage(props) {
                     <div css={s.section}>
                         <h2 css={s.sectionTitle}>모임 멤버</h2>
                         <div css={s.memberSection}>
-                            {userList?.map((user) => {
-                                const roleEmoji = user.moimRole === "OWNER" ? "👑" : "👤";
-                                return (
-                                    <button key={user.userId} css={s.memberCard} onClick={() => handleUserInformationOnClick(user.userId)}>
-                                        <img
-                                            src={`${baseURL}/image${user.profileImgPath}`}
-                                            alt="프로필"
-                                            css={s.profileImage}
-                                        />
-                                        <div css={s.defaultAvatar}>{roleEmoji}</div>
-                                        <div css={s.memberInfo}>
-                                            <span css={s.memberRole}>{user.nickName}</span>
-                                            <span css={s.memberName}>{user.introduction}</span>
-                                        </div>
-                                    </button>
-                                )
-                            })
+                            {
+                                userList?.map((user) => {
+                                    const roleEmoji = user.moimRole === "OWNER" ? "👑" : "👤";
+                                    return (
+                                        <button key={user.userId} css={s.memberCard} onClick={() => handleUserInformationOnClick(user.userId)}>
+                                            <img
+                                                src={`${baseURL}/image${user.profileImgPath}`}
+                                                alt="프로필"
+                                                css={s.profileImage}
+                                            /> 
+                                            <div css={s.defaultAvatar}>{roleEmoji}</div>
+                                            <div css={s.memberInfo}>
+                                                <span css={s.memberRole}>{user.nickName}</span>
+                                                <span css={s.memberName}>{user.introduction}</span>
+                                            </div>
+                                        </button>
+                                )})
                             }
                         </div>
                     </div>
@@ -198,7 +227,64 @@ function DescriptionSuggestPage(props) {
             )}
             {activeTab === "board" && (
                 <div>
-                    <button onClick={() => navigate(`/forum/create?moimId=${moimId}`)}>게시글 작성</button>
+                    <div css={s.forumCategoryContainer}>
+                        {categoriesWithAll.map((category) => (
+                            <button
+                                key={category.forumCategoryId}
+                                onClick={() => setForumCategory(category.forumCategoryName)}
+                                css={s.categoryButton(forumCategory === category.forumCategoryName)}
+                            >
+                                {category.forumCategoryName}
+                            </button>
+                        ))}
+                        <button css={s.createButton} onClick={() => navigate(`/forum/create?moimId=${moimId}`)}>게시글 작성</button>
+                    </div>
+                    <div css={s.forumGrid}>
+                        {
+                        filteredForums?.map((forum) => {
+                            const date = new Date(forum.forumCreatedAt);
+                            const formatted = new Intl.DateTimeFormat('ko-KR', {
+                                year: 'numeric',
+                                month: 'numeric',
+                                day: 'numeric',
+                                hour: 'numeric',
+                                minute: 'numeric',
+                                hour12: true,
+                                timeZone: 'Asia/Seoul'
+                            }).format(date);
+
+                            return (
+                                <div css={s.forumCard} onClick={() => navigate(`/forum/detail?forumId=${forum.forumId}`)} key={forum.forumId}>
+                                    <div css={s.forumHeader}>
+                                        <img
+                                            css={s.modalProfileImage}
+                                            src={`${baseURL}/image${forum.user.profileImgPath}`}
+                                            alt=""
+                                        />
+                                        <div css={s.userInfo}>
+                                            <h3 css={s.h3Tag}>{forum.user.nickName}</h3>
+                                            <p css={s.postMeta}>
+                                                {forum.forumCategory.forumCategoryName} · {formatted}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div css={s.forumBody}>
+                                        <h2 css={s.forumTitle}>{forum.forumTitle}</h2>
+                                        <p css={s.forumContent}>{forum.forumContent}</p>
+                                    </div>
+                                    <div css={s.forumFooter}>
+                                        <p><BiLike /></p>
+                                        <p><FaRegComment /></p>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+            )}
+            {activeTab === "chat" && (
+                <div>
+
                 </div>
             )}
 
@@ -234,8 +320,12 @@ function DescriptionSuggestPage(props) {
                                         </span>
                                     </div>
                                     <div css={s.userCategory}>
-                                        {categoryQuery?.data?.data?.find(category => category.categoryId === selectedUser.categoryId)?.categoryEmoji}
-                                        {categoryQuery?.data?.data?.find(category => category.categoryId === selectedUser.categoryId)?.categoryName}
+                                        {categoryQuery?.data?.data
+                                        ?.find(category => category.categoryId === selectedUser.categoryId)
+                                        ?.categoryEmoji}
+                                        {categoryQuery?.data?.data
+                                        ?.find(category => category.categoryId === selectedUser.categoryId)
+                                        ?.categoryName}
                                     </div>
                                     {selectedUser.introduction && (
                                         <p css={s.userIntroduction}>{selectedUser.introduction}</p>

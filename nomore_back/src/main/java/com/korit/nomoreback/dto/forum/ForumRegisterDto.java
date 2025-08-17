@@ -28,7 +28,7 @@ public class ForumRegisterDto {
         return Forum.builder()
                 .forumTitle(forumTitle)
                 .forumContent(forumContent)
-                .createdAt(LocalDateTime.now())
+                .forumCreatedAt(LocalDateTime.now())
                 .moim(Moim.builder().moimId(moimId).build())  // 객체로 넣기
                 .user(User.builder().userId(userId).build())
                 .forumCategory(ForumCategory.builder().forumCategoryId(forumCategoryId).build())

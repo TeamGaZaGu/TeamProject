@@ -19,8 +19,8 @@ public class Forum {
     private Integer forumId;
     private String forumTitle;
     private String forumContent;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    private LocalDateTime forumCreatedAt;
+    private LocalDateTime forumUpdatedAt;
     private Integer likeCount;
     private Integer commentCount;
     private Integer isLike;

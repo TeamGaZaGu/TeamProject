@@ -52,6 +52,7 @@ public class SecurityConfig {
             auth.requestMatchers("/api/search/**").permitAll();
             auth.requestMatchers("/category/**").permitAll();
             auth.requestMatchers("/forum/**").permitAll();
+            auth.requestMatchers("/api/moims/**").permitAll();
             auth.anyRequest().authenticated();
         });
 
