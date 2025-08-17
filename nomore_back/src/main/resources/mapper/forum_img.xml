@@ -18,23 +18,23 @@
         </foreach>
     </insert>
 
-    <update id="modifyImg">
-        <foreach collection="imgList" item="img" separator=";">
+    <update id="modifyImg" parameterType="java.util.List">
+        <foreach collection="imgList" item="forumImg" separator=";">
             update
             forum_img_tb
             <set>
-                <if test="img.seq != null">seq = #{img.seq},</if>
-                <if test="img.path != null">path = #{img.path}</if>
+                <if test="forumImg.seq != null">seq = #{forumImg.seq},</if>
+                <if test="forumImg.path != null">path = #{forumImg.path}</if>
             </set>
             where
-            forum_img_id = #{img.forumImgId}
+            forum_img_id = #{forumImg.forumImgId}
         </foreach>
     </update>
 
     <delete id="deleteImg">
         delete from forum_img_tb
         where forum_img_id in
-        <foreach collection="imgIdList" item="id" open="(" separator="," close=")">
+        <foreach collection="imgIds" item="id" open="(" separator="," close=")">
             #{id}
         </foreach>
     </delete>

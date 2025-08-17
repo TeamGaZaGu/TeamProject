@@ -31,7 +31,7 @@ public class ForumController {
     }
 
     @GetMapping("/{forumId}")
-    public ResponseEntity<?> getForum(@PathVariable Integer moimId, @PathVariable Integer forumId) {
+    public ResponseEntity<?> getForum(@PathVariable Integer forumId) {
         Forum forum = forumService.getForumById(forumId);
         return ResponseEntity.ok(forum);
     }
@@ -51,9 +51,8 @@ public class ForumController {
         return ResponseEntity.ok(froms);
     }
 
-    @PutMapping("/{moimId}/{forumId}/modify")
-    public ResponseEntity<?> modifyForum(@PathVariable Integer moimId,
-                                         @PathVariable Integer forumId,
+    @PutMapping("/{forumId}/modify")
+    public ResponseEntity<?> modifyForum(@PathVariable Integer forumId,
                                          @ModelAttribute ForumImgModifyDto forumImgModifyDto,
                                          @ModelAttribute ForumModifyDto forumModifyDto) {
         forumModifyDto.setForumId(forumId);
@@ -78,9 +77,8 @@ public class ForumController {
         return ResponseEntity.ok("댓글달기");
     }
 
-    @PutMapping("/{moimId}/{forumId}/comment/modify")
-    public ResponseEntity<?> modifyComment(@PathVariable Integer moimId,
-                                           @PathVariable Integer forumId,
+    @PutMapping("/{forumId}/comment/modify")
+    public ResponseEntity<?> modifyComment(@PathVariable Integer forumId,
                                            @ModelAttribute ForumCommentModifyDto modifyDto){
         forumService.modifyComment(modifyDto,forumId);
         return ResponseEntity.ok("댓글 수정 완료");
@@ -92,8 +90,7 @@ public class ForumController {
     }
   
     @DeleteMapping("/{moimId}/{forumId}/comment/delete/{forumCommentId}")
-    public ResponseEntity<?> deleteComment(@PathVariable Integer moimId,
-                                           @PathVariable Integer forumId,
+    public ResponseEntity<?> deleteComment(@PathVariable Integer forumId,
                                            @PathVariable Integer forumCommentId) {
         forumService.deleteComment(forumCommentId,forumId);
         return ResponseEntity.ok("댓글 삭제 완료");
