@@ -133,9 +133,6 @@ function DescriptionSuggestPage(props) {
         }
     }
 
-    const handleForumOnClick = (forumId) => {
-        
-    }
 
     return (
         <div css={s.container}>

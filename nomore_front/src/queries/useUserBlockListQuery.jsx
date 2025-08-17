@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { reqUserBlockList } from "../api/userApi";
+import { reqUserBlockList } from "../api/userBlockApi";
+
 
 function useUserBlockListQuery() {
     return useQuery({
