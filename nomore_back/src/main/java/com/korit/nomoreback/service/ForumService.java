@@ -80,19 +80,26 @@ public class ForumService {
 
         Forum originForum = forumMapper.findByForumIdAndUserId(forumId,userId);
 
-        List<ForumImg> modifiedImgList = forumImgModifyDto.getImgList();
+        List<ForumImg> imgList = new ArrayList<>();
+        for (MultipartFile file : forumImgModifyDto.getForumImages()) {
+            ForumImg forumImg = new ForumImg();
+            String fileName = fileService.uploadFile(file, "/forum");
+            forumImg.setPath("/upload/forum/" + fileName);
+            imgList.add(forumImg);
+        }
+        forumImgMapper.modifyImg(imgList);
 
         if (userId.equals(forum.getUser().getUserId()) ||
-                moimRoleMapper.findRoleByUserAndMoimId(userId,forum.getMoim().getMoimId()).equals("OWNER")){
-            forumMapper.modifyForum(forumModifyDto.modify(originForum));
-            forumImgMapper.modifyImg(modifiedImgList);
+            moimRoleMapper.findRoleByUserAndMoimId(userId,forum.getMoim().getMoimId()).equals("OWNER")){
+                forumMapper.modifyForum(forumModifyDto.modify(originForum));
+                forumImgMapper.modifyImg(imgList);
             return;
         }
 
         throw new IllegalArgumentException("권한 없음");
     }
 
-    public void deleteForum(Integer forumId,Integer moimId) {
+    public void deleteForum(Integer forumId, Integer moimId) {
         Integer userId = principalUtil.getPrincipalUser().getUser().getUserId();
 
         Forum forum = forumMapper.findByForumId(forumId);
@@ -104,8 +111,12 @@ public class ForumService {
                 .toList();
 
         if (userId.equals(forum.getUser().getUserId()) ||
-                moimRoleMapper.findRoleByUserAndMoimId(userId,moimId).equals("OWNER")){
-            forumImgMapper.deleteImg(imgIds);
+                moimRoleMapper.findRoleByUserAndMoimId(userId, moimId).equals("OWNER")) {
+
+            if (imgIds != null && !imgIds.isEmpty()) {
+                forumImgMapper.deleteImg(imgIds);
+            }
+
             forumMapper.deleteForum(forumId);
             return;
         }

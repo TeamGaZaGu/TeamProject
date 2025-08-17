@@ -9,12 +9,12 @@ import { RiHome7Fill, RiHome7Line } from 'react-icons/ri';
 import { FaPen, FaRegComment, FaTrashAlt } from 'react-icons/fa';
 import { useQueryClient } from '@tanstack/react-query';
 import { baseURL } from '../../../api/axios.js';
-import { reqUserBlock } from '../../../api/userApi.js';
 import usePrincipalQuery from '../../../queries/usePrincipalQuery.jsx';
 import useUserBlockListQuery from '../../../queries/useUserBlockListQuery.jsx';
 import useForumQuery from '../../../queries/useForumQuery.jsx';
 import useForumCategoryQuery from '../../../queries/useForumCategoryQuery.jsx';
 import { BiLike } from 'react-icons/bi';
+import { reqUserBlock } from '../../../api/userBlockApi.js';
 
 function DescriptionSuggestPage(props) {
     const navigate = useNavigate();
