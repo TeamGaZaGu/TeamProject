@@ -16,7 +16,8 @@
         <association property="moim" resultMap="moimMap"/>
         <association property="forumCategory" resultMap="forumCategoryMap"/>
         <association property="user" resultMap="userMap"/>
-        <collection property="forumImgList" resultMap="forumImgMap"/>
+        <collection property="forumImgList" select="findImgsByForumId" column="forum_id"
+                    ofType="com.korit.nomoreback.domain.forum.ForumImg"/>
     </resultMap>
 
     <resultMap id="moimMap" type="com.korit.nomoreback.domain.moim.Moim">
@@ -79,37 +80,32 @@
 
     <select id="findByForumIdAndUserId" resultMap="forumMap" parameterType="map">
         select
-            f.forum_id,
-            f.forum_title,
-            f.forum_content,
-            f.forum_created_at,
-            f.moim_id,
-            f.forum_category_id,
+        f.forum_id,
+        f.forum_title,
+        f.forum_content,
+        f.forum_created_at,
+        f.moim_id,
+        f.forum_category_id,
 
-            u.user_id,
-            u.nick_name,
-            u.profile_img_path,
+        u.user_id,
+        u.nick_name,
+        u.profile_img_path,
 
-            fi.forum_img_id,
-            fi.seq,
-            fi.path,
+        fc.forum_category_id,
+        fc.forum_category_name,
 
-            fc.forum_category_id,
-            fc.forum_category_name,
-
-            ifnull(flc.like_count, 0) as like_count,
-            ifnull(flt.forum_like_id, 0) as is_like
+        ifnull(flc.like_count, 0) as like_count,
+        ifnull(flt.forum_like_id, 0) as is_like
 
         from forum_tb f
-            join user_tb u on u.user_id = f.user_id
-            left join forum_img_tb fi on fi.forum_id = f.forum_id
-            join forum_category_tb fc on fc.forum_category_id = f.forum_category_id
+        join user_tb u on u.user_id = f.user_id
+        join forum_category_tb fc on fc.forum_category_id = f.forum_category_id
 
         left join (
-            select forum_id, count(*) as like_count
-            from forum_like_tb
-            group by forum_id
-            ) flc on flc.forum_id = f.forum_id
+        select forum_id, count(*) as like_count
+        from forum_like_tb
+        group by forum_id
+        ) flc on flc.forum_id = f.forum_id
 
         left join forum_like_tb flt on flt.forum_id = f.forum_id and flt.user_id = #{userId}
 
@@ -139,51 +135,55 @@
             forum_id = #{forumId}
     </select>
 
-    <select id="findByMoimId" resultMap="forumMap">
+    <select id="findByMoimId" resultMap="forumMap" parameterType="map">
         select
-            f.forum_id,
-            f.forum_title,
-            f.forum_content,
-            f.forum_created_at,
-            f.moim_id,
-            f.forum_category_id,
+        f.forum_id,
+        f.forum_title,
+        f.forum_content,
+        f.forum_created_at,
+        f.moim_id,
+        f.forum_category_id,
 
-            u.user_id,
-            u.nick_name,
-            u.profile_img_path,
+        u.user_id,
+        u.nick_name,
+        u.profile_img_path,
 
-            fi.forum_img_id,
-            fi.seq,
-            fi.path,
+        -- 첫 번째 이미지만 가져오기
+        fi.forum_img_id,
+        fi.seq,
+        fi.path,
 
-            fc.forum_category_id,
-            fc.forum_category_name,
+        fc.forum_category_id,
+        fc.forum_category_name,
 
-            ifnull(flc.like_count, 0) as like_count,
-            ifnull(fcc.comment_count, 0) as comment_count,
-            ifnull(flt.forum_like_id, 0) as is_like
+        ifnull(flc.like_count, 0) as like_count,
+        ifnull(fcc.comment_count, 0) as comment_count,
+        ifnull(flt.forum_like_id, 0) as is_like
 
         from forum_tb f
-            join user_tb u on u.user_id = f.user_id
-            left join forum_img_tb fi on fi.forum_id = f.forum_id
-            join forum_category_tb fc on fc.forum_category_id = f.forum_category_id
+        join user_tb u on u.user_id = f.user_id
+        left join (
+        select forum_id, forum_img_id, seq, path
+        from forum_img_tb
+        where seq = 1   -- 첫 번째 이미지만
+        ) fi on fi.forum_id = f.forum_id
+        join forum_category_tb fc on fc.forum_category_id = f.forum_category_id
 
-            left join (
-                select forum_id, count(*) as like_count
-                from forum_like_tb
-                group by forum_id
-            ) flc on flc.forum_id = f.forum_id
+        left join (
+        select forum_id, count(*) as like_count
+        from forum_like_tb
+        group by forum_id
+        ) flc on flc.forum_id = f.forum_id
 
-            left join (
-                select forum_id, count(*) as comment_count
-                from forum_comment_tb
-                group by forum_id
-            ) fcc on fcc.forum_id = f.forum_id
+        left join (
+        select forum_id, count(*) as comment_count
+        from forum_comment_tb
+        group by forum_id
+        ) fcc on fcc.forum_id = f.forum_id
 
-
-            left join forum_like_tb flt
-            on flt.forum_id = f.forum_id
-            and flt.user_id = #{userId}
+        left join forum_like_tb flt
+        on flt.forum_id = f.forum_id
+        and flt.user_id = #{userId}
 
         where f.moim_id = #{moimId}
     </select>
@@ -235,5 +235,12 @@
 
         where f.moim_id = #{moimId}
         and f.forum_category_id = #{categoryId}
+    </select>
+
+    <select id="findImgsByForumId" resultMap="forumImgMap">
+        select forum_img_id, forum_id, seq, path
+        from forum_img_tb
+        where forum_id = #{forumId}
+        order by seq
     </select>
 </mapper>

@@ -21,6 +21,7 @@ public interface ForumMapper {
             @Param("categoryId") Integer categoryId,
             @Param("userId") Integer userId
     );
+    List<ForumImg> findImgsByForumId(@Param("forumId") Integer forumId);
 
     List<ForumCategory> getFourumCategories();
 }
