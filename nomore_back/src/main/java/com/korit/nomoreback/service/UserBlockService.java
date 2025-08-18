@@ -61,9 +61,8 @@ public class UserBlockService {
         return block1 != null || block2 != null;
     }
 
-    public List<Integer> getBlockedUserIds() {
-        int blockerId = principalUtil.getPrincipalUser().getUser().getUserId();
-        return userBlockMapper.findBlockedUserIdsByBlockerId(blockerId);
+    public List<Integer> getBlockedUserIds(Integer userId) {
+        return userBlockMapper.findBlockedUserIdsByBlockerId(userId);
     }
 
     public List<Integer> getBlockerIds() {

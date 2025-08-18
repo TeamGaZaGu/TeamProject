@@ -69,9 +69,9 @@ public class UserController {
         return ResponseEntity.ok(ResponseDto.success("사용자 차단을 해제했습니다."));
     }
 
-    @GetMapping("/userBlock")
-    public ResponseEntity<ResponseDto<List<Integer>>> getBlockedUsers() {
-        List<Integer> blockedUserIds = userBlockService.getBlockedUserIds();
+    @GetMapping("/{userId}/blocks")
+    public ResponseEntity<ResponseDto<List<Integer>>> getBlockedUsers(@PathVariable Integer userId) {
+        List<Integer> blockedUserIds = userBlockService.getBlockedUserIds(userId);
         return ResponseEntity.ok(ResponseDto.success(blockedUserIds));
     }
 

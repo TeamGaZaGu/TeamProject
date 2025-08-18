@@ -36,7 +36,10 @@ function DescriptionSuggestPage(props) {
     const getCategory = categories.find(category => category.categoryId === moim.categoryId);
 
     const principalQuery = usePrincipalQuery();
-    const userBlockListQuery = useUserBlockListQuery();
+    const userId = principalQuery?.data?.data?.user?.userId;
+    const userBlockListQuery = useUserBlockListQuery({userId});
+    const userBlockList = userBlockListQuery?.data?.data?.body;
+    console.log(userBlockList);
 
     const forumQuery = useForumQuery(moimId);
     const respForums = forumQuery?.data?.data || [];
@@ -51,7 +54,6 @@ function DescriptionSuggestPage(props) {
     const filteredForums = forumCategory === "전체"
         ? respForums
         : respForums.filter(forum => forum.forumCategory.forumCategoryName === forumCategory);
-    console.log(filteredForums)
 
 
     useEffect(() => {
@@ -120,16 +122,42 @@ function DescriptionSuggestPage(props) {
 
     const handleUserBlockOnClick = async (userId, nickName) => {
         
-        const isConfirmed = window.confirm(`"${nickName}" 님을 차단하시겠습니까?`);
+        const isBlocked = userRole === 'ROLE_BEN';
+        const action = isBlocked ? '차단해제' : '차단';
+        
+        const isConfirmed = window.confirm(`"${nickName}" 님을 ${action}하시겠습니까?`);
         
         if (!isConfirmed) {
             return;
+            
         }
 
-        try {
-            await reqUserBlock(userId);
-        } catch(error) {
-            console.log('사용자 차단 실패:', error);
+        if (isBlocked) {
+            try {
+                await reqUnBlockUser(userId);
+                setAllUser(prevUsers => 
+                    prevUsers.map(user => 
+                        user.userId === userId 
+                            ? { ...user, userRole: 'ROLE_USER' }
+                            : user
+                    )
+                );
+            } catch(error) {
+                console.log('사용자 차단해제 실패', error);
+            }
+        } else {
+            try {
+                await reqBlockUser(userId);
+                setAllUser(prevUsers => 
+                    prevUsers.map(user => 
+                        user.userId === userId 
+                            ? { ...user, userRole: 'ROLE_BEN' }
+                            : user
+                    )
+                );
+            } catch(error) {
+                console.log('사용자 차단 실패:', error);
+            }
         }
     }
 
@@ -206,6 +234,7 @@ function DescriptionSuggestPage(props) {
                             {
                                 userList?.map((user) => {
                                     const roleEmoji = user.moimRole === "OWNER" ? "👑" : "👤";
+                                    const isBlocked = userBlockList.includes(user.userId);
                                     return (
                                         <button key={user.userId} css={s.memberCard} onClick={() => handleUserInformationOnClick(user.userId)}>
                                             <img
