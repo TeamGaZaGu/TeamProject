@@ -1,6 +1,7 @@
 package com.korit.nomoreback.controller;
 
 import com.korit.nomoreback.domain.forum.Forum;
+import com.korit.nomoreback.domain.forum.ForumComment;
 import com.korit.nomoreback.dto.forum.*;
 import com.korit.nomoreback.security.model.PrincipalUtil;
 import com.korit.nomoreback.service.ForumService;
@@ -39,6 +40,7 @@ public class ForumController {
     @GetMapping("/{moimId}/forums")
     public ResponseEntity<List<Forum>> getForumList(@PathVariable Integer moimId) {
         List<Forum> forums = forumService.getForumsByMoimId(moimId);
+
         System.out.println(forumService.getForumsByMoimId(moimId));
         return ResponseEntity.ok(forums);
     }
@@ -51,8 +53,9 @@ public class ForumController {
         return ResponseEntity.ok(froms);
     }
 
-    @PutMapping("/{forumId}/modify")
-    public ResponseEntity<?> modifyForum(@PathVariable Integer forumId,
+    @PutMapping("/{moimId}/{forumId}/modify")
+    public ResponseEntity<?> modifyForum(@PathVariable Integer moimId,
+                                         @PathVariable Integer forumId,
                                          @ModelAttribute ForumImgModifyDto forumImgModifyDto,
                                          @ModelAttribute ForumModifyDto forumModifyDto) {
         forumModifyDto.setForumId(forumId);
@@ -77,8 +80,9 @@ public class ForumController {
         return ResponseEntity.ok("댓글달기");
     }
 
-    @PutMapping("/{forumId}/comment/modify")
-    public ResponseEntity<?> modifyComment(@PathVariable Integer forumId,
+    @PutMapping("/{moimId}/{forumId}/comment/modify")
+    public ResponseEntity<?> modifyComment(@PathVariable Integer moimId,
+                                           @PathVariable Integer forumId,
                                            @ModelAttribute ForumCommentModifyDto modifyDto){
         forumService.modifyComment(modifyDto,forumId);
         return ResponseEntity.ok("댓글 수정 완료");
@@ -88,23 +92,30 @@ public class ForumController {
     public ResponseEntity<?> getFourumCategories() {
         return ResponseEntity.ok(forumService.getFourumCategories());
     }
+
+    @GetMapping("/{forumId}/comments")
+    public ResponseEntity<List<ForumComment>> getComments(@PathVariable Integer forumId) {
+        List<ForumComment> comments = forumService.getCommentsByForumId(forumId);
+        return ResponseEntity.ok(comments);
+    }
   
     @DeleteMapping("/{moimId}/{forumId}/comment/delete/{forumCommentId}")
-    public ResponseEntity<?> deleteComment(@PathVariable Integer forumId,
+    public ResponseEntity<?> deleteComment(@PathVariable Integer moimId,
+                                           @PathVariable Integer forumId,
                                            @PathVariable Integer forumCommentId) {
         forumService.deleteComment(forumCommentId,forumId);
         return ResponseEntity.ok("댓글 삭제 완료");
     }
 
-    @PostMapping("/{moimId}/{forumId}/like")
-    public ResponseEntity<?> like(@PathVariable Integer moimId,
+    @PostMapping("/{forumId}/like")
+    public ResponseEntity<?> like(
                                   @PathVariable Integer forumId) {
         forumService.like(forumId);
         return ResponseEntity.ok("좋아요");
     }
   
-    @DeleteMapping("/{moimId}/{forumId}/dislike")
-    public ResponseEntity<?> dislike(@PathVariable Integer moimId,
+    @DeleteMapping("/{forumId}/dislike")
+    public ResponseEntity<?> dislike(
                                      @PathVariable Integer forumId) {
         forumService.dislike(forumId);
         return ResponseEntity.ok("좋아요 삭제 요청 완료");

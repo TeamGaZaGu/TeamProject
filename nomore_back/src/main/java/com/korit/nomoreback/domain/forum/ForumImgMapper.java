@@ -10,7 +10,7 @@ public interface ForumImgMapper {
 
     int insertImg(ForumImg forumImg);
     int insertMany(List<ForumImg> forumImgs);
-    int modifyImg(@Param("imgList") List<ForumImg> imgList);
+    ForumImg modifyImg(List<ForumImg> forumImgs);
     List<ForumImg> findImgById(@Param("forumId") Integer forumId);
     int deleteImg(@Param("imgIds")List<Integer> imgIds);
 

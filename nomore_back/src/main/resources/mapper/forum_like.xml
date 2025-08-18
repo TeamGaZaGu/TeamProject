@@ -6,8 +6,8 @@
 <mapper namespace="com.korit.nomoreback.domain.forum.ForumLikeMapper">
 
     <insert id="insertLike">
-        insert into forum_like_tb (id, forum_id, user_id)
-        values (default, #{forumId}, #{userId})
+        insert into forum_like_tb (forum_id, user_id)
+        values (#{forumId}, #{userId})
     </insert>
 
     <delete id="deleteLike">
