@@ -20,9 +20,7 @@ public interface UserBlockMapper {
             @Param("blockedId") Integer blockedId
     );
 
-    List<Integer> findBlockedUserIdsByBlockerId(
-            @Param("blockerId") Integer blockerId
-    );
+    List<Integer> findBlockedUserIdsByBlockerId(Integer userId);
 
     List<Integer> findBlockerIdsByBlockedId(
             @Param("blockedId") Integer blockedId

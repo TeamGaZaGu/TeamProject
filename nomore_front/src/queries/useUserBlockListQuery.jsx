@@ -2,10 +2,10 @@ import { useQuery } from "@tanstack/react-query";
 import { reqUserBlockList } from "../api/userBlockApi";
 
 
-function useUserBlockListQuery() {
+function useUserBlockListQuery({userId}) {
     return useQuery({
-        queryKey: ["userBlockList"],
-        queryFn: async () => await reqUserBlockList(),
+        queryKey: ["userBlockList", userId],
+        queryFn: async () => await reqUserBlockList({userId}),
         staleTime: 1000 * 60 * 60,
         gcTime: 1000 * 60 * 60,
     });

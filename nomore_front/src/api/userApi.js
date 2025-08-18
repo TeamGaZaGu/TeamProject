@@ -7,5 +7,3 @@ export const reqBlockUser = async (userId) => api.put(`/api/user/siteBlockUser?u
 
 // 관리자가 차단 해제
 export const reqUnBlockUser = async (userId) => api.put(`/api/user/siteUnBlockUser?userId=${userId}`);
-
-console.log("userApi loaded", { reqBlockUser });

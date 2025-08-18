@@ -43,17 +43,13 @@
           AND blocked_id = #{blockedId}
     </delete>
 
-    <select id="findBlockedUserIdsByBlockerId"
-            parameterType="int"
-            resultType="int">
-        SELECT
+    <select id="findBlockedUserIdsByBlockerId" resultType="java.lang.Integer">
+        select
             blocked_id
-        FROM
+        from
             user_block_tb
-        WHERE
-            blocker_id = #{blockerId}
-        ORDER BY
-            block_id DESC
+        where
+            blocker_id = #{userId}
     </select>
 
     <select id="findBlockerIdsByBlockedId"
