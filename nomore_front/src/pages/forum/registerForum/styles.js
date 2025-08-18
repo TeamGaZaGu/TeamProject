@@ -1,10 +1,9 @@
 import { css } from "styled-components";
 
 export const layout = css`
-  max-width: 123.7rem;
+  max-width: 1024px;
   margin: 0 auto;
   padding: 24px;
-  width: 100%;
   background-color: white;
 
   h1 {

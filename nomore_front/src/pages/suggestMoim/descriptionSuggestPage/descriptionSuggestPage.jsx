@@ -9,12 +9,12 @@ import { RiHome7Fill, RiHome7Line } from 'react-icons/ri';
 import { FaPen, FaRegComment, FaTrashAlt } from 'react-icons/fa';
 import { useQueryClient } from '@tanstack/react-query';
 import { baseURL } from '../../../api/axios.js';
+import { reqUserBlock } from '../../../api/userBlockApi.js';
 import usePrincipalQuery from '../../../queries/usePrincipalQuery.jsx';
 import useUserBlockListQuery from '../../../queries/useUserBlockListQuery.jsx';
 import useForumQuery from '../../../queries/useForumQuery.jsx';
 import useForumCategoryQuery from '../../../queries/useForumCategoryQuery.jsx';
 import { BiLike } from 'react-icons/bi';
-import { reqUserBlock } from '../../../api/userBlockApi.js';
 
 function DescriptionSuggestPage(props) {
     const navigate = useNavigate();
@@ -254,7 +254,7 @@ function DescriptionSuggestPage(props) {
                             }).format(date);
 
                             return (
-                                <div css={s.forumCard} onClick={() => navigate(`/forum/detail?forumId=${forum.forumId}`)} key={forum.forumId}>
+                                <div css={s.forumCard} onClick={() => navigate(`/forum/detail?moimId=${moimId}&forumId=${forum.forumId}`)} key={forum.forumId}>
                                     <div css={s.forumHeader}>
                                         <img
                                             css={s.modalProfileImage}
@@ -273,8 +273,8 @@ function DescriptionSuggestPage(props) {
                                         <p css={s.forumContent}>{forum.forumContent}</p>
                                     </div>
                                     <div css={s.forumFooter}>
-                                        <p><BiLike /></p>
-                                        <p><FaRegComment /></p>
+                                        <p><BiLike /> {forum.likeCount}</p>
+                                        <p><FaRegComment /> {forum.commentCount}</p>
                                     </div>
                                 </div>
                             );

@@ -85,7 +85,6 @@
                 fct.forum_id,
                 fct.parent_comment_id,
                 fct.parent_user_id,
-                fct.parent_id,
                 fct.user_id,
                 fct.forum_comment,
                 fct.created_at,
@@ -103,14 +102,14 @@
             ct.forum_id,
             ct.parent_comment_id,
             ct.parent_user_id,
-            put.nickname as parent_username,
+            put.nick_name as parent_username,
             ct.user_id as ct_user_id,
 
             ut.user_id,
-            ut.nickname,
+            ut.nick_name,
             ut.profile_img_path,
 
-            ct.content,
+            ct.forum_comment,
             ct.created_at,
             ct.`level`,
             ct.`path`

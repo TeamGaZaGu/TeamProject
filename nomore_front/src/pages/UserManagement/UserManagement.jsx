@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { reqAllUser, reqBlockUser, reqUnBlockUser } from '../../api/userApi';
+import { reqAllUser } from '../../api/userApi';
+import { reqUserBlock, reqUserUnBlock } from '../../api/userBlockApi';
 /** @jsxImportSource @emotion/react */
 import * as s from './styles';
 import { baseURL } from '../../api/axios';
@@ -38,7 +39,7 @@ function UserManagement(props) {
 
         if (isBlocked) {
             try {
-                await reqUnBlockUser(userId);
+                await reqUserUnBlock (userId);
                 setAllUser(prevUsers => 
                     prevUsers.map(user => 
                         user.userId === userId 
@@ -51,7 +52,7 @@ function UserManagement(props) {
             }
         } else {
             try {
-                await reqBlockUser(userId);
+                await reqUserBlock(userId);
                 setAllUser(prevUsers => 
                     prevUsers.map(user => 
                         user.userId === userId 

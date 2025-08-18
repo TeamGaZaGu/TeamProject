@@ -11,5 +11,5 @@ public class ForumImgModifyDto {
     private Integer forumImgId;
     private Integer seq;
     private MultipartFile path;
-    private List<MultipartFile> forumImages;
+    private List<ForumImg> imgList;
 }

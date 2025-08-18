@@ -1,5 +1,6 @@
 package com.korit.nomoreback.domain.forum;
 
+import com.korit.nomoreback.domain.user.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -26,6 +27,7 @@ public class ForumComment {
     private LocalDateTime createdAt;
 
     private Integer moimId;
+    private User user;
 
 
 }
