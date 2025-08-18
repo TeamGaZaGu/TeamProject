@@ -107,15 +107,15 @@ public class ForumController {
         return ResponseEntity.ok("댓글 삭제 완료");
     }
 
-    @PostMapping("/{forumId}/like")
-    public ResponseEntity<?> like(
+    @PostMapping("/{moimId}/{forumId}/like")
+    public ResponseEntity<?> like(@PathVariable Integer moimId,
                                   @PathVariable Integer forumId) {
         forumService.like(forumId);
         return ResponseEntity.ok("좋아요");
     }
   
-    @DeleteMapping("/{forumId}/dislike")
-    public ResponseEntity<?> dislike(
+    @DeleteMapping("/{moimId}/{forumId}/dislike")
+    public ResponseEntity<?> dislike(@PathVariable Integer moimId,
                                      @PathVariable Integer forumId) {
         forumService.dislike(forumId);
         return ResponseEntity.ok("좋아요 삭제 요청 완료");
