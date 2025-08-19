@@ -1,6 +1,7 @@
     package com.korit.nomoreback.controller;
 
     import com.korit.nomoreback.domain.moim.Moim;
+    import com.korit.nomoreback.domain.moim.MoimBan;
     import com.korit.nomoreback.domain.user.User;
     import com.korit.nomoreback.dto.moim.*;
     import com.korit.nomoreback.dto.response.ResponseDto;
@@ -107,13 +108,16 @@
             return ResponseEntity.ok(moimService.moimUserList(moimId));
         }
 
-        @PostMapping("/{moimId}/ban")
+        @PostMapping("/{moimId}/ban/{userId}")
         public ResponseEntity<ResponseDto<?>> banUser(
-                @PathVariable Integer moimId,  // Long → Integer
-                @RequestBody MoimBanReqDto dto) {
-
-            moimBanService.banUser(moimId, dto.getUserId());
+                @PathVariable Integer moimId,
+                @PathVariable Integer userId) {
+            moimBanService.banUser(moimId, userId);
             return ResponseEntity.ok(ResponseDto.success("사용자를 모임에서 강퇴했습니다."));
         }
 
+        @GetMapping("/{moimId}/ban")
+        public ResponseEntity<List<MoimBan>> banUserList(@PathVariable Integer moimId) {
+            return ResponseEntity.ok(moimBanService.banUserList(moimId));
+        }
     }

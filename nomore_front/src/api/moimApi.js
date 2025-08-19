@@ -16,3 +16,7 @@ export const reqModifyMoim = async (data, moimId) => await api.patch(`/api/moim/
 export const reqDeleteMoim = async (moimId) => await api.delete(`/api/moim/${moimId}/delete`)
 
 export const reqMoimUserList = async (moimId) => await api.get(`/api/moim/userList?moimId=${moimId}`);
+
+export const reqMoimUserBan = async (moimId, userId) => await api.post(`/api/moim/${moimId}/ban/${userId}`);
+
+export const reqMoimBanUserList = async (moimId) => await api.get(`/api/moim/${moimId}/ban`)

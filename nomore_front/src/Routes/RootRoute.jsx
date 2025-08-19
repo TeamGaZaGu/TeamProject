@@ -17,7 +17,6 @@ import BenUserPage from '../pages/BenUserPage/BenUserPage';
 function RootRoute(props) {
     const principalQuery = usePrincipalQuery();
     const user = principalQuery?.data?.data?.user;
-    console.log(user);
 
     if (!principalQuery.isFetched) {
         return <Loading />
