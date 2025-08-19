@@ -25,8 +25,8 @@ function UserManagement(props) {
         }
     };
 
-    const handleBlockUserOnClick = async (userId, nickName, userRole) => {
-        const isBlocked = userRole === 'ROLE_BEN';
+    const handleBlockUserOnClick = async (userId, nickName, userSiteBlock) => {
+        const isBlocked = userSiteBlock === 1;
         const action = isBlocked ? '차단해제' : '차단';
         
         const isConfirmed = window.confirm(`"${nickName}" 님을 ${action}하시겠습니까?`);
@@ -42,7 +42,7 @@ function UserManagement(props) {
                 setAllUser(prevUsers => 
                     prevUsers.map(user => 
                         user.userId === userId 
-                            ? { ...user, userRole: 'ROLE_USER' }
+                            ? { ...user, userSiteBlock: 0 }
                             : user
                     )
                 );
@@ -55,7 +55,7 @@ function UserManagement(props) {
                 setAllUser(prevUsers => 
                     prevUsers.map(user => 
                         user.userId === userId 
-                            ? { ...user, userRole: 'ROLE_BEN' }
+                            ? { ...user, userSiteBlock: 1 }
                             : user
                     )
                 );
@@ -114,17 +114,17 @@ function UserManagement(props) {
                                     <td css={s.tableCell}>{user.gender}</td>
                                     <td css={s.tableCell}>{user.birthDate}</td>
                                     <td css={s.tableCell}>
-                                        {user.userRole === 'ROLE_BEN' ? (
+                                        {user.userSiteBlock === 1 ? (
                                             <button 
                                                 css={s.unblockButton} 
-                                                onClick={() => handleBlockUserOnClick(user.userId, user.nickName, user.userRole)}
+                                                onClick={() => handleBlockUserOnClick(user.userId, user.nickName, user.userSiteBlock)}
                                             >
                                                 차단해제
                                             </button>
                                         ) : (
                                             <button 
                                                 css={s.blockButton} 
-                                                onClick={() => handleBlockUserOnClick(user.userId, user.nickName, user.userRole)}
+                                                onClick={() => handleBlockUserOnClick(user.userId, user.nickName, user.userSiteBlock)}
                                             >
                                                 차단
                                             </button>
