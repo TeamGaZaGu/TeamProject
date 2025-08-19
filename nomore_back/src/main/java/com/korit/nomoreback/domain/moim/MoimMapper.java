@@ -24,4 +24,6 @@ public interface MoimMapper {
     List<MoimListRespDto> searchMoim(MoimSearchReqDto searchReqDto);
 
     List<User> moimUserList(Integer moimId);
+    void decreaseMoimCount(@Param("moimId") Integer moimId);
+
 }

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.korit.nomoreback.domain.moim.MoimBanMapper">
+
+    <insert id="insertBan">
+        INSERT INTO moim_ban_tb (moim_id, user_id)
+        VALUES (#{moimId}, #{userId})
+    </insert>
+
+    <select id="existsByMoimIdAndUserId" resultType="boolean">
+        SELECT EXISTS (
+            SELECT 1
+            FROM moim_ban_tb
+            WHERE moim_id = #{moimId} AND user_id = #{userId}
+        )
+    </select>
+
+</mapper>

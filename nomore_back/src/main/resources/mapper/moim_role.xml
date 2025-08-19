@@ -27,5 +27,10 @@
             user_id = #{userId} AND moim_id = #{moimId}
     </select>
 
+    <delete id="deleteByMoimIdAndUserId">
+        DELETE FROM moim_role_tb
+        WHERE moim_id = #{moimId} AND user_id = #{userId}
+    </delete>
+
 
 </mapper>
