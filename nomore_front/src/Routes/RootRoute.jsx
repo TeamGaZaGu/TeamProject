@@ -13,6 +13,7 @@ import CatogoryPage from '../pages/CategoryPage/CatogoryPage';
 import UserManagement from '../pages/UserManagement/UserManagement';
 import ForumRoute from './ForumRoute';
 import BenUserPage from '../pages/BenUserPage/BenUserPage';
+import ChattingPage from '../pages/chatting/ChattingPage';
 
 function RootRoute(props) {
     const principalQuery = usePrincipalQuery();
@@ -39,6 +40,7 @@ function RootRoute(props) {
                 <Route path='/searchpage' element={ <SearchPage /> } />
                 <Route path='/oauth2/login' element={<Oauth2Redirect />} />
                 <Route path='/auth/signup' element={ <Signup /> } />
+                <Route path='/chatting/:moimId' element={ <ChattingPage /> } />
                 <Route path='/mypage' element={ <Mypage /> } />
                 <Route path='/category/*' element={ <CatogoryPage /> } />
                 {user?.userRole === "ROLE_ADMIN" && (

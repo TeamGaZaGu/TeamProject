@@ -57,6 +57,21 @@ public class JwtUtil {
     }
 
 
+    public Integer getUserId(String token) {
+        Claims claims = getClaims(token);
+        if (claims == null) return null;
+
+        Object userIdObj = claims.get("userId");
+        if (userIdObj == null) return null;
+
+        try {
+            // 숫자 또는 문자열 모두 Integer로 변환
+            return Integer.valueOf(userIdObj.toString());
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
 }
 
 
