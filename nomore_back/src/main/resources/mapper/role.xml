@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.korit.nomoreback.domain.role.RoleMapper">
+
+    <resultMap id="RoleMap" type="com.korit.nomoreback.domain.role.Role">
+        <id property="roleId" column="role_id"/>
+        <result property="roleName" column="role_name"/>
+    </resultMap>
+
+    <select id="findByRoleName" resultMap="RoleMap">
+        SELECT
+        role_id,
+        role_name
+        FROM role_tb
+        WHERE role_name = #{roleName}
+        LIMIT 1
+    </select>
+
+</mapper>
