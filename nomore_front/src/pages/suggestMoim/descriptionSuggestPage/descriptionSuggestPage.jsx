@@ -234,7 +234,7 @@ function DescriptionSuggestPage(props) {
                             {
                                 userList?.map((user) => {
                                     const roleEmoji = user.moimRole === "OWNER" ? "👑" : "👤";
-                                    const isBlocked = userBlockList.includes(user.userId);
+                                    const isBlocked = userBlockList?.includes(user.userId);
                                     return (
                                         <button key={user.userId} css={s.memberCard} onClick={() => handleUserInformationOnClick(user.userId)}>
                                             <img
