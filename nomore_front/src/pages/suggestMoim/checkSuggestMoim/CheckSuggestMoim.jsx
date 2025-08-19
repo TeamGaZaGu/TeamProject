@@ -49,7 +49,7 @@ function CheckSuggestMoim(props) {
                     moimList.map((moim) => {
                         const category = categories.find(cat => cat.categoryId === moim.categoryId);
                         const categoryName = category?.categoryName;
-                        const categoryEmoji = category.categoryEmoji
+                        const categoryEmoji = category?.categoryEmoji;
         
                         return (
                             <div key={moim.moimId} css={s.moimCard} onClick={() => handleMoimOnClick(moim.moimId)}>
