@@ -54,6 +54,7 @@ function DescriptionSuggestPage(props) {
     const filteredForums = forumCategory === "전체"
         ? respForums
         : respForums.filter(forum => forum.forumCategory.forumCategoryName === forumCategory);
+        console.log(filteredForums)
 
 
     useEffect(() => {
@@ -160,9 +161,6 @@ function DescriptionSuggestPage(props) {
             alert('강퇴에 실패했습니다. 다시 시도해주세요.');
         }
     }
-
-    console.log(userList);
-
 
     return (
         <div css={s.container}>
@@ -294,6 +292,12 @@ function DescriptionSuggestPage(props) {
                     </div>
                     <div css={s.forumGrid}>
                         {
+                        filteredForums.length === 0 ? (
+                            <div css={s.register}>
+                                <h3>게시글을 등록해주세요</h3>
+                            </div>
+                        ) 
+                        :
                         filteredForums?.map((forum) => {
                             const date = new Date(forum.forumCreatedAt);
                             const formatted = new Intl.DateTimeFormat('ko-KR', {

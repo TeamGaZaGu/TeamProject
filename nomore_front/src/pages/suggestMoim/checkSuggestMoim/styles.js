@@ -2,7 +2,27 @@ import { css } from "styled-components";
 
 export const layout = css`
     display: flex;
+    margin: 5rem 5rem 0;
     justify-content: space-between;
+    align-items: center;
+`;
+
+export const createMoim = css`
+  margin-left: auto;
+  padding: 8px 16px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 10px;
+  height: 50px;
+  cursor: pointer;
+  white-space: nowrap;
+
+  &:hover {
+    background-color: #0056b3;
+  }
 `;
 
 export const moimContainer = css`

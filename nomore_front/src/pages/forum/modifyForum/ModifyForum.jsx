@@ -140,7 +140,6 @@ function ModifyForum(props) {
                 onChange={handleInputChange}
                 required
                 >
-                <option value="">{forumValue.forumCategoryId}</option>
                 {respForumCategories.map(category => (
                     <option
                         key={category.forumCategoryId}

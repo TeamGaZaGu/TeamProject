@@ -1,45 +1,43 @@
-import { css } from '@emotion/react';
+// styles.ts
+import { css } from "@emotion/react";
 
+// 전체 레이아웃
 export const layout = css`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-top: 5rem;
-  padding: 2rem;
-  width: 100%;
-  max-width: 600px;
-  min-width: 300px; 
-  margin-left: auto;
-  margin-right: auto;
-  background-color: #fafafa;
-  border-radius: 1rem;
-  height: 100vh;
+  max-width: 1000px;
+  margin: 60px auto;
+  padding: 40px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
   box-sizing: border-box;
-  overflow-y: auto;
+
+  h1 {
+    font-size: 24px;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 2rem;
+    color: #111827;
+  }
 `;
 
 export const inputContainer = css`
   display: flex;
   flex-direction: column;
-  width: 100%;
-  max-width: 40rem;
-  gap: 1.5rem;
-  max-height: 60vh;
-  padding-bottom: 2rem;
+  gap: 20px;
 `;
 
 export const imgStyle = css`
   display: flex;
-  gap: 1rem;
-  align-items: center;
+  justify-content: center;
 `;
 
 export const ImgBox = css`
-  width: 10rem;
-  height: 10rem;
-  border: 1px solid #dbdbdb;
-  border-radius: 1rem;
+  width: 140px;
+  height: 140px;
+  border-radius: 10px;
+  background-color: #f3f4f6;
   overflow: hidden;
+  border: 1px solid #d1d5db;
   cursor: pointer;
 
   img {
@@ -49,75 +47,102 @@ export const ImgBox = css`
   }
 `;
 
-export const previewBox = css`
-  width: 7rem;
-  height: 7rem;
-  border: 1px solid #ccc;
-  border-radius: 1rem;
-  overflow: hidden;
-`;
-
-export const previewImg = css`
+export const titleInput = css`
   width: 100%;
-  height: 100%;
-  object-fit: cover;
-`;
-
-export const inputStyle = css`
-  padding: 1rem;
-  border-radius: 1rem;
-  border: 1px solid #dbdbdb;
-  font-size: 1rem;
-  width: 100%;
+  padding: 12px 16px;
+  font-size: 15px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
   box-sizing: border-box;
 
   &::placeholder {
-    color: #aaa;
+    color: #9ca3af;
   }
 
   &:focus {
     outline: none;
-    border: 1px solid #7e57c2;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15);
   }
 `;
 
+export const discription = css`
+  width: 100%;
+  padding: 12px 16px;
+  font-size: 15px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  box-sizing: border-box;
+  resize: vertical;
+  min-height: 100px;
+
+  &::placeholder {
+    color: #9ca3af;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15);
+  }
+`;
+
+export const contentTextarea = css`
+  width: 100%;
+  min-height: 400px;
+  padding: 12px 16px;
+  font-size: 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  resize: vertical;
+  font-family: inherit;
+  color: #111827;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease;
+
+  &:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.3);
+  }
+
+  &::placeholder {
+    color: #9ca3af;
+  }
+`;
 
 export const dropdownContainer = css`
   display: flex; 
   position: relative;
   align-items: flex-start;
-  border: 0.1rem solid #dbdbdb;
   border-radius: 1rem;
   gap: 1rem;     
   height: 50%;
 `;
 
+
 export const dropdownButton = css`
-  position: relative;
-  padding: 12px 16px;
+  flex: 1;
+  min-width: 130px;
+  margin-right: 1rem;
+  padding: 10px 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
   background-color: #ffffff;
-  border: none;
-  border-right: 1px solid #d1d5db;
-  width: 100%;
   font-size: 14px;
   color: #374151;
-  cursor: pointer;
-  min-width: 120px;
   text-align: left;
-  transition: background-color 0.2s ease;
+  position: relative;
+  cursor: pointer;
 
   &:hover {
     background-color: #f9fafb;
   }
 
-  &:last-of-type {
-    border-right: none;
-  }
-
   &::after {
-    content: '▼';
+    content: "▾";
     position: absolute;
-    right: 8px;
+    right: 12px;
     top: 50%;
     transform: translateY(-50%);
     font-size: 10px;
@@ -127,41 +152,54 @@ export const dropdownButton = css`
 
 export const dropdownMenu = css`
   position: absolute;
-  top: 100%;
+  top: calc(100% + 6px);
   left: 0;
-  right: 0;
+  width: 100%;
+  max-height: 240px;
+  overflow-y: auto;
   background-color: #ffffff;
-  border: 1px solid #dbdbdb;
-  border-top: none;
-  border-radius: 0 0 12px 12px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  max-height: 20rem;
-  z-index: 1000;
-   overflow-y: auto;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  z-index: 10;
 `;
 
 export const dropdownItem = css`
-  display: flex;
-  align-items: center;
-  padding: 8px 12px;
+  padding: 10px 14px;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+
+  label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    cursor: pointer;
+    color: #374151;
+  }
+
+  input[type="radio"] {
+    accent-color: #2563eb;
+  }
 
   &:hover {
     background-color: #f3f4f6;
   }
+`;
 
-  input[type="radio"] {
-    margin-right: 8px;
-    accent-color: #2563eb;
-  }
+export const button = css`
+  width: 100%;
+  padding: 14px 0;
+  margin-top: 32px;
+  font-size: 16px;
+  font-weight: 600;
+  text-align: center;
+  color: #ffffff;
+  background-color: #2563eb;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
 
-  label {
-    font-size: 14px;
-    color: #374151;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    width: 100%;
+  &:hover {
+    background-color: #1e40af;
   }
 `;

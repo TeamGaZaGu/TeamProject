@@ -327,12 +327,26 @@ export const createButton = css`
   }
 `;
 
+export const register = css`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;  
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #333; 
+  
+`;
+
+
 export const forumGrid = css`
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 1rem;
   margin: 0 1rem;
 `;
+
 
 export const forumCard = css`
   background-color: #ffffff;

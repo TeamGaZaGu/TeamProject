@@ -175,11 +175,18 @@ function CreateSuggestpage(props) {
                         <img src={previewImg} alt="" />
                     </div>
                 </div>
-                <div>
-                    <input type="text" name='title' value={inputValue.title} onChange={handleOnChange} placeholder="모임 제목" css={s.inputStyle} />
+                <div css={s.title}>
+                    <input type="text" name='title' value={inputValue.title} onChange={handleOnChange} placeholder="모임 제목" css={s.titleInput} />
                 </div>
                 <div>
-                    <input type="text" name='discription' value={inputValue.discription} placeholder='모임 소개' onChange={handleOnChange} css={s.inputStyle} />
+                    <textarea
+                        css={s.contentTextarea}
+                        name="discription"
+                        value={inputValue.discription}
+                        onChange={handleOnChange}
+                        placeholder="모임 소개"
+                        required
+                    />
                 </div>
                 
                 <div css={s.dropdownContainer}>
@@ -257,7 +264,7 @@ function CreateSuggestpage(props) {
                     )}
                 </div>
             </div>
-            <button onClick={handleCreateSuggestMoimOnClick}>모임 만들기</button>
+            <button css={s.button} onClick={handleCreateSuggestMoimOnClick}>모임 만들기</button>
         </div>
     );
 }
