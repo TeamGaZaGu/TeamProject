@@ -18,12 +18,13 @@
         <result property="provider" column="provider" />
         <result property="providerId" column="provider_id" />
         <result property="userRole" column="user_role" />
+        <result property="userSiteBlock" column="user_site_block" />
     </resultMap>
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="userId">
         insert into user_tb
         values (default, #{nickName}, #{fullName}, #{birthDate},
-        #{email}, #{profileImgPath}, #{introduction}, #{gender}, #{categoryId}, #{provider},#{providerId}, #{userRole})
+        #{email}, #{profileImgPath}, #{introduction}, #{gender}, #{categoryId}, #{provider},#{providerId}, #{userRole}, #{userSiteBlock})
     </insert>
 
     <update id="updateProfile">
@@ -39,7 +40,7 @@
     <update id="blockUser">
         update user_tb
         set
-            user_role = #{userRole}
+            user_site_block = #{userSiteBlock}
         where
             user_id = #{userId}
     </update>
@@ -47,7 +48,7 @@
     <update id="unBlockUser">
         update user_tb
         set
-            user_role = #{userRole}
+            user_site_block = #{userSiteBlock}
         where
             user_id = #{userId}
     </update>
@@ -75,7 +76,8 @@
             ut.category_id,
             ut.provider,
             ut.provider_id,
-            ut.user_role
+            ut.user_role,
+            ut.user_site_block
         from
             user_tb ut
         where

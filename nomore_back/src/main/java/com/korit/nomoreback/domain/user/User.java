@@ -23,6 +23,7 @@ public class User {
     private String provider;
     private String providerId;
     private String userRole;
+    private Integer userSiteBlock;
 
     private String moimRole;
 }

@@ -33,6 +33,7 @@ public class SignupReqDto {
                 .provider(provider)
                 .providerId(providerId)
                 .userRole("ROLE_USER")
+                .userSiteBlock(0)
                 .build();
     }
 }

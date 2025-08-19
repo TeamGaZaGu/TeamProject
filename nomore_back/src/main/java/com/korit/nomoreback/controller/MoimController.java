@@ -112,16 +112,8 @@
                 @PathVariable Integer moimId,  // Long → Integer
                 @RequestBody MoimBanReqDto dto) {
 
-            moimBanService.banUser(moimId, dto.getUserId(), dto.getReason());
+            moimBanService.banUser(moimId, dto.getUserId());
             return ResponseEntity.ok(ResponseDto.success("사용자를 모임에서 강퇴했습니다."));
         }
 
-        @DeleteMapping("/{moimId}/ban")
-        public ResponseEntity<ResponseDto<?>> unbanUser(
-                @PathVariable Integer moimId,
-                @RequestParam Integer userId) {
-
-            moimBanService.unbanUser(moimId, userId);
-            return ResponseEntity.ok(ResponseDto.success("강퇴를 해제했습니다."));
-        }
     }

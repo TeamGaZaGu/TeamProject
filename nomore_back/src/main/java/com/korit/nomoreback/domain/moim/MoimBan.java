@@ -13,5 +13,4 @@ public class MoimBan {
     private Integer banId;
     private Integer moimId;
     private Integer userId;
-    private String reason;
 }
