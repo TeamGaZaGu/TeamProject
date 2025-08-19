@@ -11,52 +11,31 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class MoimBanService {
 
     private final MoimBanMapper moimBanMapper;
-    private final MoimMemberMapper moimMemberMapper;
     private final MoimRoleMapper moimRoleMapper;
     private final MoimMapper moimMapper;
-    private final PrincipalUtil principalUtil;
 
     @Transactional(rollbackFor = Exception.class)
-    public void banUser(Integer moimId, Integer targetUserId) {
-        Integer currentUserId = principalUtil.getPrincipalUser().getUser().getUserId();
+    public void banUser(Integer moimId, Integer userId) {
 
-        MoimRoleDto operatorRole = moimRoleMapper.findRoleByUserAndMoimId(currentUserId, moimId);
-        if (operatorRole == null || !"OWNER".equals(operatorRole.getMoimRole())) {
-            throw new IllegalArgumentException("모임장만 강퇴할 수 있습니다.");
-        }
-
-        if (targetUserId.equals(currentUserId)) {
-            throw new IllegalArgumentException("자기 자신을 강퇴할 수 없습니다.");
-        }
-
-        if (moimBanMapper.existsByMoimIdAndUserId(moimId, targetUserId)) {
-            moimMemberMapper.updateStatus(moimId, targetUserId, "BANNED");
-            moimRoleMapper.deleteByMoimIdAndUserId(moimId, targetUserId);
-            return;
-        }
-
-        String prevStatus = moimMemberMapper.findStatus(moimId, targetUserId);
-        if (!"JOINED".equalsIgnoreCase(prevStatus)) {
-            throw new IllegalArgumentException("해당 유저는 활성 멤버가 아닙니다.");
-        }
-
-        moimMemberMapper.updateStatus(moimId, targetUserId, "BANNED");
-
-        moimRoleMapper.deleteByMoimIdAndUserId(moimId, targetUserId);
+        moimRoleMapper.deleteByMoimIdAndUserId(moimId, userId);
 
         MoimBan moimBan = MoimBan.builder()
                 .moimId(moimId)
-                .userId(targetUserId)
+                .userId(userId)
                 .build();
         moimBanMapper.insertBan(moimBan);
 
-        if ("JOINED".equalsIgnoreCase(prevStatus)) {
-            moimMapper.decreaseMoimCount(moimId);
-        }
+        moimMapper.moimMemberDiscount(moimId);
+    }
+
+    public List<MoimBan> banUserList(Integer moimId) {
+        return moimBanMapper.selectBanUser(moimId);
     }
 }

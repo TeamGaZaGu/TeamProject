@@ -55,6 +55,15 @@
         WHERE moim_id = #{moimId}
     </update>
 
+    <update id="moimMemberDiscount">
+        update
+            moim_tb
+        set
+            moim_member_count = moim_member_count - 1
+        where
+            moim_id = #{moimId}
+    </update>
+
     <delete id="deleteMoimById" parameterType="int">
         DELETE FROM moim_tb
         WHERE moim_id = #{moimId}

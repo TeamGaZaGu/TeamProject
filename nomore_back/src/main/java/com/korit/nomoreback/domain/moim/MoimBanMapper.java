@@ -3,10 +3,12 @@ package com.korit.nomoreback.domain.moim;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 @Mapper
 public interface MoimBanMapper {
 
     int insertBan(MoimBan moimBan);
 
-    boolean existsByMoimIdAndUserId(@Param("moimId") Integer moimId, @Param("userId") Integer userId);
+    List<MoimBan> selectBanUser(Integer moimId);
 }

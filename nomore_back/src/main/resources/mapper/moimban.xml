@@ -8,12 +8,13 @@
         VALUES (#{moimId}, #{userId})
     </insert>
 
-    <select id="existsByMoimIdAndUserId" resultType="boolean">
-        SELECT EXISTS (
-            SELECT 1
-            FROM moim_ban_tb
-            WHERE moim_id = #{moimId} AND user_id = #{userId}
-        )
+    <select id="selectBanUser" resultType="com.korit.nomoreback.domain.moim.MoimBan">
+        select
+            *
+        from
+            moim_ban_tb
+        where
+            moim_id = #{moimId}
     </select>
 
 </mapper>
