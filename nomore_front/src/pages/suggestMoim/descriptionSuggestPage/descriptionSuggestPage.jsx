@@ -9,7 +9,7 @@ import { RiHome7Fill, RiHome7Line } from 'react-icons/ri';
 import { FaPen, FaRegComment, FaTrashAlt } from 'react-icons/fa';
 import { useQueryClient } from '@tanstack/react-query';
 import { baseURL } from '../../../api/axios.js';
-import { reqUserBlock } from '../../../api/userBlockApi.js';
+import { reqUserBlock, reqUserUnBlock } from '../../../api/userBlockApi.js';
 import usePrincipalQuery from '../../../queries/usePrincipalQuery.jsx';
 import useUserBlockListQuery from '../../../queries/useUserBlockListQuery.jsx';
 import useForumQuery from '../../../queries/useForumQuery.jsx';
@@ -34,12 +34,13 @@ function DescriptionSuggestPage(props) {
     const categoryQuery = useCategoryQuery();
     const categories = categoryQuery?.data?.data || [];
     const getCategory = categories.find(category => category.categoryId === moim.categoryId);
-
+    
     const principalQuery = usePrincipalQuery();
     const userId = principalQuery?.data?.data?.user?.userId;
     const userBlockListQuery = useUserBlockListQuery({userId});
     const userBlockList = userBlockListQuery?.data?.data?.body;
-    console.log(userBlockList);
+
+    const isBlockedUser = userBlockList?.includes(selectedUser?.userId)
 
     const forumQuery = useForumQuery(moimId);
     const respForums = forumQuery?.data?.data || [];
@@ -100,7 +101,6 @@ function DescriptionSuggestPage(props) {
     // 유저 정보 모달 열기
     const handleUserInformationOnClick = (userId) => {
         const user = userList.find(u => u.userId === userId);
-        console.log(user)
         if (user) {
             setSelectedUser(user);
             setIsModalOpen(true);
@@ -122,8 +122,7 @@ function DescriptionSuggestPage(props) {
 
     const handleUserBlockOnClick = async (userId, nickName) => {
         
-        const isBlocked = userRole === 'ROLE_BEN';
-        const action = isBlocked ? '차단해제' : '차단';
+        const action = isBlockedUser ? '차단해제' : '차단';
         
         const isConfirmed = window.confirm(`"${nickName}" 님을 ${action}하시겠습니까?`);
         
@@ -132,32 +131,18 @@ function DescriptionSuggestPage(props) {
             
         }
 
-        if (isBlocked) {
-            try {
-                await reqUnBlockUser(userId);
-                setAllUser(prevUsers => 
-                    prevUsers.map(user => 
-                        user.userId === userId 
-                            ? { ...user, userRole: 'ROLE_USER' }
-                            : user
-                    )
-                );
-            } catch(error) {
-                console.log('사용자 차단해제 실패', error);
+        try {
+            if (isBlockedUser) {
+                await reqUserUnBlock(userId);
+            } else {
+                await reqUserBlock(userId);
             }
-        } else {
-            try {
-                await reqBlockUser(userId);
-                setAllUser(prevUsers => 
-                    prevUsers.map(user => 
-                        user.userId === userId 
-                            ? { ...user, userRole: 'ROLE_BEN' }
-                            : user
-                    )
-                );
-            } catch(error) {
-                console.log('사용자 차단 실패:', error);
-            }
+            
+            await queryClient.invalidateQueries(['userBlockList', userId]);
+
+        } catch(error) {
+            console.log(`사용자 ${action} 실패:`, error);
+            alert(`${action}에 실패했습니다. 다시 시도해주세요.`);
         }
     }
 
@@ -234,21 +219,42 @@ function DescriptionSuggestPage(props) {
                             {
                                 userList?.map((user) => {
                                     const roleEmoji = user.moimRole === "OWNER" ? "👑" : "👤";
-                                    const isBlocked = userBlockList.includes(user.userId);
-                                    return (
-                                        <button key={user.userId} css={s.memberCard} onClick={() => handleUserInformationOnClick(user.userId)}>
-                                            <img
-                                                src={`${baseURL}/image${user.profileImgPath}`}
-                                                alt="프로필"
-                                                css={s.profileImage}
-                                            /> 
-                                            <div css={s.defaultAvatar}>{roleEmoji}</div>
-                                            <div css={s.memberInfo}>
-                                                <span css={s.memberRole}>{user.nickName}</span>
-                                                <span css={s.memberName}>{user.introduction}</span>
-                                            </div>
-                                        </button>
-                                )})
+                                    const isBlocked = userBlockList?.includes(user.userId);
+                                    if (isBlocked) {
+                                        return (
+                                            <button key={user.userId} css={s.memberCard} onClick={() => handleUserInformationOnClick(user.userId)}>
+                                                <img
+                                                    src={`${baseURL}/image${user.profileImgPath}`}
+                                                    alt="프로필"
+                                                    css={s.profileImage}
+                                                /> 
+                                                <div css={s.defaultAvatar}>{roleEmoji}</div>
+                                                <div css={s.memberInfo}>
+                                                    <span css={s.memberRole}>{user.nickName}</span>
+                                                    <span css={s.memberName}>{user.introduction}</span>
+                                                </div>
+                                                <div>
+                                                    차단한 유저
+                                                </div>
+                                            </button>
+                                        )
+                                    } else {
+                                        return (
+                                            <button key={user.userId} css={s.memberCard} onClick={() => handleUserInformationOnClick(user.userId)}>
+                                                <img
+                                                    src={`${baseURL}/image${user.profileImgPath}`}
+                                                    alt="프로필"
+                                                    css={s.profileImage}
+                                                /> 
+                                                <div css={s.defaultAvatar}>{roleEmoji}</div>
+                                                <div css={s.memberInfo}>
+                                                    <span css={s.memberRole}>{user.nickName}</span>
+                                                    <span css={s.memberName}>{user.introduction}</span>
+                                                </div>
+                                            </button>
+                                        )
+                                    }
+                                })
                             }
                         </div>
                     </div>
@@ -324,6 +330,7 @@ function DescriptionSuggestPage(props) {
             </div>
 
             {/* 유저 상세 정보 모달 */}
+            
             {isModalOpen && selectedUser && (
                 <div css={s.modalOverlay} onClick={handleModalBackdropClick}>
                     <div css={s.modalContent}>
@@ -359,7 +366,15 @@ function DescriptionSuggestPage(props) {
                                     {selectedUser.introduction && (
                                         <p css={s.userIntroduction}>{selectedUser.introduction}</p>
                                     )}
-                                    <button onClick={() => handleUserBlockOnClick(selectedUser.userId, selectedUser.nickName)}>차단하기</button>
+                                    {isBlockedUser ? (
+                                        <button onClick={() => handleUserBlockOnClick(selectedUser.userId, selectedUser.nickName)}>
+                                            차단 해제
+                                        </button>
+                                    ) : (
+                                        <button onClick={() => handleUserBlockOnClick(selectedUser.userId, selectedUser.nickName)}>
+                                            차단하기
+                                        </button>
+                                    )}
                                 </div>
                             </div>
                         </div>
