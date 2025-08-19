@@ -22,13 +22,13 @@ public class UserService {
     }
 
     public void blockUser(Integer userId) {
-        String userRole = "ROLE_BEN";
-        userMapper.blockUser(userId, userRole);
+        Integer userSiteBlock = 1;
+        userMapper.blockUser(userId, userSiteBlock);
     }
 
     public void unBlockUser(Integer userId) {
-        String userRole = "ROLE_USER";
-        userMapper.unBlockUser(userId, userRole);
+        Integer userSiteBlock = 0;
+        userMapper.unBlockUser(userId, userSiteBlock);
     }
 
     public void updateProfile(Integer userId, UserProfileUpdateReqDto reqDto, MultipartFile profileImg) {
