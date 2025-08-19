@@ -193,11 +193,57 @@ export const memberSection = css`
     gap: 12px;
 `;
 
+export const memberCardWrapper = css`
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 8px 0;
+`;
+
+export const memberInfoSection = css`
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+    cursor: pointer;
+`;
+
+export const kickButton = css`
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    margin-left: 12px;
+    white-space: nowrap;
+    transition: background-color 0.2s ease;
+
+    &:hover {
+        background-color: #c82333;
+    }
+
+    &:active {
+        transform: translateY(1px);
+    }
+`;
+
+export const blockedUserText = css`
+    font-size: 12px;
+    color: #666;
+    margin-left: auto;
+    padding-right: 8px;
+`;
+
 export const memberCard = css`
     display: flex;
     align-items: center;
     gap: 12px;
     padding: 8px 0;
+    cursor: pointer;
 `;
 
 export const profileImage = css`
@@ -509,7 +555,6 @@ export const userCategory = css`
   text-align: center;
 `;
 
-
 export const userIntroduction = css`
   margin: 0;
   font-size: 14px;
@@ -517,4 +562,31 @@ export const userIntroduction = css`
   padding: 12px;
   background-color: #f9fafb;
   border-radius: 8px;
+`;
+
+export const modalButtonContainer = css`
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+  justify-content: center;
+`;
+
+export const modalKickButton = css`
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: #c82333;
+  }
+
+  &:active {
+    transform: translateY(1px);
+  }
 `;
