@@ -76,7 +76,8 @@
             ut.category_id,
             ut.provider,
             ut.provider_id,
-            ut.user_role
+            ut.user_role,
+            ut.user_site_block
         from
             user_tb ut
         where
