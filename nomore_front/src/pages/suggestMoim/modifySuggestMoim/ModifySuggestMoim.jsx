@@ -5,6 +5,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { reqModifyMoim, reqSelectMoim } from '../../../api/moimApi';
 import useCategoryQuery from '../../../queries/useCategoryQuery';
 import { reqDistrict } from '../../../api/searchApi';
+import { baseURL } from '../../../api/axios';
 
 function ModifySuggestMoim(props) {
     const navigate = useNavigate();
@@ -13,15 +14,15 @@ function ModifySuggestMoim(props) {
     const [ moim, setMoim ] = useState("");
     
     const [inputValue, setInputValue] = useState({
-    title: "",
-    discription: "",
-    maxMembers: "",
-    districtId: "",
-    districtName: "",
-    categoryId: "",
-    moimImgPath: "",
-    moimImgFile: null,  // 추가
-});
+        title: "",
+        discription: "",
+        maxMembers: "",
+        districtId: "",
+        districtName: "",
+        categoryId: "",
+        moimImgPath: "",
+        moimImgFile: null,
+    });
 
     const categoryQuery = useCategoryQuery();
     const categories = categoryQuery?.data?.data || [];
@@ -63,7 +64,7 @@ function ModifySuggestMoim(props) {
                 setSelectedCategory(getCategory.categoryName);
                 setSelectedDistrict(moimData.districtName);
                 setSelectedMaxMembers(moimData.maxMember);
-                setPreviewImg(`http://localhost:8080/image/${moimData.moimImgPath}`);
+                setPreviewImg(`${baseURL}/image${moimData.moimImgPath}`);
 ;
             } catch (err) {
                 console.error(err);
@@ -106,7 +107,8 @@ function ModifySuggestMoim(props) {
         if (districtList.length === 0) {
             try {
                 const response = await reqDistrict();
-                setDistrictList(response?.data);
+                const districts = (response.data || []).filter(res => res.districtName !== '전체');
+                setDistrictList(districts);
             } catch (error) {
                 console.log(error);
             }
@@ -200,10 +202,17 @@ function ModifySuggestMoim(props) {
                         </div>
                     </div>
                     <div>
-                        <input type="text" name='title' value={inputValue.title} onChange={handleOnChange} placeholder="모임 제목" css={s.inputStyle} />
+                        <input type="text" name='title' value={inputValue.title} onChange={handleOnChange} placeholder="모임 제목" css={s.titleInput} />
                     </div>
                     <div>
-                        <input type="text" name='discription' value={inputValue.discription} placeholder='모임 소개' onChange={handleOnChange} css={s.inputStyle} />
+                       <textarea
+                            css={s.contentTextarea}
+                            name="discription"
+                            value={inputValue.discription}
+                            onChange={handleOnChange}
+                            placeholder="모임 소개"
+                            required
+                        />
                     </div>
                     
                     <div css={s.dropdownContainer}>
@@ -278,7 +287,7 @@ function ModifySuggestMoim(props) {
                         )}
                     </div>
                 </div>
-                <button onClick={handleCreateSuggestMoimOnClick}>모임 수정</button>
+                <button css={s.button} onClick={handleCreateSuggestMoimOnClick}>모임 수정</button>
             </div>
     )};
 }

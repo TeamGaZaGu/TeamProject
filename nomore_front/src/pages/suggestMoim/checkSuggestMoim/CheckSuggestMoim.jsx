@@ -42,7 +42,7 @@ function CheckSuggestMoim(props) {
             <div>
                 <div css={s.layout}>
                     <h2>추천모임</h2>
-                    <button onClick={handleCreateMoimOnClick}>모임 만들기</button>
+                    <button css={s.createMoim} onClick={handleCreateMoimOnClick}>모임 만들기</button>
                 </div>
                <div css={s.moimContainer}>
                 {
