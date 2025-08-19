@@ -29,6 +29,7 @@ public class SecurityConfig {
         corsConfiguration.addAllowedOriginPattern(CorsConfiguration.ALL);
         corsConfiguration.addAllowedMethod(CorsConfiguration.ALL);
         corsConfiguration.addAllowedHeader(CorsConfiguration.ALL);
+        corsConfiguration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", corsConfiguration);
@@ -54,14 +55,15 @@ public class SecurityConfig {
             auth.requestMatchers("/forum/**").permitAll();
             auth.requestMatchers("/api/moims/**").permitAll();
             auth.requestMatchers("/api/admin/**").hasRole("ADMIN");
+            auth.requestMatchers("/ws/**").permitAll();
             auth.anyRequest().authenticated();
         });
 
         http.exceptionHandling(handling ->
                 handling.authenticationEntryPoint((request, response, authException) -> {
-                    response.setStatus(401);
-                }
-            )
+                            response.setStatus(401);
+                        }
+                )
         );
 
         http.oauth2Login(oauth2 -> oauth2
@@ -75,4 +77,5 @@ public class SecurityConfig {
 
         return http.build();
     }
+
 }

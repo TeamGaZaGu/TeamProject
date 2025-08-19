@@ -15,6 +15,7 @@ import useUserBlockListQuery from '../../../queries/useUserBlockListQuery.jsx';
 import useForumQuery from '../../../queries/useForumQuery.jsx';
 import useForumCategoryQuery from '../../../queries/useForumCategoryQuery.jsx';
 import { BiLike } from 'react-icons/bi';
+import ChattingPage from '../../chatting/ChattingPage.jsx';
 
 function DescriptionSuggestPage(props) {
     const navigate = useNavigate();
@@ -357,11 +358,7 @@ function DescriptionSuggestPage(props) {
                     </div>
                 </div>
             )}
-            {activeTab === "chat" && (
-                <div>
-
-                </div>
-            )}
+            {activeTab === "chat" && <ChattingPage moimId={moimId} />}
 
             <div css={s.bottomActions}>
                 <button css={s.joinButton} onClick={handleJoinMoimOnClick}>
