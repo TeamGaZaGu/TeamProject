@@ -6,6 +6,7 @@ import { reqDetailForum, reqModifyForum } from '../../../api/forumApi';
 import useForumCategoryQuery from '../../../queries/useForumCategoryQuery';
 import { Upload, X } from 'lucide-react';
 import { BsSendArrowUpFill } from 'react-icons/bs';
+import { baseURL } from '../../../api/axios.js';
 
 function ModifyForum(props) {
     const navigate = useNavigate()
@@ -21,18 +22,18 @@ function ModifyForum(props) {
     const [ forumValue, setForumValue ] = useState({
         forumTitle: "",
         forumContent: "",
-        forumImages: "",
+        forumImages: [],
         forumCategoryId: "",
     });
 
-    console.log(forumValue)
+    console.log("forumValue", forumValue.forumImages)
 
     useEffect(() => {
         if (forum) {
             setForumValue({
                 forumTitle: forum.forumTitle || '',
                 forumContent: forum.forumContent || '',
-                forumImages: "",
+                forumImages: forum.forumImgList || [],
                 forumCategoryId: forum.forumCategory?.forumCategoryId || '',
             });
         }
@@ -191,14 +192,29 @@ function ModifyForum(props) {
                         </div>
                     }
                     {
+                        forumValue.forumImages?.map((img, index) => (
+                            <div key={`existing-${index}`}>
+                                <div css={s.previewImg}>
+                                    <img src={`${baseURL}/image${img.path}`} alt={`forum-img-${index}`} />
+                                    <button
+                                        type="button"
+                                        onClick={() => handleImgDeleteOnClick(index)}
+                                        >
+                                        <X size={12} />
+                                    </button>
+                                </div>
+                            </div>
+                        ))
+                    }
+                    {
                         images.map((img, index) => (
-                            <div key={index}>
+                            <div key={`new-${index}`}>
                                 <div css={s.previewImg}>
                                     <img src={img.dataUrl} alt="" />
                                     <button
                                         type="button"
                                         onClick={() => handleImgDeleteOnClick(index)}
-                                    >
+                                        >
                                         <X size={12} />
                                     </button>
                                 </div>

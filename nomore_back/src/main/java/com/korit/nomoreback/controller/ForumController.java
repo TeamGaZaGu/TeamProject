@@ -70,10 +70,11 @@ public class ForumController {
         return ResponseEntity.ok("삭제 완료");
     }
 
-    @PostMapping(value = "/{moimId}/{forumId}/comment", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping("/{moimId}/{forumId}/comment")
     public ResponseEntity<?> registerComment(@PathVariable Integer moimId,
                                              @PathVariable Integer forumId,
-                                             @ModelAttribute ForumCommentRegDto dto) {
+                                             @RequestBody ForumCommentRegDto dto) {
+        System.out.println(dto);
         dto.setMoimId(moimId);
         dto.setForumId(forumId);
         forumService.registerComment(dto);

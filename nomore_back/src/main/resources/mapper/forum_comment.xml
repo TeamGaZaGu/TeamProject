@@ -25,7 +25,6 @@
     </resultMap>
 
     <insert id="insert">
-
         insert into forum_comment_tb(
             forum_id,
             parent_comment_id,
@@ -120,7 +119,6 @@
         order by
             order_number desc,
             `path`
-
     </select>
 
     <select id="getCountByForumId" resultType="java.lang.Integer">

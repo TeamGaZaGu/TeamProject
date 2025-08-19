@@ -9,7 +9,7 @@ public class ForumCommentRegDto {
     private Integer forumId;
     private Integer parentCommentId;
     private Integer parentUserId;
-    private String forumComment;
+    private String content;
 
     public ForumComment toEntity(Integer userId) {
         return ForumComment.builder()
@@ -18,7 +18,7 @@ public class ForumCommentRegDto {
                 .parentCommentId(parentCommentId)
                 .parentUserId(parentUserId)
                 .userId(userId)
-                .forumComment(forumComment)
+                .forumComment(content)
                 .build();
     }
 }

@@ -1,159 +1,196 @@
-import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import {
-  reqGetForumById,
-  reqGetForumComments,
-  reqRegisterComment,
-  reqLikeForum,
-  reqDislikeForum,
-} from "../../../api/forumApi";
-import { BiLike } from "react-icons/bi";
-import { FaRegComment } from "react-icons/fa";
+/** @jsxImportSource @emotion/react */
+import * as s from './styles.js';
+import React, { useEffect, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import {  reqRegisterComment, reqDeleteForum, reqDetailForum, reqGetComment } from '../../../api/forumApi';
+import { baseURL } from '../../../api/axios.js';
+import { BiLike } from 'react-icons/bi';
+import { FaCameraRetro, FaRegComment } from 'react-icons/fa';
+import { useQueryClient } from '@tanstack/react-query';
 
-function DetailedForum() {
-  // URL에서 moimId와 forumId 가져오기
-  const { moimId, forumId } = useParams();
+function DetailedForum(props) {
+    const navigate = useNavigate();
+    const queryClient = useQueryClient();
 
-  const [forum, setForum] = useState(null);
-  const [comments, setComments] = useState([]);
-  const [commentText, setCommentText] = useState("");
-  const [replyText, setReplyText] = useState({}); // 대댓글 별로 관리
+    const [ searchParam ] = useSearchParams();
+    const forumId = searchParam.get("forumId");
 
-  useEffect(() => {
-    if (!forumId) return;
+    const [ comments, setComments ] = useState([]);
+    const [ commentValue, setCommentValue ] = useState("");
+    const [ recomment, setRecomment ] = useState(null);
+    
+    const [ forum, setForum ] = useState([]);
+    let formatted = "";
+    if (forum?.forumCreatedAt) {
+        const date = new Date(forum.forumCreatedAt);
+        formatted = new Intl.DateTimeFormat("ko-KR", {
+            year: "numeric",
+            month: "numeric",
+            day: "numeric",
+            hour: "numeric",
+            minute: "numeric",
+            hour12: true,
+            timeZone: "Asia/Seoul",
+        }).format(date);
+    }
+    
+    useEffect(() => {
+        const fetchForum = async () => {
+            try {
+                const response = await reqDetailForum(forumId);
+                setForum(response.data);
+            } catch (error) {
+                console.error("게시글 불러오기 실패:", error);
+            }
+        };
 
-    const fetchData = async () => {
+        if (forumId) {
+            fetchForum();
+        }
+    }, [forumId]);
+
+    const fetchComment = async () => {
       try {
-        const forumRes = await reqGetForumById(forumId);
-        setForum(forumRes.data);
-
-        const commentsRes = await reqGetForumComments(forumId);
-        setComments(commentsRes.data);
-      } catch (err) {
-        console.error(err);
+        const response = await reqGetComment(forumId);
+        setComments(response?.data)
+      } catch (error) {
+          console.log("댓글 불러오기 실패:", error);
       }
     };
+    useEffect(() => {
+      if (forumId) {
+            fetchComment();
+        }
+    }, [forumId])
 
-    fetchData();
-  }, [forumId]);
+    const handleDeleteForumOnClick = async (forumId, moimId) => {
+        try {
+            await reqDeleteForum(forumId, moimId);
 
-  // 좋아요 토글
-  const handleLikeClick = async () => {
-    if (!forum) return;
-    try {
-      if (forum.isLike === 1) {
-        await reqDislikeForum(moimId, forumId);
-        setForum({ ...forum, isLike: 0, likeCount: forum.likeCount - 1 });
-      } else {
-        await reqLikeForum(moimId, forumId);
-        setForum({ ...forum, isLike: 1, likeCount: forum.likeCount + 1 });
+            await queryClient.invalidateQueries({ queryKey: ['forums', moimId] });
+
+            await navigate(`/suggest/description?moimId=${moimId}`);
+            
+        } catch (error) {
+            console.error("삭제 실패:", error);
+            alert("게시글 삭제 중 오류 발생");
+        }
+    };
+
+    const handleCommentOnChange = (e) => {
+      const value = e.target.value;
+      setCommentValue(value);
+
+      if (recomment && !value.startsWith(`@${recomment?.user?.nickName}`)) {
+        setRecomment(null);
       }
-    } catch (err) {
-      console.error(err);
     }
-  };
 
-  // 댓글 작성
-  const handleCommentSubmit = async () => {
-    if (!commentText.trim()) return;
-    try {
-      await reqRegisterComment(moimId, forumId, commentText);
-      setCommentText("");
-      const commentsRes = await reqGetForumComments(forumId);
-      setComments(commentsRes.data);
-    } catch (err) {
-      console.error(err);
+    const handleRegisterCommentOnClick = async (forumId, moimId) => {
+      const content = /^@\w+\s/.test(commentValue) 
+            ? commentValue.substring(commentValue.indexOf(" ") + 1)
+            : commentValue;
+
+      const comment = {
+        parentCommentId: recomment?.forumCommentId,
+        parentUserId: recomment?.user.userId,
+        content
+      }
+      await reqRegisterComment(forumId, moimId, comment)
+      setCommentValue("");
+      setRecomment(null);
+      await fetchComment();
     }
-  };
 
-  // 대댓글 작성
-  const handleReplySubmit = async (parentComment) => {
-    const content = replyText[parentComment.forumCommentId];
-    if (!content || !content.trim()) return;
+    useEffect(() => {
+        if(!!recomment) {
+            setCommentValue(prev => {
+                const content = /^@\w+\s/.test(commentValue) 
+                    ? commentValue.substring(commentValue.indexOf(" ") + 1)
+                    : commentValue;
 
-    try {
-      await reqRegisterComment(
-        moimId,
-        forumId,
-        content,
-        parentComment.forumCommentId,
-        parentComment.userId
-      );
-      setReplyText({ ...replyText, [parentComment.forumCommentId]: "" });
-      const commentsRes = await reqGetForumComments(forumId);
-      setComments(commentsRes.data);
-    } catch (err) {
-      console.error(err);
-    }
-  };
+                return `@${recomment.user.nickName} ${content}`;
+            });
+        }
+    }, [recomment]);
+    
 
-  if (!forum) return <div>로딩중...</div>;
-
-  return (
-    <div>
-      <h1>{forum.forumTitle}</h1>
-      <p>{forum.forumContent}</p>
-      <p>작성자: {forum.user?.nickName}</p>
-      <p>카테고리: {forum.forumCategory?.forumCategoryName}</p>
-
-      {/* 좋아요/댓글 */}
-      <div>
-        <button onClick={handleLikeClick}>
-          <BiLike /> {forum.likeCount} {forum.isLike === 1 ? "💖" : ""}
-        </button>
-        <span>
-          <FaRegComment /> {comments.length}
-        </span>
-      </div>
-
-      {/* 댓글 작성 */}
-      <div>
-        <textarea
-          value={commentText}
-          onChange={(e) => setCommentText(e.target.value)}
-          placeholder="댓글 작성..."
-        />
-        <button onClick={handleCommentSubmit}>작성</button>
-      </div>
-
-      {/* 댓글 리스트 */}
-      <div>
-        {comments.map((c) => (
-          <div key={c.forumCommentId} style={{ marginTop: "10px" }}>
-            <p>
-              <strong>{c.user?.nickName}</strong>: {c.forumComment}
-            </p>
-
-            {/* 대댓글 작성 */}
-            <div style={{ marginLeft: "20px" }}>
-              <textarea
-                value={replyText[c.forumCommentId] || ""}
-                onChange={(e) =>
-                  setReplyText({
-                    ...replyText,
-                    [c.forumCommentId]: e.target.value,
-                  })
-                }
-                placeholder="대댓글 작성..."
-              />
-              <button onClick={() => handleReplySubmit(c)}>작성</button>
-            </div>
-
-            {/* 대댓글 표시 */}
-            {c.children &&
-              c.children.map((child) => (
-                <div key={child.forumCommentId} style={{ marginLeft: "40px" }}>
-                  <p>
-                    <strong>{child.user?.nickName}</strong> (reply to{" "}
-                    {child.parentUsername}): {child.forumComment}
-                  </p>
+    return (
+        <div css={s.forumCard} key={forum?.forumId}>
+            <div css={s.forumHeader}>
+                <div css={s.left}>
+                    <img
+                        css={s.modalProfileImage}
+                        src={`${baseURL}/image${forum?.user?.profileImgPath}`}
+                        alt=""
+                    />
+                    <div css={s.userInfo}>
+                        <h3 css={s.h3Tag}>{forum?.user?.nickName}</h3>
+                        <p css={s.postMeta}>
+                            {forum?.forumCategory?.forumCategoryName} · {formatted}
+                        </p>
+                    </div>
                 </div>
-              ))}
-          </div>
-        ))}
-      </div>
-    </div>
-  );
+                <div css={s.buttonWrapper}>
+                    <button css={s.editButton} onClick={() => navigate(`/forum/modify?forumId=${forumId}`)}>수정</button>
+                    <button css={s.deleteButton} onClick={() => handleDeleteForumOnClick(forumId, forum?.moim?.moimId)}>삭제</button>
+                </div>
+            </div>
+            <div css={s.forumBody}>
+                <h2 css={s.forumTitle}>{forum?.forumTitle}</h2>
+                <p css={s.forumContent}>{forum?.forumContent}</p>
+                {forum?.forumImgList?.map(img => (
+                  <img key={img.forumImgId} src={`${baseURL}/image${img.path}`} alt="forum-img" />
+                ))}
+            </div>
+            <div css={s.forumFooter}>
+                <p><BiLike />{forum?.likeCount}</p>
+                <p><FaRegComment />{forum?.commentCount}</p>
+            </div>
+            <div css={s.comments}>
+              <div css={s.commentList}>
+                  {
+                    comments?.map(comment => {
+                      if (comment.level === 0) {
+                        return <>
+                            <div css={s.commentItem}>
+                                <img src={`${baseURL}/image${comment?.user?.profileImgPath}`} alt="profile" css={s.commentProfileImage} />
+                                <div css={s.commentBody}>
+                                    <p css={s.commentAuthor}>{comment?.user?.nickName}</p>
+                                    <p css={s.commentText}>{comment?.forumComment}</p>
+                                    <p css={s.recomment} onClick={() => setRecomment(comment)}>답글 달기</p>
+                                </div>
+                            </div>
+                        </>
+                      }
+                      return <>
+                          <div></div>
+                          <div css={s.subCommentGridContainer}>
+                              <img src={`${baseURL}/image${comment?.user?.profileImgPath}`} alt="profile" css={s.commentProfileImage} />
+                              <div css={s.commentBody}>
+                                  <p css={s.commentAuthor}>{comment?.user?.nickName}</p>
+                                  <span css={s.commentText}><span css={s.tagText}>@{comment.parentUsername}</span>{comment?.forumComment}</span>
+                                  <p css={s.recomment} onClick={() => setRecomment(comment)}>답글 달기</p>
+                              </div>
+                          </div>
+                      </>
+                    })
+                  }
+              </div>
+
+              <div css={s.writeComment}>
+                  <input type="text" placeholder="댓글을 입력하세요" css={s.input} value={commentValue} onChange={handleCommentOnChange} />
+                  <button 
+                  css={s.button} 
+                  disabled={recomment && !recomment?.user?.userId} 
+                  onClick={() => handleRegisterCommentOnClick(forumId, forum?.moim?.moimId)}
+                  >
+                    등록
+                  </button>
+              </div>
+            </div>
+        </div>
+    );
 }
 
 export default DetailedForum;
