@@ -16,13 +16,13 @@ import BenUserPage from '../pages/BenUserPage/BenUserPage';
 
 function RootRoute(props) {
     const principalQuery = usePrincipalQuery();
-    const userRole = principalQuery?.data?.data?.user?.userRole;
-   
+    const user = principalQuery?.data?.data?.user;
+
     if (!principalQuery.isFetched) {
         return <Loading />
     }
 
-    if (userRole === 'ROLE_BEN') {
+    if (user?.userSiteBlock === 1) {
         return (
             <MainLayout>
                 <BenUserPage />
@@ -40,7 +40,9 @@ function RootRoute(props) {
                 <Route path='/auth/signup' element={ <Signup /> } />
                 <Route path='/mypage' element={ <Mypage /> } />
                 <Route path='/category/*' element={ <CatogoryPage /> } />
-                <Route path='/userManagement' element={ <UserManagement /> } />
+                {user?.userRole === "ROLE_ADMIN" && (
+                    <Route path='/userManagement' element={<UserManagement />} />
+                )}
                 <Route path='/' element={ <Home />} />
                 <Route path='*' element={ <NotFound /> } />
             </Routes>

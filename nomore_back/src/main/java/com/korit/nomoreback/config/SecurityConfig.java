@@ -53,6 +53,7 @@ public class SecurityConfig {
             auth.requestMatchers("/category/**").permitAll();
             auth.requestMatchers("/forum/**").permitAll();
             auth.requestMatchers("/api/moims/**").permitAll();
+            auth.requestMatchers("/api/admin/**").hasRole("ADMIN");
             auth.anyRequest().authenticated();
         });
 
