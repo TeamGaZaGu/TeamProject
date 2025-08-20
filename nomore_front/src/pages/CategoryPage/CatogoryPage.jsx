@@ -8,40 +8,39 @@ import useCategoryQuery from '../../queries/useCategoryQuery';
 
 function CategoryPage() {
     const navigate = useNavigate();
-    const [searchParam] = useSearchParams();
-    const categoryId = parseInt(searchParam.get("categoryId"));
+    const [searchParams, setSearchParams] = useSearchParams();
+    const categoryId = parseInt(searchParams.get("categoryId"));
 
     const categoryQuery = useCategoryQuery();
     const categoryList = categoryQuery?.data?.data || [];
     const selectCategory = categoryList.find(category => category.categoryId === categoryId);
 
-    const [page, setPage] = useState(1);
-    const [allMoims, setAllMoims] = useState([]);
-
-    const moimQuery = useMoimQuery({ page, size: 8, categoryId });
-    const currentMoims = moimQuery?.data?.data?.body.contents || [];
+    const moimQuery = useMoimQuery({ size: 8, categoryId });
+    const allMoims = moimQuery?.data?.pages?.map(page => page.data.body.contents).flat() || [];
     const isLast = moimQuery?.data?.data?.body.isLast || false;
+    console.log("!!");
+    console.log(allMoims);
 
     const loaderRef = useRef(null);
 
     // 새 데이터가 들어오면 allMoims에 누적
-    useEffect(() => {
-        if (currentMoims.length > 0) {
-            if (page === 1) {
-                setAllMoims(currentMoims);
-            } else {
-                setAllMoims(prev => [...prev, ...currentMoims]);
-            }
-        }
-    }, [currentMoims, page]);
+    // useEffect(() => {
+    //     if (currentMoims.length > 0) {
+    //         if (page === 1) {
+    //             setAllMoims(currentMoims);
+    //         } else {
+    //             setAllMoims(prev => [...prev, ...currentMoims]);
+    //         }
+    //     }
+    // }, [currentMoims]);
 
     // 무한 스크롤 (IntersectionObserver)
     useEffect(() => {
-        if (isLast) return; // 마지막 페이지면 더 안 불러옴
-
         const observer = new IntersectionObserver((entries) => {
             if (entries[0].isIntersecting) {
-                setPage(prev => prev + 1);
+                if(moimQuery.hasNextPage) {
+                    moimQuery.fetchNextPage();
+                }
             }
         }, { 
             rootMargin: "200px",  // 👈 바닥 200px 전에 미리 불러오기
@@ -56,7 +55,7 @@ function CategoryPage() {
                 observer.unobserve(loaderRef.current);
             }
         };
-    }, [isLast]);
+    }, [loaderRef.current]);
 
     const handleMoimOnClick = (moimId) => {
         navigate(`/suggest/description?moimId=${moimId}`);
