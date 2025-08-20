@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react'; // ✅ 추가: useEffect import
 /** @jsxImportSource @emotion/react */
 import * as s from './styles';
 import useMoimQuery from '../../queries/useMoimQuery';
@@ -8,8 +8,23 @@ import { useNavigate } from 'react-router-dom';
 function HomeMoims({ category }) {
     const navigate = useNavigate();
     const [page, setPage] = useState(1);
+    const [allMoims, setAllMoims] = useState([]);
+    const [isLoadingMore, setIsLoadingMore] = useState(false);
+    
     const moimQuery = useMoimQuery({ page, size: 8, categoryId: category.categoryId });
-    const moims = moimQuery?.data?.data?.body.contents || [];
+    const currentMoims = moimQuery?.data?.data?.body.contents || [];
+    const isLast = moimQuery?.data?.data?.body.isLast || false;
+
+    useEffect(() => {
+        if (currentMoims.length > 0) {
+            if (page === 1) {
+                setAllMoims(currentMoims);
+            } else {
+                setAllMoims(prev => [...prev, ...currentMoims]);
+            }
+            setIsLoadingMore(false);
+        }
+    }, [currentMoims, page]);
 
     const handleMoimOnClick = (moimId) => {
         navigate(`/suggest/description?moimId=${moimId}`);
@@ -37,8 +52,16 @@ function HomeMoims({ category }) {
         `;
     };
 
-    // 모임이 없으면 렌더링하지 않음
-    if (moims.length === 0) {
+    const handleLoadMore = () => {
+        setIsLoadingMore(true);
+        setPage(prev => prev + 1);
+    };
+
+    if (moimQuery.isLoading && page === 1) {
+        return null;
+    }
+
+    if (allMoims.length === 0 && !moimQuery.isLoading) {
         return null;
     }
 
@@ -50,7 +73,7 @@ function HomeMoims({ category }) {
             </div>
             
             <ul css={s.gridContainerStyle}>
-                {moims.map((moim) => {
+                {allMoims.map((moim) => {
                     const isAvailable = moim.memberCount < moim.maxMember;
                     const hasImage = moim.moimImgPath && moim.moimImgPath !== '';
                     const imageUrl = hasImage ? `${baseURL}/image${moim.moimImgPath}` : null;
@@ -112,6 +135,28 @@ function HomeMoims({ category }) {
                     );
                 })}
             </ul>
+
+            {!isLast && (
+                <div css={s.loadMoreContainerStyle}>
+                    <button 
+                        css={s.loadMoreButtonStyle}
+                        onClick={handleLoadMore}
+                        disabled={isLoadingMore}
+                    >
+                        {isLoadingMore ? (
+                            <>
+                                <span css={s.spinnerStyle}>⏳</span>
+                                불러오는 중...
+                            </>
+                        ) : (
+                            <>
+                                모임 더보기
+                                <span css={s.arrowStyle}>▼</span>
+                            </>
+                        )}
+                    </button>
+                </div>
+            )}
         </div>
     );
 }
