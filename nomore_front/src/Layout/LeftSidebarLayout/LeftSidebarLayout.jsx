@@ -9,7 +9,6 @@ import useCategoryQuery from '../../queries/useCategoryQuery';
 import { BiRun } from 'react-icons/bi';
 import MypageButton from '../Mypage/MypageButton';
 import usePrincipalQuery from '../../queries/usePrincipalQuery';
-import { reqSearch } from '../../api/searchApi';
 import { useNavigate } from 'react-router-dom';
 import { FaUserSlash } from 'react-icons/fa';
 import { reqAllUser } from '../../api/userApi';
