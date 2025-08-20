@@ -2,7 +2,7 @@
 import * as s from './styles.js';
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { reqDeleteMoim, reqJoinMoim, reqMoimBanUserList, reqMoimUserBan, reqMoimUserList, reqSelectMoim } from '../../../api/moimApi';
+import { reqDeleteMoim, reqJoinMoim, reqMoimUserList, reqSelectMoim } from '../../../api/moimApi';
 import useCategoryQuery from '../../../queries/useCategoryQuery.jsx';
 import { IoChatbubbleEllipses, IoChatbubbleEllipsesOutline, IoClipboard, IoClipboardOutline, IoClose } from 'react-icons/io5';
 import { RiHome7Fill, RiHome7Line } from 'react-icons/ri';
@@ -55,7 +55,6 @@ function DescriptionSuggestPage(props) {
     const filteredForums = forumCategory === "전체"
         ? respForums
         : respForums.filter(forum => forum.forumCategory.forumCategoryName === forumCategory);
-        console.log(filteredForums)
 
 
     useEffect(() => {
@@ -84,25 +83,8 @@ function DescriptionSuggestPage(props) {
         }
     }, []);
 
-    const handleJoinMoimOnClick = async () => {
-        try {
-            const response = await reqMoimBanUserList(moimId);
-            const banList = response?.data;
-            
-            const isBannedUser = banList?.find(ban => ban.userId === userId);
-            
-            if (isBannedUser) {
-                alert("해당 모임에 가입하실 수 없습니다.");
-                return;
-            }
-            
-            const joinResponse = await reqJoinMoim(moimId);
-            alert("모임 가입이 완료되었습니다!");
-            
-        } catch (error) {
-            console.error("가입 처리 중 에러:", error);
-            alert("가입 처리 중 문제가 발생했습니다. 다시 시도해주세요.");
-        }
+    const handleJoinMoimOnClick = () => {
+        reqJoinMoim(moimId)
     }
 
     const handleModifyOnClick = () => {
@@ -152,7 +134,7 @@ function DescriptionSuggestPage(props) {
             } else {
                 await reqUserBlock(userId);
             }
-        
+            
             await queryClient.invalidateQueries(['userBlockList', userId]);
 
         } catch(error) {
@@ -162,7 +144,6 @@ function DescriptionSuggestPage(props) {
     }
 
     const handleKickUserOnClick = async (userId, nickName) => {
-
         const isConfirmed = window.confirm(`"${nickName}" 님을 강퇴하시겠습니까?`);
         
         if (!isConfirmed) {
@@ -170,23 +151,19 @@ function DescriptionSuggestPage(props) {
         }
 
         try {
-            await reqMoimUserBan(moimId, userId);
+            // TODO: 강퇴 API 호출
+            // await reqKickUser(moimId, userId);
+            console.log(`${nickName} 강퇴 처리`);
             alert(`${nickName}님을 강퇴했습니다.`);
             handleCloseModal();
-
-            const [userResponse, moimResponse] = await Promise.all([
-                reqMoimUserList(moimId),
-                reqSelectMoim(moimId)
-            ]);
-            
-            setUserList(userResponse?.data);
-            setMoim(moimResponse.data);
-        
         } catch(error) {
             console.log('강퇴 실패:', error);
             alert('강퇴에 실패했습니다. 다시 시도해주세요.');
         }
     }
+
+    console.log(userList);
+
 
     return (
         <div css={s.container}>
@@ -318,12 +295,6 @@ function DescriptionSuggestPage(props) {
                     </div>
                     <div css={s.forumGrid}>
                         {
-                        filteredForums.length === 0 ? (
-                            <div css={s.register}>
-                                <h3>게시글을 등록해주세요</h3>
-                            </div>
-                        ) 
-                        :
                         filteredForums?.map((forum) => {
                             const date = new Date(forum.forumCreatedAt);
                             const formatted = new Intl.DateTimeFormat('ko-KR', {
@@ -418,6 +389,7 @@ function DescriptionSuggestPage(props) {
                                                 차단하기
                                             </button>
                                         )}
+                                        {/* 강퇴 버튼 - 방장이고 자신이 아닌 경우만 표시 */}
                                         {userList.find(u => u.userId === userId)?.moimRole === "OWNER" && 
                                          selectedUser.userId !== userId && (
                                             <button css={s.modalKickButton} onClick={() => handleKickUserOnClick(selectedUser.userId, selectedUser.nickName)}>
