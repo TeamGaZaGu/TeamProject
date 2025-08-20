@@ -13,6 +13,19 @@ function CategoryPage() {
 
     const categoryQuery = useCategoryQuery();
     const categoryList = categoryQuery?.data?.data || [];
+
+    const [page, setPage] = useState(1);
+    const moimQuery = useMoimQuery({ 
+        queryKey: ["categoryPageMoims"],
+        queryFn: async () => await reqfindAllMoim()
+     });
+    const allMoims = moimQuery?.data?.data?.body?.contents || 
+                     moimQuery?.data?.data || 
+                     [];
+    const moims = categoryId === 1 
+        ? allMoims 
+        : allMoims.filter(moim => moim.categoryId === categoryId);
+
     const selectCategory = categoryList.find(category => category.categoryId === categoryId);
 
     const moimQuery = useMoimQuery({ size: 8, categoryId });
