@@ -21,6 +21,23 @@ public class MoimService {
     private final PrincipalUtil principalUtil;
     private final FileService fileService;
 
+    public MoimCategoryRespDto categoryMoim(MoimCategoryReqDto dto) {
+        Integer totalElements = moimMapper.getCountOfOptions(dto.toOption());
+        Integer totalPages = (int) Math.ceil(totalElements.doubleValue() / dto.getSize().doubleValue());
+        List<Moim> foundMoims = moimMapper.findAllOfOptions(dto.toOption());
+        boolean isLast = dto.getPage().equals(totalPages);
+
+        return MoimCategoryRespDto.builder()
+                .contents(foundMoims)
+                .totalElements(totalElements)
+                .totalPages(totalPages)
+                .page(dto.getPage())
+                .size(dto.getSize())
+                .isLast(isLast)
+                .build();
+
+    }
+
     public void createMoim(MoimCreateDto dto) {
 
         Moim moimEntity = dto.toEntity();
@@ -103,9 +120,6 @@ public class MoimService {
         moimMapper.deleteMoimById(moimId);
     }
 
-    public List<Moim> findAll() {
-        return moimMapper.findAll();
-    }
 
     public List<Moim> findMoimByCategoryIdInUserId() {
         Integer userId = principalUtil.getPrincipalUser().getUser().getUserId();
@@ -117,14 +131,14 @@ public class MoimService {
         return moimMapper.findMoimByUserId(userId);
     }
 
-    public List<Moim> findMoimByCategoryId(Integer categoryId) {
-
-        if (categoryId == 1){
-            return moimMapper.findAll();
-        }else {
-            return moimMapper.findMoimByCategoryId(categoryId);
-        }
-    }
+//    public List<Moim> findMoimByCategoryId(Integer categoryId) {
+//
+//        if (categoryId == 1){
+//            return moimMapper.findAll();
+//        }else {
+//            return moimMapper.findMoimByCategoryId(categoryId);
+//        }
+//    }
 
     public List<MoimListRespDto> searchMoim(MoimSearchReqDto searchReqDto) {
         System.out.println(moimMapper.searchMoim(searchReqDto));

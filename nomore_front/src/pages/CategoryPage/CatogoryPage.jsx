@@ -1,40 +1,34 @@
 /** @jsxImportSource @emotion/react */
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import React from 'react';
+import React, { useState } from 'react';
 import useMoimQuery from '../../queries/useMoimQuery';
 import { baseURL } from '../../api/axios';
 import * as s from './styles';
 import useCategoryQuery from '../../queries/useCategoryQuery';
-import { category } from '../../Layout/LeftSidebarLayout/styles';
 
 function CatogoryPage(props) {
-
     const navigate = useNavigate();
-    const [ searchParam ] = useSearchParams();
-    const categoryId = parseInt(searchParam.get("categoryId")); // 숫자로 변환
+    const [searchParam] = useSearchParams();
+    const categoryId = parseInt(searchParam.get("categoryId"));
     const categoryQuery = useCategoryQuery();
-    const categoryList = categoryQuery?.data?.data;
+    const categoryList = categoryQuery?.data?.data || []; // 기본값 설정
+    const [page, setPage] = useState(1);
+    const moimQuery = useMoimQuery({ page, size: 8, categoryId });
+    const moims = moimQuery?.data?.data?.body.contents || [];
     const selectCategory = categoryList.find(category => category.categoryId === categoryId);
-    const moimQuery = useMoimQuery();
-    const moimList = moimQuery?.data?.data;
     
-    // find → filter로 변경하고 타입 비교 주의
-    let categoryMoim = moimList?.filter(moim => moim.categoryId === categoryId);
-
-    if (categoryId === 1) {
-        categoryMoim = moimList;
-    }
-    
-    console.log('categoryId from URL:', categoryId);
-    console.log('filtered moims:', categoryMoim);
-
     const handleMoimOnClick = (moimId) => {
         navigate(`/suggest/description?moimId=${moimId}`);
     }
-
+    
+    // 로딩 상태 처리
+    if (categoryQuery.isLoading) {
+        return <div>카테고리 정보를 불러오는 중...</div>;
+    }
+    
     return (
         <div css={s.containerStyle}>
-            {!categoryMoim || categoryMoim.length === 0 ? (
+            {!moims || moims.length === 0 ? (
                 <div css={s.noMoimStyle}>
                     <div className="icon">📭</div>
                     <h3>해당 카테고리에 모임이 없습니다.</h3>
@@ -42,11 +36,10 @@ function CatogoryPage(props) {
                 </div>
             ) : (
                 <ul css={s.gridContainerStyle}>
-                    {categoryMoim.map((moim) => {
+                    {moims.map((moim) => {
                         const isAvailable = moim.memberCount < moim.maxMember;
                         const hasImage = moim.moimImgPath && moim.moimImgPath !== '';
                         const imageUrl = hasImage ? `${baseURL}/image${moim.moimImgPath}` : null;
-                        console.log('individual moim:', moim);
                         
                         return (
                             <li key={moim.moimId} css={s.moimCardStyle} onClick={() => handleMoimOnClick(moim.moimId)}>
@@ -90,7 +83,10 @@ function CatogoryPage(props) {
                                     
                                     <div css={s.tagsStyle}>
                                         <span css={s.locationTagStyle}>{moim.districtName}</span>
-                                        <span css={s.categoryTagStyle}>{selectCategory.categoryEmoji} {selectCategory.categoryName}</span>
+                                        {/* 안전한 접근으로 수정 */}
+                                        <span css={s.categoryTagStyle}>
+                                            {selectCategory?.categoryEmoji} {selectCategory?.categoryName}
+                                        </span>
                                     </div>
                                     
                                     <div css={s.memberInfoStyle}>

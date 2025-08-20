@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { IoIosSearch } from "react-icons/io";
 /** @jsxImportSource @emotion/react */
 import * as s from './styles';
-import { reqCategory, reqDistrict, reqSearch } from '../../api/searchApi';
+import { reqCategory, reqDistrict } from '../../api/searchApi';
 import useCategoryQuery from '../../queries/useCategoryQuery';
 import { useNavigate } from 'react-router-dom';
+import useMoimQuery from '../../queries/useMoimQuery';
+import { reqfindAllMoim } from '../../api/moimApi';
 
 function HeaderLayout(props) {
     const navigate = useNavigate();
@@ -98,11 +100,13 @@ function HeaderLayout(props) {
         }));
     }
     
+    const [page, setPage] = useState(1);
+
     const handleSearchInputOnClick = async () => {
         try {
-            const response = await reqSearch(combinedSearch);
+            const response = await reqfindAllMoim({ page, size: 8, categoryId: combinedSearch.categoryId, districtId: combinedSearch.districtId, searchText: combinedSearch.keyword });
             console.log(response);
-            navigate("/searchpage", {state: response.data});
+            navigate("/searchpage", {state: response?.data?.body?.contents});
         } catch (error) {
             console.error("검색 실패", error);
         }

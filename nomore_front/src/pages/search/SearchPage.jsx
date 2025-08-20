@@ -9,7 +9,7 @@ function SearchPage(props) {
     const navigate = useNavigate();
     const location = useLocation();
     const searchMoim = location.state;
-    console.log(searchMoim)
+    console.log(searchMoim);
 
     const handleMoimOnClick = (moimId) => {
         navigate(`/suggest/description?moimId=${moimId}`);
