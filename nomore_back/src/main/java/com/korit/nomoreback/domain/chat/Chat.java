@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 public class Chat {
 
     private Integer chatId;
-    private String chatContent;
+    private String chattingContent;
     private LocalDateTime chattedAt;
     private String userNickName;
     private Integer moimId;
