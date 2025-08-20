@@ -1,15 +1,35 @@
 import React, { useState } from 'react';
 /** @jsxImportSource @emotion/react */
 import * as s from './styles';
-import useMoimQuery from '../../queries/useMoimQuery';
 import { baseURL } from '../../api/axios';
 import { useNavigate } from 'react-router-dom';
+import useCategoryQuery from '../../queries/useCategoryQuery';
+import { reqfindAllMoim } from '../../api/moimApi';
+import { useQuery } from '@tanstack/react-query';
 
 function HomeMoims({ category }) {
     const navigate = useNavigate();
-    const [page, setPage] = useState(1);
-    const moimQuery = useMoimQuery({ page, size: 8, categoryId: category.categoryId });
-    const moims = moimQuery?.data?.data?.body.contents || [];
+    
+    // 직접 reqfindAllMoim 호출 (파라미터 없이)
+    const moimQuery = useQuery({
+        queryKey: ["homePageMoims"],
+        queryFn: async () => await reqfindAllMoim(), // 파라미터 없이 호출
+    });
+    
+    const allMoims = moimQuery?.data?.data?.body?.contents || 
+                     moimQuery?.data?.data || 
+                     [];
+    
+    // 카테고리별 필터링
+    const moims = category.categoryId === 1 
+        ? allMoims // 전체 카테고리면 모든 모임
+        : allMoims.filter(moim => moim.categoryId === category.categoryId); // 특정 카테고리만
+
+    console.log(`${category.categoryName} 카테고리 모임:`, moims);
+    console.log("전체 모임 데이터:", allMoims);
+
+    const categoryQuery = useCategoryQuery();
+    const allCategories = categoryQuery?.data?.data || [];
 
     const handleMoimOnClick = (moimId) => {
         navigate(`/suggest/description?moimId=${moimId}`);
@@ -38,7 +58,7 @@ function HomeMoims({ category }) {
     };
 
     // 모임이 없으면 렌더링하지 않음
-    if (moims.length === 0) {
+    if (!moims || moims.length === 0) {
         return null;
     }
 
@@ -54,6 +74,9 @@ function HomeMoims({ category }) {
                     const isAvailable = moim.memberCount < moim.maxMember;
                     const hasImage = moim.moimImgPath && moim.moimImgPath !== '';
                     const imageUrl = hasImage ? `${baseURL}/image${moim.moimImgPath}` : null;
+
+                    const moimCategory = allCategories.find(cat => cat.categoryId === moim.categoryId);
+                    const displayCategory = category.categoryId === 1 ? moimCategory : category;
 
                     return (
                         <li 
@@ -88,7 +111,7 @@ function HomeMoims({ category }) {
                                         📍 {moim.districtName}
                                     </span>
                                     <span css={s.categoryTagStyle}>
-                                        {category.categoryEmoji} {category.categoryName}
+                                        {displayCategory?.categoryEmoji} {displayCategory?.categoryName}
                                     </span>
                                 </div>
 

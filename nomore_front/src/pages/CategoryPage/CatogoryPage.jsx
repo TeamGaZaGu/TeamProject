@@ -11,10 +11,18 @@ function CatogoryPage(props) {
     const [searchParam] = useSearchParams();
     const categoryId = parseInt(searchParam.get("categoryId"));
     const categoryQuery = useCategoryQuery();
-    const categoryList = categoryQuery?.data?.data || []; // 기본값 설정
+    const categoryList = categoryQuery?.data?.data || [];
     const [page, setPage] = useState(1);
-    const moimQuery = useMoimQuery({ page, size: 8, categoryId });
-    const moims = moimQuery?.data?.data?.body.contents || [];
+    const moimQuery = useMoimQuery({ 
+        queryKey: ["categoryPageMoims"],
+        queryFn: async () => await reqfindAllMoim()
+     });
+    const allMoims = moimQuery?.data?.data?.body?.contents || 
+                     moimQuery?.data?.data || 
+                     [];
+    const moims = categoryId === 1 
+        ? allMoims 
+        : allMoims.filter(moim => moim.categoryId === categoryId);
     const selectCategory = categoryList.find(category => category.categoryId === categoryId);
     
     const handleMoimOnClick = (moimId) => {
