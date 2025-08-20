@@ -1,4 +1,3 @@
-import React, { useState } from 'react';
 /** @jsxImportSource @emotion/react */
 import * as s from './styles';
 import { baseURL } from '../../api/axios';
@@ -70,7 +69,7 @@ function HomeMoims({ category }) {
             </div>
             
             <ul css={s.gridContainerStyle}>
-                {moims.map((moim) => {
+                {allMoims.map((moim) => {
                     const isAvailable = moim.memberCount < moim.maxMember;
                     const hasImage = moim.moimImgPath && moim.moimImgPath !== '';
                     const imageUrl = hasImage ? `${baseURL}/image${moim.moimImgPath}` : null;
@@ -135,6 +134,28 @@ function HomeMoims({ category }) {
                     );
                 })}
             </ul>
+
+            {moimQuery.hasNextPage && (
+                <div css={s.loadMoreContainerStyle}>
+                    <button 
+                        css={s.loadMoreButtonStyle}
+                        onClick={handleLoadMore}
+                        disabled={moimQuery.isLoading}
+                    >
+                        {moimQuery.isLoading ? (
+                            <>
+                                <span css={s.spinnerStyle}>⏳</span>
+                                불러오는 중...
+                            </>
+                        ) : (
+                            <>
+                                모임 더보기
+                                <span css={s.arrowStyle}>▼</span>
+                            </>
+                        )}
+                    </button>
+                </div>
+            )}
         </div>
     );
 }

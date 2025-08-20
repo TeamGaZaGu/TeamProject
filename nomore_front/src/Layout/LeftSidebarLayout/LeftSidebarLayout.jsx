@@ -29,7 +29,7 @@ function LeftSidebarLayout(props) {
     }
 
     const handleCategoryOnClick = (categoryId) => {
-        navigate(`/category/?categoryId=${categoryId}`);
+        navigate(`/category?categoryId=${categoryId}`);
     }
 
     const handleUseManagementOnClick =  async () => {

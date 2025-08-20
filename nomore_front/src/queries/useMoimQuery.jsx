@@ -1,10 +1,16 @@
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { reqfindAllMoim } from "../api/moimApi";
 
-function useMoimQuery({page, size, categoryId, districtId, searchText}) {
-    return useQuery({
-        queryKey: ["moimpage", page, size, categoryId, districtId, searchText],
-        queryFn: async () => await reqfindAllMoim({page, size, categoryId, districtId, searchText}),
+function useMoimQuery({size, categoryId, districtId, searchText}) {
+    return useInfiniteQuery({
+        queryKey: ["moimpage", size, categoryId, districtId, searchText],
+        queryFn: async ({ pageParam = 1 }) => await reqfindAllMoim({page: pageParam, size, categoryId, districtId, searchText}),
+        getNextPageParam: (lastPage, allPages) => {
+            console.log(lastPage)
+            const currentPage = lastPage.data.body.page;
+            const totalPages = lastPage.data.body.totalPages + 1;
+            return currentPage + 1 < totalPages ? currentPage + 1 : undefined;
+        },
     });
 }
 

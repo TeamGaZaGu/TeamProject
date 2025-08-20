@@ -35,19 +35,6 @@ function Home(props) {
         );
     }
 
-    if (!categoryList || categoryList.length === 0) {
-        return (
-            <div css={s.containerStyle}>
-                <div css={s.contentWrapperStyle}>
-                    <div css={s.emptyStateStyle}>
-                        <h3>등록된 모임이 없습니다</h3>
-                        <p>새로운 모임이 곧 업데이트될 예정입니다.</p>
-                    </div>
-                </div>
-            </div>
-        );
-    }
-
     return (
         <div css={s.containerStyle}>
             <div css={s.contentWrapperStyle}>

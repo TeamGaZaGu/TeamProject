@@ -1,17 +1,19 @@
 /** @jsxImportSource @emotion/react */
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import useMoimQuery from '../../queries/useMoimQuery';
 import { baseURL } from '../../api/axios';
 import * as s from './styles';
 import useCategoryQuery from '../../queries/useCategoryQuery';
 
-function CatogoryPage(props) {
+function CategoryPage() {
     const navigate = useNavigate();
-    const [searchParam] = useSearchParams();
-    const categoryId = parseInt(searchParam.get("categoryId"));
+    const [searchParams, setSearchParams] = useSearchParams();
+    const categoryId = parseInt(searchParams.get("categoryId"));
+
     const categoryQuery = useCategoryQuery();
     const categoryList = categoryQuery?.data?.data || [];
+
     const [page, setPage] = useState(1);
     const moimQuery = useMoimQuery({ 
         queryKey: ["categoryPageMoims"],
@@ -23,20 +25,62 @@ function CatogoryPage(props) {
     const moims = categoryId === 1 
         ? allMoims 
         : allMoims.filter(moim => moim.categoryId === categoryId);
+
     const selectCategory = categoryList.find(category => category.categoryId === categoryId);
-    
+
+    const moimQuery = useMoimQuery({ size: 8, categoryId });
+    const allMoims = moimQuery?.data?.pages?.map(page => page.data.body.contents).flat() || [];
+    const isLast = moimQuery?.data?.data?.body.isLast || false;
+    console.log("!!");
+    console.log(allMoims);
+
+    const loaderRef = useRef(null);
+
+    // 새 데이터가 들어오면 allMoims에 누적
+    // useEffect(() => {
+    //     if (currentMoims.length > 0) {
+    //         if (page === 1) {
+    //             setAllMoims(currentMoims);
+    //         } else {
+    //             setAllMoims(prev => [...prev, ...currentMoims]);
+    //         }
+    //     }
+    // }, [currentMoims]);
+
+    // 무한 스크롤 (IntersectionObserver)
+    useEffect(() => {
+        const observer = new IntersectionObserver((entries) => {
+            if (entries[0].isIntersecting) {
+                if(moimQuery.hasNextPage) {
+                    moimQuery.fetchNextPage();
+                }
+            }
+        }, { 
+            rootMargin: "200px",  // 👈 바닥 200px 전에 미리 불러오기
+        });
+
+        if (loaderRef.current) {
+            observer.observe(loaderRef.current);
+        }
+
+        return () => {
+            if (loaderRef.current) {
+                observer.unobserve(loaderRef.current);
+            }
+        };
+    }, [loaderRef.current]);
+
     const handleMoimOnClick = (moimId) => {
         navigate(`/suggest/description?moimId=${moimId}`);
-    }
-    
-    // 로딩 상태 처리
+    };
+
     if (categoryQuery.isLoading) {
         return <div>카테고리 정보를 불러오는 중...</div>;
     }
-    
+
     return (
         <div css={s.containerStyle}>
-            {!moims || moims.length === 0 ? (
+            {!allMoims || allMoims.length === 0 ? (
                 <div css={s.noMoimStyle}>
                     <div className="icon">📭</div>
                     <h3>해당 카테고리에 모임이 없습니다.</h3>
@@ -44,11 +88,11 @@ function CatogoryPage(props) {
                 </div>
             ) : (
                 <ul css={s.gridContainerStyle}>
-                    {moims.map((moim) => {
+                    {allMoims.map((moim) => {
                         const isAvailable = moim.memberCount < moim.maxMember;
                         const hasImage = moim.moimImgPath && moim.moimImgPath !== '';
                         const imageUrl = hasImage ? `${baseURL}/image${moim.moimImgPath}` : null;
-                        
+
                         return (
                             <li key={moim.moimId} css={s.moimCardStyle} onClick={() => handleMoimOnClick(moim.moimId)}>
                                 {hasImage ? (
@@ -81,29 +125,24 @@ function CatogoryPage(props) {
                                         {moim.title}
                                     </div>
                                 )}
-                                
+
                                 <div css={s.contentStyle}>
                                     <h3 css={s.titleStyle}>{moim.title}</h3>
-                                    
                                     <p css={s.descriptionStyle}>
                                         {moim.discription || '모임에 대한 자세한 설명이 곧 업데이트됩니다.'}
                                     </p>
-                                    
                                     <div css={s.tagsStyle}>
                                         <span css={s.locationTagStyle}>{moim.districtName}</span>
-                                        {/* 안전한 접근으로 수정 */}
                                         <span css={s.categoryTagStyle}>
                                             {selectCategory?.categoryEmoji} {selectCategory?.categoryName}
                                         </span>
                                     </div>
-                                    
                                     <div css={s.memberInfoStyle}>
                                         <div css={s.memberCountStyle}>
                                             👥 <span className="current">{moim.memberCount}</span>
                                             <span> / </span>
                                             <span className="total">{moim.maxMember}명</span>
                                         </div>
-                                        
                                         <div css={s.statusBadgeStyle} className={isAvailable ? 'available' : 'full'}>
                                             {isAvailable ? '모집중' : '모집완료'}
                                         </div>
@@ -114,8 +153,11 @@ function CatogoryPage(props) {
                     })}
                 </ul>
             )}
+
+            {/* 스크롤 감지용 div */}
+            {!isLast && <div ref={loaderRef} style={{ height: "50px" }} />}
         </div>
     );
 }
 
-export default CatogoryPage;
+export default CategoryPage;

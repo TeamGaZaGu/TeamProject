@@ -25,7 +25,7 @@ public class MoimService {
         Integer totalElements = moimMapper.getCountOfOptions(dto.toOption());
         Integer totalPages = (int) Math.ceil(totalElements.doubleValue() / dto.getSize().doubleValue());
         List<Moim> foundMoims = moimMapper.findAllOfOptions(dto.toOption());
-        boolean isLast = dto.getPage().equals(totalPages);
+        boolean isLast = foundMoims.size() < dto.getSize();
 
         return MoimCategoryRespDto.builder()
                 .contents(foundMoims)
