@@ -57,7 +57,6 @@ function DescriptionSuggestPage(props) {
     const filteredForums = forumCategory === "전체"
         ? respForums
         : respForums.filter(forum => forum.forumCategory.forumCategoryName === forumCategory);
-        console.log(filteredForums)
 
     const fetchMoim = async () => {
         try {
@@ -168,7 +167,7 @@ function DescriptionSuggestPage(props) {
             } else {
                 await reqUserBlock(userId);
             }
-        
+            
             await queryClient.invalidateQueries(['userBlockList', userId]);
 
         } catch(error) {
@@ -178,7 +177,6 @@ function DescriptionSuggestPage(props) {
     }
 
     const handleKickUserOnClick = async (userId, nickName) => {
-
         const isConfirmed = window.confirm(`"${nickName}" 님을 강퇴하시겠습니까?`);
         
         if (!isConfirmed) {
@@ -186,18 +184,11 @@ function DescriptionSuggestPage(props) {
         }
 
         try {
-            await reqMoimUserBan(moimId, userId);
+            // TODO: 강퇴 API 호출
+            // await reqKickUser(moimId, userId);
+            console.log(`${nickName} 강퇴 처리`);
             alert(`${nickName}님을 강퇴했습니다.`);
             handleCloseModal();
-
-            const [userResponse, moimResponse] = await Promise.all([
-                reqMoimUserList(moimId),
-                reqSelectMoim(moimId)
-            ]);
-            
-            setUserList(userResponse?.data);
-            setMoim(moimResponse.data);
-        
         } catch(error) {
             console.log('강퇴 실패:', error);
             alert('강퇴에 실패했습니다. 다시 시도해주세요.');
@@ -214,7 +205,7 @@ function DescriptionSuggestPage(props) {
         :
         toast.error("모임 가입이 필요한 페이지입니다")
     }
-    
+
     return (
         <div css={s.container}>
             <div css={s.header}>
@@ -486,6 +477,7 @@ function DescriptionSuggestPage(props) {
                                                 차단하기
                                             </button>
                                         )}
+                                        {/* 강퇴 버튼 - 방장이고 자신이 아닌 경우만 표시 */}
                                         {userList.find(u => u.userId === userId)?.moimRole === "OWNER" && 
                                          selectedUser.userId !== userId && (
                                             <button css={s.modalKickButton} onClick={() => handleKickUserOnClick(selectedUser.userId, selectedUser.nickName)}>

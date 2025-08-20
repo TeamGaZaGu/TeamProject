@@ -60,8 +60,9 @@
 
 
         @GetMapping("/find")
-        public List<Moim> findAllMoims() {
-            return moimService.findAll();
+        public ResponseEntity<ResponseDto<?>> findCategoryMoims(MoimCategoryReqDto dto) {
+            System.out.println(dto);
+            return ResponseEntity.ok(ResponseDto.success(moimService.categoryMoim(dto)));
         }
 
         @GetMapping("/find/categoryIdInUserId")
@@ -69,10 +70,10 @@
             return moimService.findMoimByCategoryIdInUserId();
         }
 
-        @GetMapping("/find/{categoryId}")
-        public List<Moim> findMoimByCategoryId(@PathVariable Integer categoryId) {
-            return moimService.findMoimByCategoryId(categoryId);
-        }
+//        @GetMapping("/find/{categoryId}")
+//        public List<Moim> findMoimByCategoryId(@PathVariable Integer categoryId) {
+//            return moimService.findMoimByCategoryId(categoryId);
+//        }
 
         @PatchMapping(value = "/{moimId}/modify", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
         public ResponseEntity<?> updateMoim(@PathVariable Integer moimId, @ModelAttribute MoimModifyDto dto) {

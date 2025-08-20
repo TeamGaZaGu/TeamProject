@@ -183,4 +183,54 @@
             mrt.moim_id = #{moimId};
     </select>
 
+    <select id="findAllOfOptions" resultMap="MoimResultMap">
+        select
+            mt.moim_id,
+            mt.moim_title,
+            mt.moim_discription,
+            mt.moim_member_count,
+            mt.moim_max_member,
+            mt.district_id as mt_district_id,
+            mt.category_id,
+            mt.user_id,
+            mt.moim_img_path,
+
+            dt.district_id,
+            dt.district_name
+        from
+            moim_tb mt
+            left outer join district_tb dt on(dt.district_id = mt.district_id)
+        where
+            1 = 1
+            <if test="categoryId != null and categoryId != 1">
+                and category_id = #{categoryId}
+            </if>
+            <if test="districtId != null and districtId != 1">
+                and mt.district_id = #{districtId}
+            </if>
+            <if test="searchText != null and searchText != ''">
+                and (moim_title = concat('%', #{searchText}, '%') or moim_discription = concat('%', #{searchText}, '%'))
+            </if>
+        limit #{startIndex}, #{size}
+    </select>
+
+    <select id="getCountOfOptions" resultType="java.lang.Integer">
+        select
+            count(*)
+        from
+            moim_tb mt
+            left outer join district_tb dt on(dt.district_id = mt.district_id)
+        where
+            1 = 1
+            <if test="categoryId != null and categoryId != 1">
+                and category_id = #{categoryId}
+            </if>
+            <if test="districtId != null and districtId != 1">
+                and mt.district_id = #{districtId}
+            </if>
+            <if test="searchText != null and searchText != ''">
+                and (moim_title = concat('%', #{searchText}, '%') or moim_discription = concat('%', #{searchText}, '%'))
+            </if>
+    </select>
+
 </mapper>
