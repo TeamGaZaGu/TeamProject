@@ -1,4 +1,3 @@
-import React, { useState, useEffect } from 'react'; // ✅ 추가: useEffect import
 /** @jsxImportSource @emotion/react */
 import * as s from './styles';
 import useMoimQuery from '../../queries/useMoimQuery';
@@ -7,24 +6,8 @@ import { useNavigate } from 'react-router-dom';
 
 function HomeMoims({ category }) {
     const navigate = useNavigate();
-    const [page, setPage] = useState(1);
-    const [allMoims, setAllMoims] = useState([]);
-    const [isLoadingMore, setIsLoadingMore] = useState(false);
-    
-    const moimQuery = useMoimQuery({ page, size: 8, categoryId: category.categoryId });
-    const currentMoims = moimQuery?.data?.data?.body.contents || [];
-    const isLast = moimQuery?.data?.data?.body.isLast || false;
-
-    useEffect(() => {
-        if (currentMoims.length > 0) {
-            if (page === 1) {
-                setAllMoims(currentMoims);
-            } else {
-                setAllMoims(prev => [...prev, ...currentMoims]);
-            }
-            setIsLoadingMore(false);
-        }
-    }, [currentMoims, page]);
+    const moimQuery = useMoimQuery({ size: 8, categoryId: category.categoryId });
+    const allMoims = moimQuery?.data?.pages?.map(page => page.data.body.contents).flat() || [];
 
     const handleMoimOnClick = (moimId) => {
         navigate(`/suggest/description?moimId=${moimId}`);
@@ -53,13 +36,8 @@ function HomeMoims({ category }) {
     };
 
     const handleLoadMore = () => {
-        setIsLoadingMore(true);
-        setPage(prev => prev + 1);
+        moimQuery.fetchNextPage();
     };
-
-    if (moimQuery.isLoading && page === 1) {
-        return null;
-    }
 
     if (allMoims.length === 0 && !moimQuery.isLoading) {
         return null;
@@ -136,14 +114,14 @@ function HomeMoims({ category }) {
                 })}
             </ul>
 
-            {!isLast && (
+            {moimQuery.hasNextPage && (
                 <div css={s.loadMoreContainerStyle}>
                     <button 
                         css={s.loadMoreButtonStyle}
                         onClick={handleLoadMore}
-                        disabled={isLoadingMore}
+                        disabled={moimQuery.isLoading}
                     >
-                        {isLoadingMore ? (
+                        {moimQuery.isLoading ? (
                             <>
                                 <span css={s.spinnerStyle}>⏳</span>
                                 불러오는 중...

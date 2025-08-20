@@ -222,7 +222,16 @@
             moim_tb mt
             left outer join district_tb dt on(dt.district_id = mt.district_id)
         where
-            category_id = #{categoryId}
+            1 = 1
+            <if test="categoryId != null and categoryId != 1">
+                and category_id = #{categoryId}
+            </if>
+            <if test="districtId != null and districtId != 1">
+                and mt.district_id = #{districtId}
+            </if>
+            <if test="searchText != null and searchText != ''">
+                and (moim_title = concat('%', #{searchText}, '%') or moim_discription = concat('%', #{searchText}, '%'))
+            </if>
     </select>
 
 </mapper>
