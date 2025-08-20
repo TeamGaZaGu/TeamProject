@@ -69,13 +69,21 @@ export const moimCard = css`
 `;
 
 export const loginContainer = css`
+  display: flex; 
+  flex-direction: column;
+  justify-content: center;  
+  align-items: center;      
   text-align: center;
-  padding: 40px;
-  background-color: #f9f9f9;
+  width: 100%;
+  height: 100%;
+  background-color: #ffffff;
 `;
 
 export const loginBox = css`
-  display: inline-block;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   padding: 30px;
   border-radius: 15px;
   background-color: #7a51c2;

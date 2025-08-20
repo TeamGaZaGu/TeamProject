@@ -81,6 +81,10 @@ public class MoimService {
         moimMapper.increaseMoimCount(moimId);
     }
 
+    public void exitMoim(Integer moimId, Integer userId) {
+        moimRoleMapper.exitMoim(moimId, userId);
+    }
+
     public Moim findMoim (Integer moimId) {
         return moimMapper.findByMoimId(moimId);
     }
@@ -88,7 +92,14 @@ public class MoimService {
 
 
 
-    public void modifyMoim(MoimModifyDto modifyDto) {
+    public void modifyMoim(MoimModifyDto modifyDto, Integer userId) {
+        MoimRoleDto roleDto = moimRoleMapper.findRoleByUserAndMoimId(userId, modifyDto.getMoimId());
+
+        String role = roleDto.getMoimRole();
+
+        if (roleDto == null || !"OWNER".equals(role)){
+            throw new IllegalArgumentException("권한 없는 사용자");
+        }
 
         Moim originMoim = moimMapper.findByMoimId(modifyDto.getMoimId());
         final String UPLOAD_PATH = "/moim";

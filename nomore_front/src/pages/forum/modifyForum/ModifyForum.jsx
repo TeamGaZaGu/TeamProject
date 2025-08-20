@@ -7,10 +7,11 @@ import useForumCategoryQuery from '../../../queries/useForumCategoryQuery';
 import { Upload, X } from 'lucide-react';
 import { BsSendArrowUpFill } from 'react-icons/bs';
 import { baseURL } from '../../../api/axios.js';
+import { useQueryClient } from '@tanstack/react-query';
 
 function ModifyForum(props) {
     const navigate = useNavigate()
-
+    const queryClient = useQueryClient();
     const [ searchParam ] = useSearchParams();
     const forumId = searchParam.get("forumId");
 
@@ -25,8 +26,6 @@ function ModifyForum(props) {
         forumImages: [],
         forumCategoryId: "",
     });
-
-    console.log("forumValue", forumValue.forumImages)
 
     useEffect(() => {
         if (forum) {
@@ -115,8 +114,9 @@ function ModifyForum(props) {
         }
 
         try {
-            await reqModifyForum(forumId, formData)
+            await reqModifyForum(forum?.moim?.moimId, forumId, formData)
             await navigate(`/forum/detail?forumId=${forumId}`);
+            await queryClient.invalidateQueries({ queryKey: ['forums', forum?.moim?.moimId] });
         } catch (error) {
             console.error("게시글 등록 실패:", error);
             alert("게시글 등록에 실패했습니다.");

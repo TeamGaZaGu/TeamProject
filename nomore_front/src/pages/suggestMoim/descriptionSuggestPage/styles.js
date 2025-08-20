@@ -339,14 +339,73 @@ export const register = css`
   
 `;
 
-
 export const forumGrid = css`
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1rem;
   margin: 0 1rem;
 `;
 
+export const loginContainer = css`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 60vh;
+  padding: 40px;
+  background-color: #f9f9f9;
+`;
+
+export const loginBox = css`
+  display: inline-block;
+  padding: 30px;
+  border-radius: 15px;
+  background-color: #7a51c2;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  text-align: center;
+`;
+
+export const googleLogin = css`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  color: black;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  width: 250px;
+  cursor: pointer;
+
+  img {
+    width: 20px;
+    margin-right: 10px;
+  }
+`;
+
+export const kakaoLogin = css`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fee500;
+  color: #3c1e1e;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  border-radius: 8px;
+  width: 250px;
+  cursor: pointer;
+  
+  img {
+    width: 20px;
+    margin-right: 10px;
+  }
+`;
+
+export const forumContainer = css`
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+`;
 
 export const forumCard = css`
   background-color: #ffffff;
@@ -436,7 +495,7 @@ export const bottomActions = css`
     box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
 `;
 
-export const joinButton = css`
+export const joinMoimButton = css`
     width: 100%;
     max-width: 640px;
     margin: 0 auto;
@@ -453,6 +512,30 @@ export const joinButton = css`
     
     &:hover {
         background-color: #0056b3;
+    }
+    
+    &:active {
+        transform: translateY(1px);
+    }
+`;
+
+export const exitMoimButton = css`
+    width: 100%;
+    max-width: 640px;
+    margin: 0 auto;
+    display: block;
+    background-color: #d80c2e;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 16px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    
+    &:hover {
+        background-color: #b30000;
     }
     
     &:active {

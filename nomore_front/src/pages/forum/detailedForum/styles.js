@@ -137,19 +137,33 @@ export const comments = css`
 export const commentList = css`
   flex: 1;
   margin-bottom: 12px;
-  overflow-y: auto; 
+  overflow-y: unset; 
+`;
+
+export const commentRow = css`
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #f3f4f6;
 `;
 
 export const commentItem = css`
   display: flex;
   align-items: center;
-  margin-bottom: 12px;
+`;
+
+export const subCommentItem = css`
+  display: flex;
+  align-items: center;
+  margin-left: 5rem;
 `;
 
 export const commentProfileImage = css`
   display: flex;
-  width: 32px;
-  height: 32px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
   object-fit: cover;
   margin-right: 10px;
@@ -159,7 +173,7 @@ export const commentBody = css`
   background: white;
   margin-left: 5px;
   border-radius: 8px;
-  padding: 8px 30px;
+  padding: 1px 30px;
   max-width: 80%;
 `;
 
@@ -173,7 +187,7 @@ export const commentAuthor = css`
 export const commentText = css`
   font-size: 13px;
   line-height: 1.5;
-  margin-top: 4px;
+  margin: 4px 0;
   color: #374151;
 `;
 
@@ -184,13 +198,33 @@ export const tagText = css`
 `;
 
 export const recomment = css`
+  margin: 6px 0;
   color: #888888;
   cursor: pointer;
+`;
+
+export const transactionButton = css`
+  display: flex;
+  gap: 6px;
+
+  button {
+    background: #f3f4f6;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 12px;
+    cursor: pointer;
+
+    &:hover {
+      background: #e5e7eb;
+    }
+  }
 `;
 
 export const subCommentGridContainer = css`
   display: grid;
   grid-template-columns: 6rem 31rem;
+  margin-left: 5rem;
   width: 37rem;
 `;
 
@@ -228,5 +262,66 @@ export const button = css`
 
   &:hover {
     background: #1d4ed8;
+  }
+`;
+
+export const loginContainer = css`
+  display: flex; 
+  flex-direction: column;
+  justify-content: center;  
+  align-items: center;      
+  text-align: center;
+  width: 100%;
+  height: 100%;
+  background-color: #ffffff;
+`;
+
+export const loginBox = css`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 30px;
+  border-radius: 15px;
+  background-color: #d66df0;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+`;
+
+export const googleLogin = css`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  color: black;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  width: 250px;
+  cursor: pointer;
+
+  img {
+    width: 20px;
+    margin-right: 10px;
+  }
+`;
+
+export const kakaoLogin = css`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fee500;
+  color: #3c1e1e;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  border-radius: 8px;
+  width: 250px;
+  cursor: pointer;
+  
+  img {
+    width: 20px;
+    margin-right: 10px;
   }
 `;

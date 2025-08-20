@@ -34,7 +34,7 @@
     <delete id="deleteImg">
         delete from forum_img_tb
         where forum_img_id in
-        <foreach collection="imgIdList" item="id" open="(" separator="," close=")">
+        <foreach collection="imgIds" item="id" open="(" separator="," close=")">
             #{id}
         </foreach>
     </delete>

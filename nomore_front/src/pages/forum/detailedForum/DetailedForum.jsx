@@ -2,15 +2,19 @@
 import * as s from './styles.js';
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import {  reqRegisterComment, reqDeleteForum, reqDetailForum, reqGetComment } from '../../../api/forumApi';
+import {  reqRegisterComment, reqDeleteForum, reqDetailForum, reqGetComment, reqDeleteComment } from '../../../api/forumApi';
 import { baseURL } from '../../../api/axios.js';
 import { BiLike } from 'react-icons/bi';
 import { FaCameraRetro, FaRegComment } from 'react-icons/fa';
 import { useQueryClient } from '@tanstack/react-query';
+import usePrincipalQuery from '../../../queries/usePrincipalQuery.jsx';
+import { SiKakaotalk } from 'react-icons/si';
+import { FcGoogle } from 'react-icons/fc';
 
 function DetailedForum(props) {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
+    const principalQuery = usePrincipalQuery();
 
     const [ searchParam ] = useSearchParams();
     const forumId = searchParam.get("forumId");
@@ -57,20 +61,22 @@ function DetailedForum(props) {
           console.log("댓글 불러오기 실패:", error);
       }
     };
+
     useEffect(() => {
       if (forumId) {
             fetchComment();
         }
     }, [forumId])
 
+        
     const handleDeleteForumOnClick = async (forumId, moimId) => {
+        const confirmDelete = window.confirm("게시글을 삭제하시겠습니까?");
+        if (!confirmDelete) return;
+
         try {
             await reqDeleteForum(forumId, moimId);
-
-            await queryClient.invalidateQueries({ queryKey: ['forums', moimId] });
-
-            await navigate(`/suggest/description?moimId=${moimId}`);
-            
+            queryClient.invalidateQueries(['forums']); 
+            navigate(`/suggest/description?moimId=${moimId}`);
         } catch (error) {
             console.error("삭제 실패:", error);
             alert("게시글 삭제 중 오류 발생");
@@ -87,7 +93,7 @@ function DetailedForum(props) {
     }
 
     const handleRegisterCommentOnClick = async (forumId, moimId) => {
-      const content = /^@\w+\s/.test(commentValue) 
+      const content = /^@[가-힣\w]+(?=\s|$|[^가-힣\w])/.test(commentValue)
             ? commentValue.substring(commentValue.indexOf(" ") + 1)
             : commentValue;
 
@@ -105,7 +111,7 @@ function DetailedForum(props) {
     useEffect(() => {
         if(!!recomment) {
             setCommentValue(prev => {
-                const content = /^@\w+\s/.test(commentValue) 
+                const content = /^@[가-힣\w]+(?=\s|$|[^가-힣\w])/.test(commentValue)
                     ? commentValue.substring(commentValue.indexOf(" ") + 1)
                     : commentValue;
 
@@ -113,81 +119,122 @@ function DetailedForum(props) {
             });
         }
     }, [recomment]);
-    
 
-    return (
-        <div css={s.forumCard} key={forum?.forumId}>
-            <div css={s.forumHeader}>
-                <div css={s.left}>
-                    <img
-                        css={s.modalProfileImage}
-                        src={`${baseURL}/image${forum?.user?.profileImgPath}`}
-                        alt=""
-                    />
-                    <div css={s.userInfo}>
-                        <h3 css={s.h3Tag}>{forum?.user?.nickName}</h3>
-                        <p css={s.postMeta}>
-                            {forum?.forumCategory?.forumCategoryName} · {formatted}
-                        </p>
+    const handleCommentDeleteOnClick = async (forumId, moimId, forumCommentId) => {
+        const confirmDelete = window.confirm("댓글을 삭제하시겠습니까?");
+        if (!confirmDelete) return;
+
+        try {
+            await reqDeleteComment(forumId, moimId, forumCommentId);
+            alert("댓글이 삭제되었습니다.");
+            await fetchComment()
+        } catch (e) {
+            alert("권한이 없습니다.");
+        }
+    };
+
+    if(principalQuery.isFetched && principalQuery.isSuccess) {
+        return (
+            <div css={s.forumCard} key={forum?.forumId}>
+                <div css={s.forumHeader}>
+                    <div css={s.left}>
+                        <img
+                            css={s.modalProfileImage}
+                            src={`${baseURL}/image${forum?.user?.profileImgPath}`}
+                            alt=""
+                        />
+                        <div css={s.userInfo}>
+                            <h3 css={s.h3Tag}>{forum?.user?.nickName}</h3>
+                            <p css={s.postMeta}>
+                                {forum?.forumCategory?.forumCategoryName} · {formatted}
+                            </p>
+                        </div>
+                    </div>
+                    <div css={s.buttonWrapper}>
+                        <button css={s.editButton} onClick={() => navigate(`/forum/modify?forumId=${forumId}`)}>수정</button>
+                        <button css={s.deleteButton} onClick={() => handleDeleteForumOnClick(forumId, forum?.moim?.moimId)}>삭제</button>
                     </div>
                 </div>
-                <div css={s.buttonWrapper}>
-                    <button css={s.editButton} onClick={() => navigate(`/forum/modify?forumId=${forumId}`)}>수정</button>
-                    <button css={s.deleteButton} onClick={() => handleDeleteForumOnClick(forumId, forum?.moim?.moimId)}>삭제</button>
+                <div css={s.forumBody}>
+                    <h2 css={s.forumTitle}>{forum?.forumTitle}</h2>
+                    <p css={s.forumContent}>{forum?.forumContent}</p>
+                    {forum?.forumImgList?.map(img => (
+                      <img key={img.forumImgId} src={`${baseURL}/image${img.path}`} alt="forum-img" />
+                    ))}
+                </div>
+                <div css={s.forumFooter}>
+                    <p><BiLike />{forum?.likeCount}</p>
+                    <p><FaRegComment />{comments.length}</p>
+                </div>
+                <div css={s.comments}>
+                  <div css={s.commentList}>
+                      {
+                        comments?.map(comment => {
+                          if (comment.level === 0) {
+                            return <>
+                                <div css={s.commentRow}>
+                                    <div css={s.commentItem}>
+                                        <img src={`${baseURL}/image${comment?.user?.profileImgPath}`} alt="profile" css={s.commentProfileImage} />
+                                        <div css={s.commentBody}>
+                                        <p css={s.commentAuthor}>{comment?.user?.nickName}</p>
+                                        <p css={s.commentText}>{comment?.forumComment}</p>
+                                        <p css={s.recomment} onClick={() => setRecomment(comment)}>답글 달기</p>
+                                        </div>
+                                    </div>
+    
+                                    <div css={s.transactionButton}>
+                                        <button>수정</button>
+                                        <button onClick={() => handleCommentDeleteOnClick(forumId, forum.moim.moimId, comment.forumCommentId)}>삭제</button>
+                                    </div>
+                                </div>
+                            </>
+                          }
+                          return <>
+                              <div css={s.commentRow}>
+                                    <div css={s.subCommentItem}>
+                                        <img src={`${baseURL}/image${comment?.user?.profileImgPath}`} alt="profile" css={s.commentProfileImage} />
+                                        <div css={s.commentBody}>
+                                        <p css={s.commentAuthor}>{comment?.user?.nickName}</p>
+                                        <span css={s.commentText}><span css={s.tagText}>@{comment.parentUsername}</span>{comment?.forumComment}</span>
+                                        <p css={s.recomment} onClick={() => setRecomment(comment)}>답글 달기</p>
+                                        </div>
+                                    </div>
+                                    <div css={s.transactionButton}>
+                                        <button>수정</button>
+                                        <button onClick={() => handleCommentDeleteOnClick(forumId, comment.forumCommentId)}>삭제</button>
+                                    </div>
+                                </div>
+                          </>
+                        })
+                      }
+                  </div>
+    
+                  <div css={s.writeComment}>
+                      <input type="text" placeholder="댓글을 입력하세요" css={s.input} value={commentValue} onChange={handleCommentOnChange} />
+                      <button 
+                      css={s.button} 
+                      disabled={recomment && !recomment?.user?.userId} 
+                      onClick={() => handleRegisterCommentOnClick(forumId, forum?.moim?.moimId)}
+                      >
+                        등록
+                      </button>
+                  </div>
                 </div>
             </div>
-            <div css={s.forumBody}>
-                <h2 css={s.forumTitle}>{forum?.forumTitle}</h2>
-                <p css={s.forumContent}>{forum?.forumContent}</p>
-                {forum?.forumImgList?.map(img => (
-                  <img key={img.forumImgId} src={`${baseURL}/image${img.path}`} alt="forum-img" />
-                ))}
-            </div>
-            <div css={s.forumFooter}>
-                <p><BiLike />{forum?.likeCount}</p>
-                <p><FaRegComment />{forum?.commentCount}</p>
-            </div>
-            <div css={s.comments}>
-              <div css={s.commentList}>
-                  {
-                    comments?.map(comment => {
-                      if (comment.level === 0) {
-                        return <>
-                            <div css={s.commentItem}>
-                                <img src={`${baseURL}/image${comment?.user?.profileImgPath}`} alt="profile" css={s.commentProfileImage} />
-                                <div css={s.commentBody}>
-                                    <p css={s.commentAuthor}>{comment?.user?.nickName}</p>
-                                    <p css={s.commentText}>{comment?.forumComment}</p>
-                                    <p css={s.recomment} onClick={() => setRecomment(comment)}>답글 달기</p>
-                                </div>
-                            </div>
-                        </>
-                      }
-                      return <>
-                          <div></div>
-                          <div css={s.subCommentGridContainer}>
-                              <img src={`${baseURL}/image${comment?.user?.profileImgPath}`} alt="profile" css={s.commentProfileImage} />
-                              <div css={s.commentBody}>
-                                  <p css={s.commentAuthor}>{comment?.user?.nickName}</p>
-                                  <span css={s.commentText}><span css={s.tagText}>@{comment.parentUsername}</span>{comment?.forumComment}</span>
-                                  <p css={s.recomment} onClick={() => setRecomment(comment)}>답글 달기</p>
-                              </div>
-                          </div>
-                      </>
-                    })
-                  }
-              </div>
-
-              <div css={s.writeComment}>
-                  <input type="text" placeholder="댓글을 입력하세요" css={s.input} value={commentValue} onChange={handleCommentOnChange} />
-                  <button 
-                  css={s.button} 
-                  disabled={recomment && !recomment?.user?.userId} 
-                  onClick={() => handleRegisterCommentOnClick(forumId, forum?.moim?.moimId)}
-                  >
-                    등록
-                  </button>
-              </div>
+        );
+    }
+    return (
+        <div css={s.loginContainer}>
+            <h2>로그인이 필요한 페이지입니다</h2>
+            <div css={s.loginBox}>
+            <button css={s.googleLogin} onClick={() => { window.location.href = "http://localhost:8080/oauth2/authorization/google"; }}>
+                <FcGoogle />
+                구글 로그인
+            </button>
+            <button css={s.kakaoLogin} onClick={() => { window.location.href = "http://localhost:8080/oauth2/authorization/kakao"; }}>
+                <SiKakaotalk />
+                카카오 로그인
+            </button>
             </div>
         </div>
     );

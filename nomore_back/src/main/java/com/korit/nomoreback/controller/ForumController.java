@@ -104,7 +104,7 @@ public class ForumController {
     public ResponseEntity<?> deleteComment(@PathVariable Integer moimId,
                                            @PathVariable Integer forumId,
                                            @PathVariable Integer forumCommentId) {
-        forumService.deleteComment(forumCommentId,forumId);
+        forumService.deleteComment(forumCommentId,forumId, moimId);
         return ResponseEntity.ok("댓글 삭제 완료");
     }
 

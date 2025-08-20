@@ -69,7 +69,6 @@
         WHERE moim_id = #{moimId}
     </delete>
 
-
     <select id="findByMoimId" resultMap="MoimResultMap">
         SELECT
             mt.moim_id,
