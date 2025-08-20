@@ -105,7 +105,7 @@ function Signup(props) {
 
   const handleSignupRegOnClick = async () => {
     try {
-    const response = await reqSignup(inputValue);
+    await reqSignup(inputValue);
     toast.success("회원가입 완료!");
     setTimeout(() => {
           navigate("/oauth2/login")
@@ -113,7 +113,6 @@ function Signup(props) {
       }, 1200)
   } catch (error) {
     const errorMessage = error.response.data.body.nickName
-    console.log(errorMessage)
     toast.error(errorMessage);
   }
 }

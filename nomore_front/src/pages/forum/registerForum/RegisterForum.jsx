@@ -7,10 +7,12 @@ import { reqGetForumCategories, reqRegisterForum } from '../../../api/forumApi';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { FiPlus, FiX } from 'react-icons/fi';
 import useForumCategoryQuery from '../../../queries/useForumCategoryQuery';
+import { useQueryClient } from '@tanstack/react-query';
 
 function RegisterForum(props) {
     const navigate = useNavigate();
     const [ searchParam ] = useSearchParams();
+    const queryClient = useQueryClient();
     const moimId = searchParam.get("moimId");
     const forumCategoryQuery = useForumCategoryQuery();
     const respForumCategories = forumCategoryQuery?.data?.data || [];
@@ -82,8 +84,9 @@ function RegisterForum(props) {
         }
 
         try {
-            const response = await reqRegisterForum(formData, moimId);
-            navigate("/");
+            await reqRegisterForum(formData, moimId);
+            navigate(`/suggest/description?moimId=${moimId}`);
+            await queryClient.invalidateQueries({ queryKey: ['forums', moimId] });
         } catch (error) {
             console.error("게시글 등록 실패:", error);
             alert("게시글 등록에 실패했습니다.");

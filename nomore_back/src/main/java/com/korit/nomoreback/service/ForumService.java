@@ -3,6 +3,7 @@ package com.korit.nomoreback.service;
 import com.korit.nomoreback.domain.forum.*;
 import com.korit.nomoreback.domain.moimRole.MoimRoleMapper;
 import com.korit.nomoreback.dto.forum.*;
+import com.korit.nomoreback.dto.moim.MoimRoleDto;
 import com.korit.nomoreback.security.model.PrincipalUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -84,8 +85,10 @@ public class ForumService {
 
         if (userId.equals(forum.getUser().getUserId()) ||
                 moimRoleMapper.findRoleByUserAndMoimId(userId,forum.getMoim().getMoimId()).equals("OWNER")){
+            if (modifiedImgList != null) {
+                forumImgMapper.modifyImg(modifiedImgList);
+            }
             forumMapper.modifyForum(forumModifyDto.modify(originForum));
-            forumImgMapper.modifyImg(modifiedImgList);
             return;
         }
 
@@ -104,8 +107,10 @@ public class ForumService {
                 .toList();
 
         if (userId.equals(forum.getUser().getUserId()) ||
-                moimRoleMapper.findRoleByUserAndMoimId(userId,moimId).equals("OWNER")){
-            forumImgMapper.deleteImg(imgIds);
+            moimRoleMapper.findRoleByUserAndMoimId(userId,moimId).equals("OWNER")){
+            if (!imgIds.isEmpty()) {
+                forumImgMapper.deleteImg(imgIds);
+            }
             forumMapper.deleteForum(forumId);
             return;
         }
@@ -140,20 +145,20 @@ public class ForumService {
                 .forEach(forumComment -> forumCommentMapper.modifyComment(modifyDto.toEntity(forumComment)));
     }
 
-    public void deleteComment(Integer forumCommentId, Integer forumId) {
+    public void deleteComment(Integer forumCommentId, Integer forumId, Integer moimId) {
         Integer userId = principalUtil.getPrincipalUser().getUser().getUserId();
-
         ForumComment comment = forumCommentMapper.findByCommentId(forumCommentId);
+        MoimRoleDto moimRoleDto = moimRoleMapper.findRoleByUserAndMoimId(userId,moimId);
 
         if (comment == null || !comment.getForumId().equals(forumId)) {
             throw new IllegalArgumentException("댓글이 존재하지 않거나 게시판이 다릅니다.");
         }
 
-        if (!comment.getUserId().equals(userId)) {
+        if (!comment.getUserId().equals(userId) && moimRoleDto.getMoimRole().equals("MEMBER")) {
             throw new IllegalArgumentException("권한 없음");
         }
 
-        forumCommentMapper.deleteComment(userId,forumCommentId);
+        forumCommentMapper.deleteComment(forumCommentId);
     }
 
 

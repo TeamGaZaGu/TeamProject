@@ -46,6 +46,12 @@
 
             return ResponseEntity.ok("가입 완");
         }
+        @DeleteMapping("/{moimId}/exit")
+        public ResponseEntity<?> exit(@PathVariable Integer moimId) {
+            Integer userId = principalUtil.getPrincipalUser().getUser().getUserId();
+            moimService.exitMoim(moimId, userId);
+            return ResponseEntity.ok("탈퇴 완");
+        }
 
         @GetMapping("/{moimId}/select")
         public ResponseEntity<?> selectMoim(@PathVariable Integer moimId) {
@@ -70,9 +76,9 @@
 
         @PatchMapping(value = "/{moimId}/modify", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
         public ResponseEntity<?> updateMoim(@PathVariable Integer moimId, @ModelAttribute MoimModifyDto dto) {
-            System.out.println(dto);
+            Integer userId = principalUtil.getPrincipalUser().getUser().getUserId();
             dto.setMoimId(moimId);
-            moimService.modifyMoim(dto);
+            moimService.modifyMoim(dto, userId);
             System.out.println(dto);
             return ResponseEntity.ok("수정 완");
         }

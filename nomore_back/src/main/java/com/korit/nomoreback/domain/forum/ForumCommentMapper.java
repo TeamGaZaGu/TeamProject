@@ -12,7 +12,7 @@ public interface ForumCommentMapper {
     List<ForumComment> findAllByForumId(Integer forumId);
     int getCountByForumId(Integer forumId);
     int modifyComment(ForumComment forumComment);
-    int deleteComment(@Param("userId")Integer userId, @Param("forumCommentId") Integer forumCommentId);
+    int deleteComment(@Param("forumCommentId") Integer forumCommentId);
     ForumComment findByCommentId(@Param("forumCommentId") Integer forumCommentId);
 
 

@@ -10,6 +10,7 @@ export const reqSelectMoim = async (moimId) => await api.get(`/api/moim/${moimId
 
 export const reqJoinMoim = async (moimId) => await api.post(`/api/moim/${moimId}/join`)
 
+export const reqExitMoim = async (moimId) => await api.delete(`/api/moim/${moimId}/exit`)
 
 export const reqModifyMoim = async (data, moimId) => await api.patch(`/api/moim/${moimId}/modify`, data)
 

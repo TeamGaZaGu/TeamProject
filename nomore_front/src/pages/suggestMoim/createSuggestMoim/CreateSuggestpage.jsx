@@ -52,17 +52,15 @@ function CreateSuggestpage(props) {
         const reader = new FileReader();
         console.log("reader",reader)
 
-        reader.onload = () => {  // FileReader 의 콜백함수 파일 읽기 완료 후 이 함수가 실행됨
-            setPreviewImg(reader.result); // 미리보기 이미지 상태 설정
+        reader.onload = () => {  
+            setPreviewImg(reader.result); 
         };
-        reader.readAsDataURL(file); // 이미지 파일을 읽어서 Data URL로 변환
+        reader.readAsDataURL(file);
         setInputValue(prev => ({
             ...prev,
             moimImgFile: file,
         }));
     };
-
-    console.log(inputValue)
 
     const handleToggleDistrictOnClick = async () => {
         setIsDistrictOpen((prev) => !prev);
@@ -73,7 +71,8 @@ function CreateSuggestpage(props) {
         if (districtList.length === 0) {
             try {
                 const response = await reqDistrict();
-                setDistrictList(response?.data);
+                const districts = (response?.data || []).filter(district => district.districtName !== '전체');
+                setDistrictList(districts);
             } catch (error) {
                 console.log(error);
             }

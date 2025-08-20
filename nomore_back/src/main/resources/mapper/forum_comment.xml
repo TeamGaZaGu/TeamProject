@@ -56,7 +56,7 @@
     <delete id="deleteComment">
         delete from forum_comment_tb
         where
-            forum_id = #{forumId} and user_id = #{userId}
+            forum_comment_id = #{forumCommentId}
     </delete>
 
     <select id="findAllByForumId" resultMap="CommentMap">

@@ -66,7 +66,7 @@
             <if test="forumTitle != null">forum_title = #{forumTitle},</if>
             <if test="forumContent != null">forum_content = #{forumContent},</if>
             <if test="forumCategory != null and forumCategory.forumCategoryId != null">
-                forum_category_id = #{forumCategory.forumCategoryId}</if>
+                forum_category_id = #{forumCategory.forumCategoryId},</if>
             forum_updated_at = now()
         </set>
         where

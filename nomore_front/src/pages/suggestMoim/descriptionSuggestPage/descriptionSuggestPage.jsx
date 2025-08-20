@@ -2,7 +2,7 @@
 import * as s from './styles.js';
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { reqDeleteMoim, reqJoinMoim, reqMoimBanUserList, reqMoimUserBan, reqMoimUserList, reqSelectMoim } from '../../../api/moimApi';
+import { reqDeleteMoim, reqExitMoim, reqJoinMoim, reqMoimBanUserList, reqMoimUserBan, reqMoimUserList, reqSelectMoim } from '../../../api/moimApi';
 import useCategoryQuery from '../../../queries/useCategoryQuery.jsx';
 import { IoChatbubbleEllipses, IoChatbubbleEllipsesOutline, IoClipboard, IoClipboardOutline, IoClose } from 'react-icons/io5';
 import { RiHome7Fill, RiHome7Line } from 'react-icons/ri';
@@ -16,12 +16,15 @@ import useForumQuery from '../../../queries/useForumQuery.jsx';
 import useForumCategoryQuery from '../../../queries/useForumCategoryQuery.jsx';
 import { BiLike } from 'react-icons/bi';
 import ChattingPage from '../../chatting/ChattingPage.jsx';
+import { FcGoogle } from 'react-icons/fc';
+import { SiKakaotalk } from 'react-icons/si';
+import toast, { Toaster } from 'react-hot-toast';
 
 function DescriptionSuggestPage(props) {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
     const [ searchParam ] = useSearchParams();
-    const moimId = searchParam.get("moimId")
+    const moimId = searchParam.get("moimId");
 
     const [activeTab, setActiveTab] = useState("home");
 
@@ -43,8 +46,7 @@ function DescriptionSuggestPage(props) {
     const isBlockedUser = userBlockList?.includes(selectedUser?.userId)
 
     const forumQuery = useForumQuery(moimId);
-    const respForums = forumQuery?.data?.data || [];
-    
+    const respForums = forumQuery?.data?.data || []; 
 
     const forumCategoryQuery = useForumCategoryQuery();
     const respForumCategories = forumCategoryQuery?.data?.data || [];
@@ -57,26 +59,25 @@ function DescriptionSuggestPage(props) {
         : respForums.filter(forum => forum.forumCategory.forumCategoryName === forumCategory);
         console.log(filteredForums)
 
+    const fetchMoim = async () => {
+        try {
+            const response = await reqSelectMoim(moimId);
+            setMoim(response.data);
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const fetchMoimUserList = async () => {
+        try {
+            const response = await reqMoimUserList(moimId);
+            setUserList(response?.data);
+        } catch(error) {
+            console.log(error);
+        }
+    }
 
     useEffect(() => {
-        const fetchMoim = async () => {
-            try {
-                const response = await reqSelectMoim(moimId);
-                setMoim(response.data);
-            } catch (err) {
-                console.error(err);
-            }
-        };
-
-        const fetchMoimUserList = async () => {
-            try {
-                const response = await reqMoimUserList(moimId);
-                setUserList(response?.data);
-            } catch(error) {
-                console.log(error);
-            }
-        }
-        
 
         if (moimId) {
             fetchMoim();
@@ -97,6 +98,8 @@ function DescriptionSuggestPage(props) {
             }
             
             const joinResponse = await reqJoinMoim(moimId);
+            await fetchMoim();
+            await fetchMoimUserList();
             alert("모임 가입이 완료되었습니다!");
             
         } catch (error) {
@@ -105,11 +108,24 @@ function DescriptionSuggestPage(props) {
         }
     }
 
+    const handleExitMoimOnClick = async () => {
+        const isConfirmed = window.confirm("이 모임에서 탈퇴하시겠습니까?")
+
+        if (!isConfirmed) {
+            return;
+        }
+        if (userId !== moim?.userId) {
+            await reqExitMoim(moimId)
+            fetchMoim()
+            navigate("/")
+        }
+    }
+
     const handleModifyOnClick = () => {
         navigate(`/suggest/modify?moimId=${moimId}`)
     }
 
-    const handleDeleteOnClick = async () => {
+    const handleDeleteMoimOnClick = async () => {
         await reqDeleteMoim(moimId)
         queryClient.invalidateQueries(["moimpage"])
         alert("모임 삭제 성공")
@@ -188,6 +204,17 @@ function DescriptionSuggestPage(props) {
         }
     }
 
+    const handleWriteForumOnClick = () => {
+         navigate(`/forum/create?moimId=${moimId}`)
+    }
+
+    const handleJoinForumOnClick = (forumId) => {
+        userList.find(user => user.userId === userId) ?
+        navigate(`/forum/detail?moimId=${moimId}&forumId=${forumId}`)
+        :
+        toast.error("모임 가입이 필요한 페이지입니다")
+    }
+    
     return (
         <div css={s.container}>
             <div css={s.header}>
@@ -230,8 +257,19 @@ function DescriptionSuggestPage(props) {
                     </button>
                 </div>
                 <div>
-                    <button css={s.Transaction} onClick={handleModifyOnClick}><FaPen />수정</button>
-                    <button css={s.Transaction} onClick={handleDeleteOnClick}><FaTrashAlt />삭제</button>
+                        {
+                        userId !== moim?.userId ?
+                            userList.find(user => user.userId === userId) ? (
+                                <button css={s.exitMoimButton} onClick={handleExitMoimOnClick}>모임 탈퇴하기</button>
+                            ) : (
+                                <button css={s.joinMoimButton} onClick={handleJoinMoimOnClick}>모임 가입하기</button>
+                            )
+                            :
+                            <>
+                                <button css={s.Transaction} onClick={handleModifyOnClick}><FaPen />수정</button>
+                                <button css={s.Transaction} onClick={handleDeleteMoimOnClick}><FaTrashAlt />삭제</button>
+                            </>
+                        }
                 </div>
             </div>
             
@@ -314,61 +352,91 @@ function DescriptionSuggestPage(props) {
                                 {category.forumCategoryName}
                             </button>
                         ))}
-                        <button css={s.createButton} onClick={() => navigate(`/forum/create?moimId=${moimId}`)}>게시글 작성</button>
+                        {
+                            userId !== undefined ? 
+                                userList.find(user => user.userId === userId) ? (
+                                    <button css={s.createButton} onClick={handleWriteForumOnClick}>게시글 작성</button>
+                                ) : (
+                                    <button css={s.createButton} onClick={handleJoinMoimOnClick}>모임 가입하기</button>
+                                )
+                                :
+                                 <></>
+                        }
                     </div>
                     <div css={s.forumGrid}>
                         {
-                        filteredForums.length === 0 ? (
-                            <div css={s.register}>
-                                <h3>게시글을 등록해주세요</h3>
-                            </div>
-                        ) 
-                        :
-                        filteredForums?.map((forum) => {
-                            const date = new Date(forum.forumCreatedAt);
-                            const formatted = new Intl.DateTimeFormat('ko-KR', {
-                                year: 'numeric',
-                                month: 'numeric',
-                                day: 'numeric',
-                                hour: 'numeric',
-                                minute: 'numeric',
-                                hour12: true,
-                                timeZone: 'Asia/Seoul'
-                            }).format(date);
-
-                            return (
-                                <div css={s.forumCard} onClick={() => navigate(`/forum/detail?moimId=${moimId}&forumId=${forum.forumId}`)} key={forum.forumId}>
-                                    <div css={s.forumHeader}>
-                                        <img
-                                            css={s.modalProfileImage}
-                                            src={`${baseURL}/image${forum.user.profileImgPath}`}
-                                            alt=""
-                                        />
-                                        <div css={s.userInfo}>
-                                            <h3 css={s.h3Tag}>{forum.user.nickName}</h3>
-                                            <p css={s.postMeta}>
-                                                {forum.forumCategory.forumCategoryName} · {formatted}
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <div css={s.forumBody}>
-                                        <h2 css={s.forumTitle}>{forum.forumTitle}</h2>
-                                        <p css={s.forumContent}>{forum.forumContent}</p>
-                                    </div>
-                                    <div css={s.forumFooter}>
-                                        <p><BiLike /> {forum.likeCount}</p>
-                                        <p><FaRegComment /> {forum.commentCount}</p>
-                                    </div>
+                            userId === undefined ? 
+                            <div css={s.loginContainer}>
+                                <h2>로그인이 필요한 페이지입니다</h2>
+                                <div css={s.loginBox}>
+                                <button css={s.googleLogin} onClick={() => { window.location.href = "http://localhost:8080/oauth2/authorization/google"; }}>
+                                    <FcGoogle />
+                                    구글 로그인
+                                </button>
+                                <button css={s.kakaoLogin} onClick={() => { window.location.href = "http://localhost:8080/oauth2/authorization/kakao"; }}>
+                                    <SiKakaotalk />
+                                    카카오 로그인
+                                </button>
                                 </div>
-                            );
-                        })}
+                            </div>
+                            :
+                            filteredForums.length === 0 ? (
+                                <div css={s.register}>
+                                    <h3>게시글을 등록해주세요</h3>
+                                </div>
+                            ) 
+                        :
+                        <div css={s.forumContainer}>
+                            {
+                                filteredForums?.map((forum) => {
+                                    const date = new Date(forum.forumCreatedAt);
+                                    const formatted = new Intl.DateTimeFormat('ko-KR', {
+                                        year: 'numeric',
+                                        month: 'numeric',
+                                        day: 'numeric',
+                                        hour: 'numeric',
+                                        minute: 'numeric',
+                                        hour12: true,
+                                        timeZone: 'Asia/Seoul'
+                                    }).format(date);
+        
+                                    return (
+                                        <div css={s.forumCard} onClick={() => handleJoinForumOnClick(forum.forumId)} key={forum.forumId}>
+                                            <Toaster />
+                                            <div css={s.forumHeader}>
+                                                <img
+                                                    css={s.modalProfileImage}
+                                                    src={`${baseURL}/image${forum.user.profileImgPath}`}
+                                                    alt=""
+                                                />
+                                                <div css={s.userInfo}>
+                                                    <h3 css={s.h3Tag}>{forum.user.nickName}</h3>
+                                                    <p css={s.postMeta}>
+                                                        {forum.forumCategory.forumCategoryName} · {formatted}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <div css={s.forumBody}>
+                                                <h2 css={s.forumTitle}>{forum.forumTitle}</h2>
+                                                <p css={s.forumContent}>{forum.forumContent}</p>
+                                            </div>
+                                            <div css={s.forumFooter}>
+                                                <p><BiLike /> {forum.likeCount}</p>
+                                                <p><FaRegComment /> {forum.commentCount}</p>
+                                            </div>
+                                        </div>
+                                    );
+                                })
+                            }
+                        </div>
+                        }
                     </div>
                 </div>
             )}
             {activeTab === "chat" && <ChattingPage moimId={moimId} />}
 
             <div css={s.bottomActions}>
-                <button css={s.joinButton} onClick={handleJoinMoimOnClick}>
+                <button css={s.joinButton} >
                     모임 가입하기
                 </button>
             </div>
