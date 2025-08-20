@@ -1,6 +1,14 @@
 import api from "./axios";
 
-export const reqfindAllMoim = async () => await api.get("/api/moim/find")
+export const reqfindAllMoim = async ({page, size, categoryId, districtId, searchText}) => await api.get("/api/moim/find", {
+    params: {
+        page,
+        size,
+        categoryId: categoryId || null,
+        districtId: districtId || null,
+        searchText: searchText || null,
+    }
+})
 
 export const reqCreateSuggestMoim = async (data) => await api.post("/api/moim/register", data)
 
