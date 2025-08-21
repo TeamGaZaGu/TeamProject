@@ -484,6 +484,58 @@ export const forumFooter = css`
   }
 `;
 
+export const loadMoreContainerStyle = css`
+    display: flex;
+    justify-content: center;
+    margin-top: 30px;
+    padding: 20px 0;
+`;
+
+export const loadMoreButtonStyle = css`
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 25px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+
+    &:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    &:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    &:active:not(:disabled) {
+        transform: translateY(0);
+    }
+`;
+
+export const spinnerStyle = css`
+    animation: spin 1s linear infinite;
+    
+    @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+`;
+
+export const arrowStyle = css`
+    font-size: 12px;
+    transition: transform 0.3s ease;
+`;
+
 export const bottomActions = css`
     position: fixed;
     bottom: 0;

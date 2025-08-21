@@ -61,7 +61,6 @@
 
         @GetMapping("/find")
         public ResponseEntity<ResponseDto<?>> findCategoryMoims(MoimCategoryReqDto dto) {
-            System.out.println(dto);
             return ResponseEntity.ok(ResponseDto.success(moimService.categoryMoim(dto)));
         }
 
