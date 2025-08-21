@@ -21,3 +21,7 @@ export const reqGetComment = async (forumId) => await api.get(`api/moims/${forum
 export const reqRegisterComment = async (forumId, moimId, data) => await api.post(`api/moims/${moimId}/${forumId}/comment`, data);
 
 export const reqDeleteComment = async (forumId, moimId, forumCommentId) => await api.delete(`api/moims/${moimId}/${forumId}/comment/delete/${forumCommentId}`)
+
+export const reqLike = async (forumId) => await api.post(`api/moims/${forumId}/like`);
+
+export const reqDislike = async (forumId) => await api.delete(`/api/moims/${forumId}/dislike`);
