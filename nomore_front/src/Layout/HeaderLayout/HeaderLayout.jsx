@@ -99,17 +99,15 @@ function HeaderLayout(props) {
             keyword: e.target.value,
         }));
     }
-    
-    const [page, setPage] = useState(1);
 
-    const handleSearchInputOnClick = async () => {
-        try {
-            const response = await reqfindAllMoim({ page, size: 8, categoryId: combinedSearch.categoryId, districtId: combinedSearch.districtId, searchText: combinedSearch.keyword });
-            console.log(response);
-            navigate("/searchpage", {state: response?.data?.body?.contents});
-        } catch (error) {
-            console.error("검색 실패", error);
-        }
+    const handleSearchInputOnClick = () => {
+        navigate("/searchpage", {
+            state: {
+                categoryId: combinedSearch.categoryId,
+                districtId: combinedSearch.districtId,
+                searchText: combinedSearch.keyword
+            }
+        });
     }
     
     return (

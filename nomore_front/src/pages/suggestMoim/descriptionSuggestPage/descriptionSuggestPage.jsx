@@ -184,8 +184,6 @@ function DescriptionSuggestPage(props) {
         }
 
         try {
-            // TODO: 강퇴 API 호출
-            // await reqKickUser(moimId, userId);
             console.log(`${nickName} 강퇴 처리`);
             alert(`${nickName}님을 강퇴했습니다.`);
             handleCloseModal();

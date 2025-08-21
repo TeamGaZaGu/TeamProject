@@ -18,23 +18,9 @@ function CategoryPage() {
     const moimQuery = useMoimQuery({ size: 8, categoryId });
     const allMoims = moimQuery?.data?.pages?.map(page => page.data.body.contents).flat() || [];
     const isLast = moimQuery?.data?.data?.body.isLast || false;
-    console.log("!!");
-    console.log(allMoims);
 
     const loaderRef = useRef(null);
 
-    // 새 데이터가 들어오면 allMoims에 누적
-    // useEffect(() => {
-    //     if (currentMoims.length > 0) {
-    //         if (page === 1) {
-    //             setAllMoims(currentMoims);
-    //         } else {
-    //             setAllMoims(prev => [...prev, ...currentMoims]);
-    //         }
-    //     }
-    // }, [currentMoims]);
-
-    // 무한 스크롤 (IntersectionObserver)
     useEffect(() => {
         const observer = new IntersectionObserver((entries) => {
             if (entries[0].isIntersecting) {
@@ -43,7 +29,7 @@ function CategoryPage() {
                 }
             }
         }, { 
-            rootMargin: "200px",  // 👈 바닥 200px 전에 미리 불러오기
+            rootMargin: "500px",
         });
 
         if (loaderRef.current) {

@@ -17,34 +17,21 @@ function CheckSuggestMoim(props) {
     const categoryQuery = useCategoryQuery();
     const categories = categoryQuery?.data?.data || [];
 
-    const [ page, setPage ] = useState(1);
-    const [ moimList, setMoimList ] = useState([]);
-
-    const moimQuery = useMoimQuery({ page, size: 8, categoryId });
-    const currentMoims = moimQuery?.data?.data?.body.contents || [];
+    const moimQuery = useMoimQuery({ size: 8, categoryId });
+    const allMoims = moimQuery?.data?.pages?.map(page => page.data.body.contents).flat() || [];
     const isLast = moimQuery?.data?.data?.body.isLast || false;
 
     const loaderRef = useRef(null);
 
     useEffect(() => {
-        if (currentMoims.length > 0) {
-            if (page === 1) {
-                setMoimList(currentMoims);
-            } else {
-                setMoimList(prev => [...prev, ...currentMoims]);
-            }
-        }
-    }, [currentMoims, page]);
-
-    useEffect(() => {
-        if (isLast) return; // 마지막 페이지면 더 안 불러옴
-
         const observer = new IntersectionObserver((entries) => {
             if (entries[0].isIntersecting) {
-                setPage(prev => prev + 1);
+                if(moimQuery.hasNextPage) {
+                    moimQuery.fetchNextPage();
+                }
             }
         }, { 
-            rootMargin: "200px",  // 👈 바닥 200px 전에 미리 불러오기
+            rootMargin: "500px",
         });
 
         if (loaderRef.current) {
@@ -56,7 +43,7 @@ function CheckSuggestMoim(props) {
                 observer.unobserve(loaderRef.current);
             }
         };
-    }, [isLast]);
+    }, [loaderRef.current]);
 
     const handleMoimOnClick = (moimId) => {
         navigate(`/suggest/description?moimId=${moimId}`);
@@ -79,7 +66,7 @@ function CheckSuggestMoim(props) {
                 </div>
                 <div css={s.moimContainer}>
                     {
-                        moimList.map((moim) => {
+                        allMoims.map((moim) => {
                             const category = categories.find(cat => cat.categoryId === moim.categoryId);
                             const categoryName = category?.categoryName;
                             const categoryEmoji = category?.categoryEmoji;
