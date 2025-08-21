@@ -1,54 +1,96 @@
-import { css } from "@emotion/react";
+/** @jsxImportSource @emotion/react */
+import { css } from '@emotion/react';
 
-export const container = css`
-  min-height: 100vh;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+export const PageContainer = css`
+  display: flex;
+  height: 85vh;
+  width: 80%;
+  margin: 0 auto;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  overflow: hidden;
+`;
+
+export const UserListContainer = css`
+  width: 200px;
+  background-color: #f9f9f9;
+  border-right: 1px solid #ddd;
+  overflow-y: auto;
+  padding: 16px;
+`;
+
+export const UserItem = css`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+  border-bottom: 1px solid #eee;
+`;
+
+export const UserProfileImage = css`
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+`;
+
+export const UserDetails = css`
+  display: flex;
+  flex-direction: column;
+`;
+
+export const RoleTag = css`
+  font-size: 12px;
+  color: #555;
 `;
 
 export const ChatContainer = css`
+  flex: 1;
   display: flex;
   flex-direction: column;
-  height: 100%;
-  padding: 16px;
+  justify-content: flex-end;
 `;
 
 export const MessageList = css`
   flex: 1;
   overflow-y: auto;
+  padding: 16px;
   display: flex;
   flex-direction: column;
   gap: 8px;
-  margin-bottom: 16px;
-`;
-
-export const MessageItem = css`
-  display: inline-block;
-  max-width: 70%;
-  word-break: break-word;
-  padding: 8px 12px;
-  border-radius: 16px;
 `;
 
 export const MyMessageItem = css`
-  ${MessageItem};
-  align-self: flex-end; /* 오른쪽 정렬 */
-  background-color: #4f92ff;
+  align-self: flex-end;
+  background-color: #4f93ff;
   color: white;
-  border-radius: 16px 16px 0 16px;
+  padding: 8px 12px;
+  border-radius: 16px;
+  max-width: 60%;
+  word-break: break-word;
 `;
 
 export const OtherUserMessage = css`
-  ${MessageItem};
-  align-self: flex-start; /* 왼쪽 정렬 */
-  background-color: #4f93ff;
+  align-self: flex-start;
+  background-color: #f1f1f1;
   color: black;
-  border-radius: 16px 16px 16px 0;
+  padding: 8px 12px;
+  border-radius: 16px;
+  max-width: 60%;
+  word-break: break-word;
+`;
+
+export const Timestamp = css`
+  font-size: 10px;
+  color: #888;
+  margin-left: 4px;
 `;
 
 export const InputContainer = css`
   display: flex;
-  gap: 8px;
   padding: 8px;
+  border-top: 1px solid #ddd;
+  gap: 8px;
   input {
     flex: 1;
     padding: 8px 12px;
@@ -65,8 +107,3 @@ export const InputContainer = css`
   }
 `;
 
-export const Timestamp = css`
-  font-size: 0.9rem;
-  color: #000000;
-  margin-left: 4px;
-`;
