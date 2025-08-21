@@ -16,5 +16,5 @@ public class MoimListRespDto {
     private String categoryName;
     private Integer userId;
     private String nickName;
-    private String moimImagePath;
+    private MultipartFile moimImagePath;
 }

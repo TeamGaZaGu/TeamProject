@@ -1,42 +1,14 @@
 import api from "./axios";
 
-export const reqfindAllMoim = async ({page, size, categoryId, districtId, searchText} = {}) => {
-    const defaultPage = page || 1;
-    const defaultSize = size || 20;
-    
-    const hasValidCategory = categoryId && categoryId !== "" && categoryId !== 1;
-    const hasValidDistrict = districtId && districtId !== "";
-    const hasValidSearch = searchText && searchText.trim() !== "";
-    
-    if (hasValidCategory || hasValidDistrict || hasValidSearch) {
-        const params = {};
-        
-        if (hasValidCategory) {
-            params.categoryId = categoryId;
-        }
-        
-        if (hasValidDistrict) {
-            params.districtId = districtId;
-        }
-        
-        if (hasValidSearch) {
-            params.keyword = searchText.trim();
-        }
-        
-        console.log("검색 API 호출 - 파라미터:", params);
-        
-        return await api.get("/api/moim/search", { params });
-    } else {
-        console.log("전체 모임 조회 API 호출");
-        
-        return await api.get("/api/moim/find", {
-            params: {
-                page: defaultPage,
-                size: defaultSize
-            }
-        });
+export const reqfindAllMoim = async ({page, size, categoryId, districtId, searchText}) => await api.get("/api/moim/find", {
+    params: {
+        page,
+        size,
+        categoryId: categoryId || null,
+        districtId: districtId || null,
+        searchText: searchText || null,
     }
-}
+})
 
 export const reqCreateSuggestMoim = async (data) => await api.post("/api/moim/register", data)
 

@@ -152,16 +152,7 @@ public class MoimService {
 //    }
 
     public List<MoimListRespDto> searchMoim(MoimSearchReqDto searchReqDto) {
-//        System.out.println("=== 검색 요청 ===");
-//        System.out.println("districtId: " + searchReqDto.getDistrictId());
-//        System.out.println("categoryId: " + searchReqDto.getCategoryId());
-//        System.out.println("keyword: " + searchReqDto.getKeyword());
-
-        List<MoimListRespDto> result = moimMapper.searchMoim(searchReqDto);
-//        System.out.println("=== 검색 결과 ===");
-//        System.out.println("결과 개수: " + result.size());
-        result.forEach(moim -> System.out.println("모임: " + moim.getMoimTitle()));
-        return result;
+        return moimMapper.searchMoim(searchReqDto);
     }
 
     public List<User> moimUserList(Integer moimId) {
