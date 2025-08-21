@@ -3,10 +3,13 @@ import * as s from './styles';
 import useMoimQuery from '../../queries/useMoimQuery';
 import { baseURL } from '../../api/axios';
 import { useNavigate } from 'react-router-dom';
+import useCategoryQuery from '../../queries/useCategoryQuery';
 
 function HomeMoims({ category }) {
     const navigate = useNavigate();
     const moimQuery = useMoimQuery({ size: 8, categoryId: category.categoryId });
+    const categoryQuery = useCategoryQuery();
+    const categoryList = categoryQuery?.data?.data;
     const allMoims = moimQuery?.data?.pages?.map(page => page.data.body.contents).flat() || [];
 
     const handleMoimOnClick = (moimId) => {
@@ -89,7 +92,14 @@ function HomeMoims({ category }) {
                                         📍 {moim.districtName}
                                     </span>
                                     <span css={s.categoryTagStyle}>
-                                        {category.categoryEmoji} {category.categoryName}
+                                        {category.categoryId === 1 ? (
+                                            (() => {
+                                                const moimCategory = categoryList.find(cat => cat.categoryId === moim.categoryId);
+                                                return moimCategory ? `${moimCategory.categoryEmoji} ${moimCategory.categoryName}` : '카테고리 없음';
+                                            })()
+                                        ) : (
+                                            `${category.categoryEmoji} ${category.categoryName}`
+                                        )}
                                     </span>
                                 </div>
 
