@@ -28,15 +28,20 @@ public class ChattingController {
                         ChatMessageDto chatMessageDto,
                         @Header("simpSessionAttributes") Map<String, Object> sessionAttrs) {
 
-        User user = (User) sessionAttrs.get("user");
-        if (user == null) return; // 인증 실패 시 무시
+        String userIdStr = (String) sessionAttrs.get("userId");
+        if (userIdStr == null) return;
+
+        Integer userId = Integer.valueOf(userIdStr);
+        User user = chatService.getUserById(userId); // User 조회 메소드 추가 필요
+
+        if (user == null) return;
 
         chatMessageDto.setUserNickName(user.getNickName());
         chatMessageDto.setMoimId(moimId);
         chatMessageDto.setChattedAt(LocalDateTime.now());
 
-        chatService.registerChat(user, chatMessageDto); // DB 저장
-        template.convertAndSend("/sub/chat/" + moimId, chatMessageDto); // 실시간 전송
+        chatService.registerChat(userId, chatMessageDto); // DB 저장
+        template.convertAndSend("/sub/chat/" + moimId, chatMessageDto);
     }
 
     @GetMapping("/{moimId}/messages")
