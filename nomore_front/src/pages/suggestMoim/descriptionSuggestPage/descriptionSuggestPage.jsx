@@ -506,7 +506,22 @@ function DescriptionSuggestPage(props) {
                     </div>
                 </div>
             )}
-            {activeTab === "chat" && <ChattingPage moimId={moimId} />}
+
+            {activeTab === "chat" && moimId ? (
+                    <ChattingPage 
+                        moimId={Number(moimId)}  // 숫자로 변환
+                        userId={principalQuery?.data?.data?.user?.nickName} // 확실하게 user 전달
+                    />
+                ) : activeTab === "chat" ? (
+                    <div>올바른 채팅방 ID가 필요합니다.</div>
+                ) : null}
+
+            <div css={s.bottomActions}>
+                <button css={s.joinButton} >
+                    모임 가입하기
+                </button>
+            </div>
+
             
             {isModalOpen && selectedUser && (
                 <div css={s.modalOverlay} onClick={handleModalBackdropClick}>

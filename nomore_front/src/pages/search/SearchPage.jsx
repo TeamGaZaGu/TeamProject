@@ -9,6 +9,7 @@ import useMoimQuery from '../../queries/useMoimQuery';
 function SearchPage(props) {
     const navigate = useNavigate();
     const location = useLocation();
+    const searchMoim = location.state;
     const { categoryId, districtId, searchText } = location.state || {};
 
     const moimQuery = useMoimQuery({ size: 8, categoryId, districtId, searchText });
@@ -19,6 +20,7 @@ function SearchPage(props) {
     const categoryList = categoryQuery?.data?.data;
 
     const loaderRef = useRef(null);
+    
 
     useEffect(() => {
         const observer = new IntersectionObserver((entries) => {
@@ -64,10 +66,22 @@ function SearchPage(props) {
             ) : (
                 <ul css={s.gridContainerStyle}>
                     {allMoims?.map((moim) => {
-                        const isAvailable = moim.memberCount < moim.maxMember;
-                        const hasImage = moim.moimImgPath && moim.moimImgPath !== '';
-                        const imageUrl = hasImage ? `${baseURL}/image${moim.moimImgPath}` : null;
-                        const moimCategory = categoryList?.find(category => category.categoryId === moim.categoryId);
+                         const memberCount = moim.moimMemberCount || moim.memberCount || 0;
+                            const maxMember = moim.moimMaxMember || moim.maxMember || 0;
+                            const imagePath = moim.moimImagePath || moim.moimImgPath;
+                            const title = moim.moimTitle || moim.title || "제목 없음";
+                            const description = moim.moimDiscription || moim.discription;
+                            const districtName = moim.districtName || "지역 정보 없음";
+                            
+                            let categoryName = moim.categoryName;
+                            if (!categoryName && moim.categoryId) {
+                                const category = categoryList.find(cat => cat.categoryId === moim.categoryId);
+                                categoryName = category ? `${category.categoryEmoji} ${category.categoryName}` : "카테고리 정보 없음";
+                            }
+                            
+                            const isAvailable = memberCount < maxMember;
+                            const hasImage = imagePath && imagePath !== '' && imagePath !== 'null';
+                            const imageUrl = hasImage ? `${baseURL}/image${imagePath}` : null;
                         
                         return (
                             <li key={moim.moimId} css={s.moimCardStyle}  onClick={() => handleMoimOnClick(moim.moimId)}>
@@ -110,8 +124,13 @@ function SearchPage(props) {
                                     </p>
                                     
                                     <div css={s.tagsStyle}>
-                                        <span css={s.locationTagStyle}>{moim.districtName}</span>
-                                        <span css={s.categoryTagStyle}>{moimCategory.categoryEmoji} {moimCategory.categoryName}</span>
+                                        <span css={s.locationTagStyle}>📍 {districtName}</span>
+                                        <span css={s.categoryTagStyle}>
+                                            {(() => { 
+                                                const found = categoryList.find(c => c.categoryId === (moim.categoryId ?? moim.moimCategoryId));
+                                                return found ? `${found.categoryEmoji} ${found.categoryName}` : '카테고리 정보 없음';
+                                            })()}
+                                        </span>
                                     </div>
                                     
                                     <div css={s.memberInfoStyle}>

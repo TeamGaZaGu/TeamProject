@@ -107,7 +107,14 @@ function CategoryPage() {
                                     <div css={s.tagsStyle}>
                                         <span css={s.locationTagStyle}>{moim.districtName}</span>
                                         <span css={s.categoryTagStyle}>
-                                            {selectCategory?.categoryEmoji} {selectCategory?.categoryName}
+                                            {categoryId === 1 ? (
+                                                (() => {
+                                                    const moimCategory = categoryList.find(cat => cat.categoryId === moim.categoryId);
+                                                    return moimCategory ? `${moimCategory.categoryEmoji} ${moimCategory.categoryName}` : '카테고리 없음';
+                                                })()
+                                            ) : (
+                                                `${selectCategory.categoryEmoji} ${selectCategory.categoryName}`
+                                            )}
                                         </span>
                                     </div>
                                     <div css={s.memberInfoStyle}>
