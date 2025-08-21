@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { reqAllUser, reqBlockUser, reqUnBlockUser } from '../../api/userApi';
 /** @jsxImportSource @emotion/react */
 import * as s from './styles';
-import { baseURL } from '../../api/axios';
 
 function UserManagement(props) {
     const [allUser, setAllUser] = useState([]);
@@ -103,7 +102,7 @@ function UserManagement(props) {
                                     <td css={s.tableCell}>
                                         {user.profileImgPath ? (
                                             <img
-                                                 src={`${baseURL}/image${user.profileImgPath}`}
+                                                 src={`${user.profileImgPath}`}
                                                  alt="프로필"
                                                  css={s.profileImage}
                                             />

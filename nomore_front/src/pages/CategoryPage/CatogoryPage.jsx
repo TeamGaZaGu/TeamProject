@@ -2,7 +2,6 @@
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import React, { useState, useEffect, useRef } from 'react';
 import useMoimQuery from '../../queries/useMoimQuery';
-import { baseURL } from '../../api/axios';
 import * as s from './styles';
 import useCategoryQuery from '../../queries/useCategoryQuery';
 
@@ -51,6 +50,7 @@ function CategoryPage() {
         return <div>카테고리 정보를 불러오는 중...</div>;
     }
 
+    console.log(allMoims)
     return (
         <div css={s.containerStyle}>
             {!allMoims || allMoims.length === 0 ? (
@@ -64,7 +64,7 @@ function CategoryPage() {
                     {allMoims.map((moim) => {
                         const isAvailable = moim.memberCount < moim.maxMember;
                         const hasImage = moim.moimImgPath && moim.moimImgPath !== '';
-                        const imageUrl = hasImage ? `${baseURL}/image${moim.moimImgPath}` : null;
+                        const imageUrl = `${moim.moimImgPath}`;
 
                         return (
                             <li key={moim.moimId} css={s.moimCardStyle} onClick={() => handleMoimOnClick(moim.moimId)}>

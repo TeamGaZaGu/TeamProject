@@ -41,11 +41,10 @@
         public ResponseEntity<?> join(@PathVariable Integer moimId) {
 
             Integer userId = principalUtil.getPrincipalUser().getUser().getUserId();
-
             moimService.joinMoim(moimId, userId);
-
             return ResponseEntity.ok("가입 완");
         }
+
         @DeleteMapping("/{moimId}/exit")
         public ResponseEntity<?> exit(@PathVariable Integer moimId) {
             Integer userId = principalUtil.getPrincipalUser().getUser().getUserId();
@@ -77,19 +76,16 @@
 
         @PatchMapping(value = "/{moimId}/modify", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
         public ResponseEntity<?> updateMoim(@PathVariable Integer moimId, @ModelAttribute MoimModifyDto dto) {
+            System.out.println(dto);
             Integer userId = principalUtil.getPrincipalUser().getUser().getUserId();
             dto.setMoimId(moimId);
             moimService.modifyMoim(dto, userId);
-            System.out.println(dto);
             return ResponseEntity.ok("수정 완");
         }
 
         @DeleteMapping("/{moimId}/delete")
         public ResponseEntity<?> remove(@PathVariable Integer moimId) {
-            Integer userId = principalUtil.getPrincipalUser().getUser().getUserId();
-
-            moimService.deleteMoimById(moimId, userId);
-
+            moimService.deleteMoimById(moimId);
             return ResponseEntity.ok("삭제 완");
         }
 

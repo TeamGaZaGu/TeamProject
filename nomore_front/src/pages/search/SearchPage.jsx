@@ -3,7 +3,6 @@ import { useLocation, useNavigate } from 'react-router-dom';
 /** @jsxImportSource @emotion/react */
 import * as s from './styles';
 import useCategoryQuery from '../../queries/useCategoryQuery';
-import { baseURL } from '../../api/axios';
 import useMoimQuery from '../../queries/useMoimQuery';
 
 function SearchPage(props) {
@@ -66,7 +65,7 @@ function SearchPage(props) {
                     {allMoims?.map((moim) => {
                         const isAvailable = moim.memberCount < moim.maxMember;
                         const hasImage = moim.moimImgPath && moim.moimImgPath !== '';
-                        const imageUrl = hasImage ? `${baseURL}/image${moim.moimImgPath}` : null;
+                        const imageUrl = `${moim.moimImgPath}`;
                         const moimCategory = categoryList?.find(category => category.categoryId === moim.categoryId);
                         
                         return (

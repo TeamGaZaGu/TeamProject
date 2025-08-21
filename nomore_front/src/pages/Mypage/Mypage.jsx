@@ -110,7 +110,7 @@ function Mypage(props) {
             <div css={s.profileSection}>
                 <div css={s.profileImage}>
                     <img 
-                        src={profileImagePreview || `${baseURL}/image${user.profileImgPath}` || `${baseURL}/image/profile/dafault.jpg`}
+                        src={profileImagePreview || `${user.profileImgPath}`}
                         style={{
                             width: '100%',
                             height: '100%',

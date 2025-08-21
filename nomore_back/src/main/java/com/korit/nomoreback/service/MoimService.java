@@ -6,11 +6,13 @@ import com.korit.nomoreback.domain.moimRole.MoimRoleMapper;
 import com.korit.nomoreback.domain.user.User;
 import com.korit.nomoreback.dto.moim.*;
 import com.korit.nomoreback.security.model.PrincipalUtil;
+import com.korit.nomoreback.util.ImageUrlUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -20,11 +22,12 @@ public class MoimService {
     private final MoimRoleMapper moimRoleMapper;
     private final PrincipalUtil principalUtil;
     private final FileService fileService;
+    private final ImageUrlUtil imageUrlUtil;
 
     public MoimCategoryRespDto categoryMoim(MoimCategoryReqDto dto) {
         Integer totalElements = moimMapper.getCountOfOptions(dto.toOption());
         Integer totalPages = (int) Math.ceil(totalElements.doubleValue() / dto.getSize().doubleValue());
-        List<Moim> foundMoims = moimMapper.findAllOfOptions(dto.toOption());
+        List<Moim> foundMoims = moimMapper.findAllOfOptions(dto.toOption()).stream().map(moim -> moim.buildImageUrl(imageUrlUtil)).collect(Collectors.toList());
         boolean isLast = foundMoims.size() < dto.getSize();
 
         return MoimCategoryRespDto.builder()
@@ -42,8 +45,7 @@ public class MoimService {
 
         Moim moimEntity = dto.toEntity();
 
-        final String UPLOAD_PATH = "/moim";
-        String moimImgPath = UPLOAD_PATH + "/" + fileService.uploadFile(dto.getMoimImg(), UPLOAD_PATH);
+        String moimImgPath = fileService.uploadFile(dto.getMoimImg(), "moim");
         moimEntity.setMoimImgPath(moimImgPath);
 
         moimMapper.createMoim(moimEntity);
@@ -94,41 +96,64 @@ public class MoimService {
 
     public void modifyMoim(MoimModifyDto modifyDto, Integer userId) {
         MoimRoleDto roleDto = moimRoleMapper.findRoleByUserAndMoimId(userId, modifyDto.getMoimId());
+        String userRole =  principalUtil.getPrincipalUser().getUser().getUserRole();
 
-        String role = roleDto.getMoimRole();
+        if ("ROLE_ADMIN".equals(userRole)) {
+            Moim originMoim = moimMapper.findByMoimId(modifyDto.getMoimId());
 
-        if (roleDto == null || !"OWNER".equals(role)){
-            throw new IllegalArgumentException("권한 없는 사용자");
-        }
-
-        Moim originMoim = moimMapper.findByMoimId(modifyDto.getMoimId());
-        final String UPLOAD_PATH = "/moim";
-
-        MultipartFile newImgFile = modifyDto.getMoimImgPath();
-        if (newImgFile != null && !newImgFile.isEmpty()) {
-            if (originMoim.getMoimImgPath() != null) {
-                fileService.deleteFile(originMoim.getMoimImgPath());
+            MultipartFile newImgFile = modifyDto.getMoimImgPath();
+            if (newImgFile != null && !newImgFile.isEmpty()) {
+                if (originMoim.getMoimImgPath() != null) {
+                    fileService.deleteFile(originMoim.getMoimImgPath());
+                }
+                String savedFileName = fileService.uploadFile(newImgFile, "moim");
+                originMoim.setMoimImgPath(savedFileName); // 저장된 파일명만 넣기
             }
-            String savedFileName = UPLOAD_PATH + "/" + fileService.uploadFile(modifyDto.getMoimImgPath(), UPLOAD_PATH);
-            originMoim.setMoimImgPath(savedFileName); // 저장된 파일명만 넣기
+
+            Moim moim = modifyDto.modify(originMoim);
+            moimMapper.updateMoim(moim);
+        } else if (!"ROLE_ADMIN".equals(userRole)) {
+            if (roleDto == null) {
+                return;
+            }
+            String role = roleDto.getMoimRole();
+            if (!"OWNER".equals(role)){
+                throw new IllegalArgumentException("권한 없는 사용자");
+            }
+
+            Moim originMoim = moimMapper.findByMoimId(modifyDto.getMoimId());
+
+            MultipartFile newImgFile = modifyDto.getMoimImgPath();
+            if (newImgFile != null && !newImgFile.isEmpty()) {
+                if (originMoim.getMoimImgPath() != null) {
+                    fileService.deleteFile(originMoim.getMoimImgPath());
+                }
+                String savedFileName = fileService.uploadFile(newImgFile, "moim");
+                originMoim.setMoimImgPath(savedFileName); // 저장된 파일명만 넣기
+            }
+
+            Moim moim = modifyDto.modify(originMoim);
+            moimMapper.updateMoim(moim);
         }
-
-        Moim moim = modifyDto.modify(originMoim);
-        moimMapper.updateMoim(moim);
-
     }
 
-    public void deleteMoimById(Integer moimId, Integer userId) {
-
+    public void deleteMoimById(Integer moimId) {
+        Integer userId = principalUtil.getPrincipalUser().getUser().getUserId();
+        String userRole =  principalUtil.getPrincipalUser().getUser().getUserRole();
         MoimRoleDto roleDto = moimRoleMapper.findRoleByUserAndMoimId(userId, moimId);
 
-        String role = roleDto.getMoimRole();
-
-        if (roleDto == null || !"OWNER".equals(role)){
-            throw new IllegalArgumentException("권한 없는 사용자");
+        if ("ROLE_ADMIN".equals(userRole)) {
+            moimMapper.deleteMoimById(moimId);
+        } else {
+            if (roleDto == null) {
+                return;
+            }
+            String role = roleDto.getMoimRole();
+            if (!"OWNER".equals(role)){
+                throw new IllegalArgumentException("권한 없는 사용자");
+            }
+            moimMapper.deleteMoimById(moimId);
         }
-
-        moimMapper.deleteMoimById(moimId);
     }
 
 

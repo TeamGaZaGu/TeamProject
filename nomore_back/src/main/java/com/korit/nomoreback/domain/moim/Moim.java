@@ -1,5 +1,7 @@
 package com.korit.nomoreback.domain.moim;
 
+import com.korit.nomoreback.domain.user.User;
+import com.korit.nomoreback.util.ImageUrlUtil;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -27,4 +29,9 @@ public class Moim {
 
     private Integer categoryId;
     private Integer userId;
+
+    public Moim buildImageUrl(ImageUrlUtil imageUrlUtil) {
+        this.moimImgPath = imageUrlUtil.buildImageUrl(this.moimImgPath, "moim");
+        return this;
+    }
 }

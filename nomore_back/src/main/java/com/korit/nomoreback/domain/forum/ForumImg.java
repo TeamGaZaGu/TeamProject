@@ -1,5 +1,6 @@
 package com.korit.nomoreback.domain.forum;
 
+import com.korit.nomoreback.util.ImageUrlUtil;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,4 +16,9 @@ public class ForumImg {
     private Integer forumId;
     private Integer seq;
     private String path;
+
+    public ForumImg buildImageUrl(ImageUrlUtil imageUrlUtil) {
+        this.path = imageUrlUtil.buildImageUrl(this.path, "forum");
+        return this;
+    }
 }

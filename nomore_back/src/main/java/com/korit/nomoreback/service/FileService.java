@@ -19,6 +19,7 @@ public class FileService {
     private final AppProperties appProperties;
 
     public String uploadFile(MultipartFile file, String imageConfigName) {
+        System.out.println("imageConfigName" + imageConfigName);
         String dirPath = appProperties.getImageConfigs().get(imageConfigName).getDirPath();
         // 원본 파일 명
         String originalFilename = generateFilename(file.getOriginalFilename());
@@ -51,7 +52,6 @@ public class FileService {
     }
     private void mkdirs( String path) {
         File f = new File(path);
-        // 해당 File 객체 생성때의 주입한 경로가 존제ㅔ 하는지 확인
         if (!f.exists()) {
             f.mkdirs();
         }
