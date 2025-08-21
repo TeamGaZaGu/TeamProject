@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import useMoimQuery from '../../queries/useMoimQuery';
 import { reqfindAllMoim } from '../../api/moimApi';
 
+
 function HeaderLayout(props) {
     const navigate = useNavigate();
 
@@ -43,9 +44,13 @@ function HeaderLayout(props) {
     const handleDistrictOnChange = (e) => {
         setSelectedDistrict(e.target.value);
         const findDistrict = districtList.find(prev => prev.districtName === e.target.value);
+        
+        const districtId = (findDistrict.districtId === 1 || findDistrict.districtName === "전체") 
+            ? null : findDistrict.districtId;
+            
         setCombinedSearch(prev => ({
             ...prev,
-            districtId: findDistrict.districtId
+            districtId: districtId
         }));
         setIsDistrictOpen(false);
     }
@@ -73,12 +78,16 @@ function HeaderLayout(props) {
         }
     }
 
-    const handleCategoryOnChange = (e) => {
+     const handleCategoryOnChange = (e) => {
         setSelectedCategory(e.target.value);
         const findCategory = categoryList.find(prev => prev.categoryName === e.target.value);
+        
+        const categoryId = (findCategory.categoryId === 1 || findCategory.categoryName === "전체") 
+            ? null : findCategory.categoryId;
+            
         setCombinedSearch(prev => ({
             ...prev,
-            categoryId: findCategory.categoryId
+            categoryId: categoryId
         }));
         setIsCategoryOpen(false);
     }
@@ -100,15 +109,19 @@ function HeaderLayout(props) {
         }));
     }
 
-    const handleSearchInputOnClick = () => {
+     const handleSearchInputOnClick = async () => {
+    try {
         navigate("/searchpage", {
             state: {
-                categoryId: combinedSearch.categoryId,
-                districtId: combinedSearch.districtId,
-                searchText: combinedSearch.keyword
+                categoryId: combinedSearch.categoryId || null,
+                districtId: combinedSearch.districtId || null,
+                searchText: combinedSearch.keyword || null
             }
         });
+    } catch (error) {
+        console.error("검색 실패", error);
     }
+}
     
     return (
         <div css={s.headerContainer}>
