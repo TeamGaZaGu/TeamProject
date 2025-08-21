@@ -1,30 +1,61 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 /** @jsxImportSource @emotion/react */
 import * as s from './styles';
 import useCategoryQuery from '../../queries/useCategoryQuery';
 import { baseURL } from '../../api/axios';
+import useMoimQuery from '../../queries/useMoimQuery';
 
 function SearchPage(props) {
     const navigate = useNavigate();
     const location = useLocation();
-    const searchMoim = location.state;
-    console.log(searchMoim);
+    const { categoryId, districtId, searchText } = location.state || {};
+
+    const moimQuery = useMoimQuery({ size: 8, categoryId, districtId, searchText });
+    const allMoims = moimQuery?.data?.pages?.map(page => page.data.body.contents).flat() || [];
+    const isLast = moimQuery?.data?.data?.body.isLast || false;
+
+    const categoryQuery = useCategoryQuery();
+    const categoryList = categoryQuery?.data?.data;
+
+    const loaderRef = useRef(null);
+
+    useEffect(() => {
+        const observer = new IntersectionObserver((entries) => {
+            if (entries[0].isIntersecting) {
+                if(moimQuery.hasNextPage) {
+                    moimQuery.fetchNextPage();
+                }
+            }
+        }, { 
+            rootMargin: "500px",
+        });
+
+        if (loaderRef.current) {
+            observer.observe(loaderRef.current);
+        }
+
+        return () => {
+            if (loaderRef.current) {
+                observer.unobserve(loaderRef.current);
+            }
+        };
+    }, [loaderRef.current]);
 
     const handleMoimOnClick = (moimId) => {
         navigate(`/suggest/description?moimId=${moimId}`);
-    }
+    };
 
     return (
         <div css={s.containerStyle}>
             <div css={s.headerStyle}>
                 <h2>검색 결과</h2>
-                {searchMoim && searchMoim.length > 0 && (
-                    <p className="result-count">총 {searchMoim.length}개의 모임을 찾았습니다</p>
+                {allMoims && allMoims.length > 0 && (
+                    <p className="result-count">총 {allMoims.length}개의 모임을 찾았습니다</p>
                 )}
             </div>
 
-            {!searchMoim || searchMoim.length === 0 ? (
+            {!allMoims || allMoims.length === 0 ? (
                 <div css={s.noResultStyle}>
                     <div className="icon">🔍</div>
                     <h3>검색 결과가 없습니다</h3>
@@ -32,10 +63,11 @@ function SearchPage(props) {
                 </div>
             ) : (
                 <ul css={s.gridContainerStyle}>
-                    {searchMoim.map((moim) => {
-                        const isAvailable = moim.moimMemberCount < moim.moimMaxMember;
-                        const hasImage = moim.moimImagePath;
-                        const imageUrl = hasImage ? `${baseURL}/image${moim.moimImagePath}` : null;
+                    {allMoims?.map((moim) => {
+                        const isAvailable = moim.memberCount < moim.maxMember;
+                        const hasImage = moim.moimImgPath && moim.moimImgPath !== '';
+                        const imageUrl = hasImage ? `${baseURL}/image${moim.moimImgPath}` : null;
+                        const moimCategory = categoryList?.find(category => category.categoryId === moim.categoryId);
                         
                         return (
                             <li key={moim.moimId} css={s.moimCardStyle}  onClick={() => handleMoimOnClick(moim.moimId)}>
@@ -79,14 +111,14 @@ function SearchPage(props) {
                                     
                                     <div css={s.tagsStyle}>
                                         <span css={s.locationTagStyle}>{moim.districtName}</span>
-                                        <span css={s.categoryTagStyle}>{moim.categoryName} {moim.categoryName}</span>
+                                        <span css={s.categoryTagStyle}>{moimCategory.categoryEmoji} {moimCategory.categoryName}</span>
                                     </div>
                                     
                                     <div css={s.memberInfoStyle}>
                                         <div css={s.memberCountStyle}>
-                                            👥 <span className="current">{moim.moimMemberCount}</span>
+                                            👥 <span className="current">{moim.memberCount}</span>
                                             <span> / </span>
-                                            <span className="total">{moim.moimMaxMember}명</span>
+                                            <span className="total">{moim.maxMember}명</span>
                                         </div>
                                         
                                         <div css={s.statusBadgeStyle} className={isAvailable ? 'available' : 'full'}>
@@ -99,6 +131,8 @@ function SearchPage(props) {
                     })}
                 </ul>
             )}
+
+            {!isLast && <div ref={loaderRef} style={{ height: "50px" }} />}
         </div>
     );
 }
