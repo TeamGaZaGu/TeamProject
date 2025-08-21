@@ -73,7 +73,7 @@ function CheckSuggestMoim(props) {
 
                             return (
                                 <div key={moim.moimId} css={s.moimCard} onClick={() => handleMoimOnClick(moim.moimId)}>
-                                    <img src={`http://localhost:8080/image${moim.moimImgPath}`} alt={moim.title} />
+                                    <img src={`${moim.moimImgPath}`} alt={moim.title} />
                                     <h3>{moim.title}</h3>
                                     <p>{moim.discription}</p>
                                     <div>

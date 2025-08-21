@@ -2,6 +2,7 @@ package com.korit.nomoreback.domain.forum;
 
 import com.korit.nomoreback.domain.moim.Moim;
 import com.korit.nomoreback.domain.user.User;
+import com.korit.nomoreback.util.ImageUrlUtil;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -30,5 +31,4 @@ public class Forum {
     private ForumCategory forumCategory;
     private User user;
     private List<ForumImg> forumImgList;
-
 }

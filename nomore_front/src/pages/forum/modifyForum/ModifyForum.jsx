@@ -6,7 +6,6 @@ import { reqDetailForum, reqModifyForum } from '../../../api/forumApi';
 import useForumCategoryQuery from '../../../queries/useForumCategoryQuery';
 import { Upload, X } from 'lucide-react';
 import { BsSendArrowUpFill } from 'react-icons/bs';
-import { baseURL } from '../../../api/axios.js';
 import { useQueryClient } from '@tanstack/react-query';
 
 function ModifyForum(props) {
@@ -194,7 +193,7 @@ function ModifyForum(props) {
                         forumValue.forumImages?.map((img, index) => (
                             <div key={`existing-${index}`}>
                                 <div css={s.previewImg}>
-                                    <img src={`${baseURL}/image${img.path}`} alt={`forum-img-${index}`} />
+                                    <img src={`${img.path}`} alt={`forum-img-${index}`} />
                                     <button
                                         type="button"
                                         onClick={() => handleImgDeleteOnClick(index)}

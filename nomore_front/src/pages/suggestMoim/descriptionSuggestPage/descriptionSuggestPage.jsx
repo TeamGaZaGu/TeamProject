@@ -8,7 +8,6 @@ import { IoChatbubbleEllipses, IoChatbubbleEllipsesOutline, IoClipboard, IoClipb
 import { RiHome7Fill, RiHome7Line } from 'react-icons/ri';
 import { FaPen, FaRegComment, FaTrashAlt } from 'react-icons/fa';
 import { useQueryClient } from '@tanstack/react-query';
-import { baseURL } from '../../../api/axios.js';
 import { reqUserBlock, reqUserUnBlock } from '../../../api/userBlockApi.js';
 import usePrincipalQuery from '../../../queries/usePrincipalQuery.jsx';
 import useUserBlockListQuery from '../../../queries/useUserBlockListQuery.jsx';
@@ -40,6 +39,7 @@ function DescriptionSuggestPage(props) {
     
     const principalQuery = usePrincipalQuery();
     const userId = principalQuery?.data?.data?.user?.userId;
+    const userRole = principalQuery?.data?.data?.user?.userRole;
     const userBlockListQuery = useUserBlockListQuery({userId});
     const userBlockList = userBlockListQuery?.data?.data?.body;
 
@@ -247,6 +247,12 @@ function DescriptionSuggestPage(props) {
                 </div>
                 <div>
                         {
+                        userRole === "ROLE_ADMIN" ?
+                        <>
+                            <button css={s.Transaction} onClick={handleModifyOnClick}><FaPen />수정</button>
+                            <button css={s.Transaction} onClick={handleDeleteMoimOnClick}><FaTrashAlt />삭제</button>
+                        </>
+                        :
                         userId !== moim?.userId ?
                             userList.find(user => user.userId === userId) ? (
                                 <button css={s.exitMoimButton} onClick={handleExitMoimOnClick}>모임 탈퇴하기</button>
@@ -265,7 +271,7 @@ function DescriptionSuggestPage(props) {
             {activeTab === "home" && (
                 <div css={s.mainContent}>
                     <div css={s.moimInfo}>
-                        <img src={`${baseURL}/image${moim.moimImgPath}`} alt="모임 썸네일" />
+                        <img src={`${moim.moimImgPath}`} alt="모임 썸네일" />
                         <div css={s.moimTextInfo}>
                         <h1 css={s.moimTitle}>{moim.title}</h1>
                         <div css={s.moimMeta}>
@@ -293,7 +299,7 @@ function DescriptionSuggestPage(props) {
                                         return (
                                             <div key={user.userId} css={s.memberCard} onClick={() => handleUserInformationOnClick(user.userId)}>
                                                 <img
-                                                    src={`${baseURL}/image${user.profileImgPath}`}
+                                                    src={`${user.profileImgPath}`}
                                                     alt="프로필"
                                                     css={s.profileImage}
                                                 /> 
@@ -311,7 +317,7 @@ function DescriptionSuggestPage(props) {
                                         return (
                                             <div key={user.userId} css={s.memberCard} onClick={() => handleUserInformationOnClick(user.userId)}>
                                                 <img
-                                                    src={`${baseURL}/image${user.profileImgPath}`}
+                                                    src={`${user.profileImgPath}`}
                                                     alt="프로필"
                                                     css={s.profileImage}
                                                 /> 
@@ -395,7 +401,7 @@ function DescriptionSuggestPage(props) {
                                             <div css={s.forumHeader}>
                                                 <img
                                                     css={s.modalProfileImage}
-                                                    src={`${baseURL}/image${forum.user.profileImgPath}`}
+                                                    src={`${forum.user.profileImgPath}`}
                                                     alt=""
                                                 />
                                                 <div css={s.userInfo}>
@@ -449,7 +455,7 @@ function DescriptionSuggestPage(props) {
                         <div css={s.modalBody}>
                             <div css={s.userProfile}>
                                 <img
-                                    src={`${baseURL}/image${selectedUser.profileImgPath}`}
+                                    src={`${selectedUser.profileImgPath}`}
                                     alt="프로필"
                                     css={s.modalProfileImage}
                                 />

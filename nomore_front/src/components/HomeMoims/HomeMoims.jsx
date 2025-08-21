@@ -1,7 +1,6 @@
 /** @jsxImportSource @emotion/react */
 import * as s from './styles';
 import useMoimQuery from '../../queries/useMoimQuery';
-import { baseURL } from '../../api/axios';
 import { useNavigate } from 'react-router-dom';
 import useCategoryQuery from '../../queries/useCategoryQuery';
 
@@ -57,7 +56,7 @@ function HomeMoims({ category }) {
                 {allMoims.map((moim) => {
                     const isAvailable = moim.memberCount < moim.maxMember;
                     const hasImage = moim.moimImgPath && moim.moimImgPath !== '';
-                    const imageUrl = hasImage ? `${baseURL}/image${moim.moimImgPath}` : null;
+                    const imageUrl = moim.moimImgPath;
 
                     return (
                         <li 

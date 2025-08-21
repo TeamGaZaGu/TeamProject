@@ -3,7 +3,6 @@ import { useLocation, useNavigate } from 'react-router-dom';
 /** @jsxImportSource @emotion/react */
 import * as s from './styles';
 import useCategoryQuery from '../../queries/useCategoryQuery';
-import { baseURL } from '../../api/axios';
 import useMoimQuery from '../../queries/useMoimQuery';
 
 function SearchPage(props) {
@@ -66,7 +65,7 @@ function SearchPage(props) {
             ) : (
                 <ul css={s.gridContainerStyle}>
                     {allMoims?.map((moim) => {
-                         const memberCount = moim.moimMemberCount || moim.memberCount || 0;
+                            const memberCount = moim.moimMemberCount || moim.memberCount || 0;
                             const maxMember = moim.moimMaxMember || moim.maxMember || 0;
                             const imagePath = moim.moimImagePath || moim.moimImgPath;
                             const title = moim.moimTitle || moim.title || "제목 없음";
@@ -81,7 +80,7 @@ function SearchPage(props) {
                             
                             const isAvailable = memberCount < maxMember;
                             const hasImage = imagePath && imagePath !== '' && imagePath !== 'null';
-                            const imageUrl = hasImage ? `${baseURL}/image${imagePath}` : null;
+                            const imageUrl = `${imagePath}`;
                         
                         return (
                             <li key={moim.moimId} css={s.moimCardStyle}  onClick={() => handleMoimOnClick(moim.moimId)}>

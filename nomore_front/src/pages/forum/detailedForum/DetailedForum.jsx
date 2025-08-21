@@ -3,7 +3,6 @@ import * as s from './styles.js';
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import {  reqRegisterComment, reqDeleteForum, reqDetailForum, reqGetComment, reqDeleteComment, reqLike, reqDislike } from '../../../api/forumApi';
-import { baseURL } from '../../../api/axios.js';
 import { BiLike, BiSolidLike } from 'react-icons/bi';
 import { FaCameraRetro, FaRegComment, FaRegHeart } from 'react-icons/fa';
 import { useQueryClient } from '@tanstack/react-query';
@@ -161,7 +160,7 @@ function DetailedForum(props) {
                     <div css={s.left}>
                         <img
                             css={s.modalProfileImage}
-                            src={`${baseURL}/image${forum?.user?.profileImgPath}`}
+                            src={`${forum?.user?.profileImgPath}`}
                             alt=""
                         />
                         <div css={s.userInfo}>
@@ -180,7 +179,7 @@ function DetailedForum(props) {
                     <h2 css={s.forumTitle}>{forum?.forumTitle}</h2>
                     <p css={s.forumContent}>{forum?.forumContent}</p>
                     {forum?.forumImgList?.map(img => (
-                      <img key={img.forumImgId} src={`${baseURL}/image${img.path}`} alt="forum-img" />
+                      <img key={img.forumImgId} src={`${img.path}`} alt="forum-img" />
                     ))}
                 </div>
                 <div css={s.forumFooter}>
@@ -199,7 +198,7 @@ function DetailedForum(props) {
                             return <>
                                 <div css={s.commentRow}>
                                     <div css={s.commentItem}>
-                                        <img src={`${baseURL}/image${comment?.user?.profileImgPath}`} alt="profile" css={s.commentProfileImage} />
+                                        <img src={`${comment?.user?.profileImgPath}`} alt="profile" css={s.commentProfileImage} />
                                         <div css={s.commentBody}>
                                         <p css={s.commentAuthor}>{comment?.user?.nickName}</p>
                                         <p css={s.commentText}>{comment?.forumComment}</p>
@@ -216,7 +215,7 @@ function DetailedForum(props) {
                           return <>
                               <div css={s.commentRow}>
                                     <div css={s.subCommentItem}>
-                                        <img src={`${baseURL}/image${comment?.user?.profileImgPath}`} alt="profile" css={s.commentProfileImage} />
+                                        <img src={`${comment?.user?.profileImgPath}`} alt="profile" css={s.commentProfileImage} />
                                         <div css={s.commentBody}>
                                         <p css={s.commentAuthor}>{comment?.user?.nickName}</p>
                                         <span css={s.commentText}><span css={s.tagText}>@{comment.parentUsername}</span>{comment?.forumComment}</span>
