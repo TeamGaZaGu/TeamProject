@@ -48,7 +48,7 @@ export const postMeta = css`
 
 export const buttonWrapper = css`
   display: flex;
-  gap: 8px; /* 버튼 간격 */
+  gap: 8px; 
   margin-top: 8px;
 `;
 
@@ -121,6 +121,10 @@ export const forumFooter = css`
       font-size: 18px;
     }
   }
+`;
+
+export const likeButton = css`
+  color: blue !important;
 `;
 
 export const comments = css`
@@ -207,16 +211,19 @@ export const transactionButton = css`
   display: flex;
   gap: 6px;
 
-  button {
-    background: #f3f4f6;
-    border: 1px solid #d1d5db;
+  & > button {
+    justify-content: center;
+    align-items: center;
+    border: none;
     border-radius: 4px;
     padding: 4px 8px;
     font-size: 12px;
+    background: #ef4444;
+    color: white;
     cursor: pointer;
 
     &:hover {
-      background: #e5e7eb;
+      background: #dc2626;
     }
   }
 `;

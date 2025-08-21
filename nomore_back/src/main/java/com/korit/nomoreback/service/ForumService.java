@@ -40,7 +40,7 @@ public class ForumService {
             int seq = 1;
 
             for (MultipartFile file : imageFiles) {
-                String storedPath = UPLOAD_PATH + "/" + fileService.uploadFile(file, UPLOAD_PATH);
+                String storedPath = fileService.uploadFile(file, "forum");
 
                 ForumImg forumImg = ForumImg.builder()
                         .forumId(forum.getForumId())

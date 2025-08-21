@@ -1,5 +1,7 @@
 package com.korit.nomoreback.service;
 
+import com.korit.nomoreback.util.AppProperties;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -11,22 +13,19 @@ import java.nio.file.Paths;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class FileService {
 
-    @Value("${user.dir}")
-    private String rootPath;
+    private final AppProperties appProperties;
 
-    public String uploadFile(MultipartFile file, String dirPath) {
+    public String uploadFile(MultipartFile file, String imageConfigName) {
+        String dirPath = appProperties.getImageConfigs().get(imageConfigName).getDirPath();
         // 원본 파일 명
         String originalFilename = generateFilename(file.getOriginalFilename());
 
-        // 파일 업로드 경로 생성
-        String uploadPath = rootPath + "/upload" + dirPath;
-        // 해당 경로 제어할 수 있는 File 객체 생성
+        mkdirs(dirPath);
 
-        mkdirs(uploadPath);
-
-        String filePath = uploadPath + "/" + originalFilename;
+        String filePath = dirPath + "/" + originalFilename;
 
         Path path = Paths.get(filePath);
         try {
@@ -63,18 +62,7 @@ public class FileService {
             return;
         }
 
-        int lastSlashIndex = path.lastIndexOf("/");
-        if (lastSlashIndex == -1) {
-            // '/'가 없는 경우, 경로나 파일명 형식이 다르므로 그냥 리턴하거나 별도 처리
-            return;
-        }
-
-        String substring = path.substring(lastSlashIndex);
-        if (substring.contains("default")) {
-            return;
-        }
-
-        File file = new File(rootPath + "/upload/" + path);
+        File file = new File(path);
         if (!file.exists()) {
             return;
         }

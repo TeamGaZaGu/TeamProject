@@ -1,20 +1,22 @@
 /** @jsxImportSource @emotion/react */
 import * as s from './styles.js';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import {  reqRegisterComment, reqDeleteForum, reqDetailForum, reqGetComment, reqDeleteComment } from '../../../api/forumApi';
+import {  reqRegisterComment, reqDeleteForum, reqDetailForum, reqGetComment, reqDeleteComment, reqLike, reqDislike } from '../../../api/forumApi';
 import { baseURL } from '../../../api/axios.js';
-import { BiLike } from 'react-icons/bi';
-import { FaCameraRetro, FaRegComment } from 'react-icons/fa';
+import { BiLike, BiSolidLike } from 'react-icons/bi';
+import { FaCameraRetro, FaRegComment, FaRegHeart } from 'react-icons/fa';
 import { useQueryClient } from '@tanstack/react-query';
 import usePrincipalQuery from '../../../queries/usePrincipalQuery.jsx';
 import { SiKakaotalk } from 'react-icons/si';
 import { FcGoogle } from 'react-icons/fc';
+import { X } from 'lucide-react';
 
 function DetailedForum(props) {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
     const principalQuery = usePrincipalQuery();
+    const inputRef = useRef(null);
 
     const [ searchParam ] = useSearchParams();
     const forumId = searchParam.get("forumId");
@@ -22,8 +24,10 @@ function DetailedForum(props) {
     const [ comments, setComments ] = useState([]);
     const [ commentValue, setCommentValue ] = useState("");
     const [ recomment, setRecomment ] = useState(null);
+    console.log("recomment",recomment)
     
     const [ forum, setForum ] = useState([]);
+    console.log(forum)
     let formatted = "";
     if (forum?.forumCreatedAt) {
         const date = new Date(forum.forumCreatedAt);
@@ -37,17 +41,17 @@ function DetailedForum(props) {
             timeZone: "Asia/Seoul",
         }).format(date);
     }
+
+    const fetchForum = async () => {
+        try {
+            const response = await reqDetailForum(forumId);
+            setForum(response.data);
+        } catch (error) {
+            console.error("게시글 불러오기 실패:", error);
+        }
+    };
     
     useEffect(() => {
-        const fetchForum = async () => {
-            try {
-                const response = await reqDetailForum(forumId);
-                setForum(response.data);
-            } catch (error) {
-                console.error("게시글 불러오기 실패:", error);
-            }
-        };
-
         if (forumId) {
             fetchForum();
         }
@@ -93,19 +97,23 @@ function DetailedForum(props) {
     }
 
     const handleRegisterCommentOnClick = async (forumId, moimId) => {
-      const content = /^@[가-힣\w]+(?=\s|$|[^가-힣\w])/.test(commentValue)
-            ? commentValue.substring(commentValue.indexOf(" ") + 1)
-            : commentValue;
+        if (commentValue.trim() === "") {
+            return setCommentValue("");
+        }
 
-      const comment = {
-        parentCommentId: recomment?.forumCommentId,
-        parentUserId: recomment?.user.userId,
-        content
-      }
-      await reqRegisterComment(forumId, moimId, comment)
-      setCommentValue("");
-      setRecomment(null);
-      await fetchComment();
+        const content = /^@[가-힣\w]+(?=\s|$|[^가-힣\w])/.test(commentValue)
+                ? commentValue.substring(commentValue.indexOf(" ") + 1)
+                : commentValue;
+        
+        const comment = {
+            parentCommentId: recomment?.forumCommentId,
+            parentUserId: recomment?.user.userId,
+            content
+        }
+        await reqRegisterComment(forumId, moimId, comment)
+        setCommentValue("");
+        setRecomment(null);
+        await fetchComment();
     }
 
     useEffect(() => {
@@ -120,9 +128,22 @@ function DetailedForum(props) {
         }
     }, [recomment]);
 
+
+    const handleLikeOnClick = async (e) => {
+        await reqLike(forumId)
+        await fetchForum()
+    }
+
+    const handleDislikeOnClick = async (e) => {
+        await reqDislike(forumId)
+        await fetchForum()
+    }
+
     const handleCommentDeleteOnClick = async (forumId, moimId, forumCommentId) => {
         const confirmDelete = window.confirm("댓글을 삭제하시겠습니까?");
         if (!confirmDelete) return;
+
+        console.log("moimId", moimId)
 
         try {
             await reqDeleteComment(forumId, moimId, forumCommentId);
@@ -163,8 +184,12 @@ function DetailedForum(props) {
                     ))}
                 </div>
                 <div css={s.forumFooter}>
-                    <p><BiLike />{forum?.likeCount}</p>
-                    <p><FaRegComment />{comments.length}</p>
+                    {
+                        !!forum.isLike
+                        ? <p onClick={(e) => handleDislikeOnClick(e)}><BiSolidLike style={{ color: '#1e1ef3ff' }} />{forum?.likeCount}</p>
+                        : <p onClick={(e) => handleLikeOnClick(e)}><BiLike />{forum?.likeCount}</p>
+                    }
+                    <p onClick={() => inputRef.current?.focus()}><FaRegComment />{comments.length}</p>
                 </div>
                 <div css={s.comments}>
                   <div css={s.commentList}>
@@ -183,8 +208,7 @@ function DetailedForum(props) {
                                     </div>
     
                                     <div css={s.transactionButton}>
-                                        <button>수정</button>
-                                        <button onClick={() => handleCommentDeleteOnClick(forumId, forum.moim.moimId, comment.forumCommentId)}>삭제</button>
+                                        <button type="button" onClick={() => handleCommentDeleteOnClick(forumId, forum.moim.moimId, comment.forumCommentId)}><X size={12} /></button>
                                     </div>
                                 </div>
                             </>
@@ -196,12 +220,18 @@ function DetailedForum(props) {
                                         <div css={s.commentBody}>
                                         <p css={s.commentAuthor}>{comment?.user?.nickName}</p>
                                         <span css={s.commentText}><span css={s.tagText}>@{comment.parentUsername}</span>{comment?.forumComment}</span>
-                                        <p css={s.recomment} onClick={() => setRecomment(comment)}>답글 달기</p>
+                                        <p css={s.recomment} 
+                                            onClick={() => {
+                                                setRecomment(comment);
+                                                setTimeout(() => inputRef.current?.focus(), 0);
+                                            }}
+                                        >
+                                            답글 달기
+                                        </p>
                                         </div>
                                     </div>
                                     <div css={s.transactionButton}>
-                                        <button>수정</button>
-                                        <button onClick={() => handleCommentDeleteOnClick(forumId, comment.forumCommentId)}>삭제</button>
+                                        <button type="button" onClick={() => handleCommentDeleteOnClick(forumId, forum.moim.moimId, comment.forumCommentId)}><X size={12} /></button>
                                     </div>
                                 </div>
                           </>
@@ -210,7 +240,7 @@ function DetailedForum(props) {
                   </div>
     
                   <div css={s.writeComment}>
-                      <input type="text" placeholder="댓글을 입력하세요" css={s.input} value={commentValue} onChange={handleCommentOnChange} />
+                      <input type="text" placeholder="댓글을 입력하세요" css={s.input} value={commentValue} onChange={handleCommentOnChange} ref={inputRef} />
                       <button 
                       css={s.button} 
                       disabled={recomment && !recomment?.user?.userId} 

@@ -11,6 +11,21 @@ spring:
     activate:
       on-profile: local-server
 
+app:
+  server-host: "http://localhost:8080"
+  image-configs:
+    profile:
+      prefix: "{app.server-host}/image/profile"
+      dir-path: "${user.dir}/upload/profile"
+      default-img: "default.jpg"
+    product:
+      prefix: "{app.server-host}/image/moim"
+      dir-path: "${user.dir}/upload/moim"
+      default-img: "default.jpg"
+    forum:
+      prefix: "{app.server-host}/image/forum"
+      dir-path: "${user.dir}/upload/forum"
+      default-img: "default.jpg"
 ---
 
 spring:
@@ -31,6 +46,4 @@ mybatis:
   configuration:
     map-underscore-to-camel-case: true
   type-aliases-package: com.korit.nomoreback.domain.entity
-
-
 
