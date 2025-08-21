@@ -15,5 +15,8 @@ public interface ForumCommentMapper {
     int deleteComment(@Param("forumCommentId") Integer forumCommentId);
     ForumComment findByCommentId(@Param("forumCommentId") Integer forumCommentId);
 
+    Integer getCountOfOptions(ForumsCommentSearchOption option);
+    List<ForumComment> findAllOfOptions(ForumsCommentSearchOption option);
+
 
 }

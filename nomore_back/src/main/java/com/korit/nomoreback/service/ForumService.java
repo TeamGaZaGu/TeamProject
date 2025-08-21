@@ -1,8 +1,10 @@
 package com.korit.nomoreback.service;
 
 import com.korit.nomoreback.domain.forum.*;
+import com.korit.nomoreback.domain.moim.Moim;
 import com.korit.nomoreback.domain.moimRole.MoimRoleMapper;
 import com.korit.nomoreback.dto.forum.*;
+import com.korit.nomoreback.dto.moim.MoimCategoryRespDto;
 import com.korit.nomoreback.dto.moim.MoimRoleDto;
 import com.korit.nomoreback.security.model.PrincipalUtil;
 import lombok.RequiredArgsConstructor;
@@ -60,9 +62,21 @@ public class ForumService {
         Integer userId = principalUtil.getPrincipalUser().getUser().getUserId();
         return forumMapper.findByForumIdAndUserId(forumId, userId);
     }
-    public List<Forum> getForumsByMoimId(Integer moimId) {
+    public ForumSearchRespDto getForumsByMoimId(ForumSearchReqDto dto) {
         Integer userId = principalUtil.getPrincipalUser().getUser().getUserId();
-        return forumMapper.findByMoimId(moimId, userId);
+        Integer totalElements = forumMapper.getCountOfOptions(dto.toOption(userId));
+        Integer totalPages = (int) Math.ceil(totalElements.doubleValue() / dto.getSize().doubleValue());
+        List<Forum> foundForums = forumMapper.findAllOfOptions(dto.toOption(userId));
+        boolean isLast = foundForums.size() < dto.getSize();
+
+        return ForumSearchRespDto.builder()
+                .contents(foundForums)
+                .totalElements(totalElements)
+                .totalPages(totalPages)
+                .page(dto.getPage())
+                .size(dto.getSize())
+                .isLast(isLast)
+                .build();
     }
 
     public List<Forum> getForumsByCategoryId(Integer moimId, Integer categoryId) {
@@ -131,10 +145,20 @@ public class ForumService {
         return forumCommentMapper.getCountByForumId(dto.getForumId());
     }
 
-    public List<ForumComment> getCommentsByForumId(Integer forumId) {
+    public ForumCommentSearchRespDto getCommentsByForumId(ForumCommentSearchReqDto dto) {
+        Integer totalElements = forumCommentMapper.getCountOfOptions(dto.toOption());
+        Integer totalPages = (int) Math.ceil(totalElements.doubleValue() / dto.getSize().doubleValue());
+        List<ForumComment> foundForums = forumCommentMapper.findAllOfOptions(dto.toOption());
+        boolean isLast = foundForums.size() < dto.getSize();
 
-        return forumCommentMapper.findAllByForumId(forumId);
-
+        return ForumCommentSearchRespDto.builder()
+                .contents(foundForums)
+                .totalElements(totalElements)
+                .totalPages(totalPages)
+                .page(dto.getPage())
+                .size(dto.getSize())
+                .isLast(isLast)
+                .build();
     }
 
     public void modifyComment (ForumCommentModifyDto modifyDto,Integer forumId) {
