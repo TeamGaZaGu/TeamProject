@@ -167,15 +167,6 @@ public class MoimService {
         return moimMapper.findMoimByUserId(userId);
     }
 
-//    public List<Moim> findMoimByCategoryId(Integer categoryId) {
-//
-//        if (categoryId == 1){
-//            return moimMapper.findAll();
-//        }else {
-//            return moimMapper.findMoimByCategoryId(categoryId);
-//        }
-//    }
-
     public List<MoimListRespDto> searchMoim(MoimSearchReqDto searchReqDto) {
         return moimMapper.searchMoim(searchReqDto);
     }

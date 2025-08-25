@@ -6,6 +6,7 @@ import api, { baseURL } from "../../api/axios";
 import usePrincipalQuery from '../../queries/usePrincipalQuery';
 import { reqMyMoimList } from '../../api/moimApi';
 import { useNavigate } from 'react-router-dom';
+import { deleteUser } from '../../api/userApi';
 
 function Mypage(props) {
 
@@ -96,6 +97,24 @@ function Mypage(props) {
             alert("수정 완료!");
         } catch (e) {
             alert("수정 실패!");
+        }
+    };
+
+    const handleDeleteUserOnClick = async () => {
+
+        const confirmDelete = window.confirm("정말 회원 탈퇴를 진행하시겠습니까?");
+        if (!confirmDelete) return;
+
+        try {
+            await deleteUser(user.userId);
+            localStorage.removeItem("AccessToken");
+
+            await principalQuery.refetch();
+            alert("회원 탈퇴가 완료되었습니다.");
+            navigate("/");
+        } catch (error) {
+            console.error(error);
+            alert("회원 탈퇴 중 오류가 발생했습니다.");
         }
     };
 
@@ -193,6 +212,11 @@ function Mypage(props) {
                 <div css={s.buttonContainer}>
                     <button css={s.saveButton} onClick={handleSaveOnclick}>
                         개인정보수정
+                    </button>
+                </div>
+                <div>
+                    <button css={s.dangerButton} onClick={handleDeleteUserOnClick}>
+                        회원 탈퇴
                     </button>
                 </div>
             </div>

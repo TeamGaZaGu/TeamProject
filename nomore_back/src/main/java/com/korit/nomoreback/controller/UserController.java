@@ -79,4 +79,11 @@ public class UserController {
         return ResponseEntity.ok(ResponseDto.success(blocked));
     }
 
+    @DeleteMapping("{userId}")
+    public ResponseEntity<ResponseDto<?>> deleteUser(@PathVariable Integer userId) {
+        userService.deleteUser(userId);
+        System.out.println(userId);
+        return ResponseEntity.ok(ResponseDto.success("회원 탈퇴 완료"));
+    }
+
 }

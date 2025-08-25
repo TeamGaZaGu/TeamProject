@@ -205,6 +205,31 @@ export const saveButton = css`
   }
 `;
 
+export const dangerButton = css`
+  padding: 0.8rem 1.5rem;
+  background-color: #ff4d4f; /* 진한 빨간색 */
+  color: white;
+  border: none;
+  border-radius: 0.8rem;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: #ff1f1f; /* hover 시 더 진하게 */
+  }
+
+  &:active {
+    background-color: #d9363e; /* 클릭 시 색 살짝 어둡게 */
+  }
+
+  &:disabled {
+    background-color: #ffa39e;
+    cursor: not-allowed;
+  }
+`;
+
 // 취소 버튼
 export const cancelButton = css`
   padding: 1rem 2rem;
@@ -260,39 +285,6 @@ export const sectionDivider = css`
   height: 1px;
   background-color: #e0e0e0;
   margin: 2rem 0;
-`;
-
-// 위험 영역 (계정 삭제 등)
-export const dangerZone = css`
-  width: 100%;
-  max-width: 40rem;
-  padding: 1.5rem;
-  border: 2px solid #ff6b6b;
-  border-radius: 1rem;
-  background-color: rgba(255, 107, 107, 0.05);
-  margin-top: 2rem;
-`;
-
-export const dangerTitle = css`
-  color: #ff6b6b;
-  font-weight: bold;
-  font-size: 1.1rem;
-  margin-bottom: 1rem;
-`;
-
-export const dangerButton = css`
-  padding: 0.8rem 1.5rem;
-  background-color: #ff6b6b;
-  color: white;
-  border: none;
-  border-radius: 0.8rem;
-  cursor: pointer;
-  font-size: 1rem;
-  font-weight: 500;
-
-  &:hover {
-    background-color: #ff5252;
-  }
 `;
 
 // 드롭다운 스타일 (회원가입과 동일)

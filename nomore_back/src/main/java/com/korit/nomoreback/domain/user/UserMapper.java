@@ -23,4 +23,6 @@ public interface UserMapper {
 
     void updateProfile(UserProfileUpdateReqDto reqDto);
     String findProfileImgPathByUserId(int userId);
+
+    void deleteUser(Integer userId);
 }
