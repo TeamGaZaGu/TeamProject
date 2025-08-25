@@ -168,15 +168,6 @@ public class MoimService {
         return moimMapper.findMoimByUserId(userId);
     }
 
-//    public List<Moim> findMoimByCategoryId(Integer categoryId) {
-//
-//        if (categoryId == 1){
-//            return moimMapper.findAll();
-//        }else {
-//            return moimMapper.findMoimByCategoryId(categoryId);
-//        }
-//    }
-
     public List<MoimListRespDto> searchMoim(MoimSearchReqDto searchReqDto) {
         return moimMapper.searchMoim(searchReqDto);
     }
@@ -184,5 +175,9 @@ public class MoimService {
     public List<User> moimUserList(Integer moimId) {
         List<User> userList = moimMapper.moimUserList(moimId).stream().map(user -> user.buildImageUrl(imageUrlUtil)).collect(Collectors.toList());
         return userList;
+    }
+
+    public List<Moim> myMoimList(Integer userId) {
+        return moimMapper.myMoimList(userId);
     }
 }

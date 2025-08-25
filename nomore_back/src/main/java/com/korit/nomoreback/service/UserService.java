@@ -65,4 +65,8 @@ public class UserService {
         reqDto.setUserId(userId);
         userMapper.updateProfile(reqDto);
     }
+
+    public void deleteUser(Integer userId) {
+        userMapper.deleteUser(userId);
+    }
 }

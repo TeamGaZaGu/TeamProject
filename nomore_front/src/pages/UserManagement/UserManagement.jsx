@@ -84,10 +84,10 @@ function UserManagement(props) {
                         <thead css={s.tableHead}>
                             <tr>
                                 <th css={s.tableHeader}>ID</th>
+                                <th css={s.tableHeader}>프로필이미지</th>
                                 <th css={s.tableHeader}>닉네임</th>
                                 <th css={s.tableHeader}>성명</th>
                                 <th css={s.tableHeader}>이메일</th>
-                                <th css={s.tableHeader}>프로필이미지</th>
                                 <th css={s.tableHeader}>성별</th>
                                 <th css={s.tableHeader}>생년월일</th>
                                 <th css={s.tableHeader}>회원차단</th>
@@ -95,11 +95,8 @@ function UserManagement(props) {
                         </thead>
                         <tbody>
                             {allUser?.filter(user => user.userRole !== 'ROLE_ADMIN').map((user) => (
-                                <tr key={user.userId} css={s.tableRow}>
+                                    <tr key={user.userId} css={s.tableRow}>
                                     <td css={s.tableCell}>{user.userId}</td>
-                                    <td css={s.tableCell}>{user.nickName}</td>
-                                    <td css={s.tableCell}>{user.fullName}</td>
-                                    <td css={s.tableCell}>{user.email}</td>
                                     <td css={s.tableCell}>
                                         {user.profileImgPath ? (
                                             <img
@@ -111,6 +108,9 @@ function UserManagement(props) {
                                             <span css={s.noImage}>이미지 없음</span>
                                         )}
                                     </td>
+                                    <td css={s.tableCell}>{user.nickName}</td>
+                                    <td css={s.tableCell}>{user.fullName}</td>
+                                    <td css={s.tableCell}>{user.email}</td>
                                     <td css={s.tableCell}>{user.gender}</td>
                                     <td css={s.tableCell}>{user.birthDate}</td>
                                     <td css={s.tableCell}>

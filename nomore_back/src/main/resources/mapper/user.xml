@@ -53,6 +53,11 @@
             user_id = #{userId}
     </update>
 
+    <delete id="deleteUser">
+        delete from user_tb
+        where user_id = #{userId}
+    </delete>
+
 
     <select id="findByProviderId" resultType="com.korit.nomoreback.domain.user.User">
         select

@@ -233,4 +233,16 @@
             </if>
     </select>
 
+    <select id="myMoimList" resultMap="MoimResultMap">
+        select
+            mt.*,
+            dt.district_name
+        from
+            moim_tb mt
+            inner join moim_role_tb mrt on(mrt.moim_id = mt.moim_id)
+            join district_tb dt on(dt.district_id = mt.district_id)
+        where
+            mrt.user_id = #{userId}
+    </select>
+
 </mapper>

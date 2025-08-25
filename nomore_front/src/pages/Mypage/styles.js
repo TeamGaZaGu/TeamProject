@@ -205,6 +205,31 @@ export const saveButton = css`
   }
 `;
 
+export const dangerButton = css`
+  padding: 0.8rem 1.5rem;
+  background-color: #ff4d4f; /* 진한 빨간색 */
+  color: white;
+  border: none;
+  border-radius: 0.8rem;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: #ff1f1f; /* hover 시 더 진하게 */
+  }
+
+  &:active {
+    background-color: #d9363e; /* 클릭 시 색 살짝 어둡게 */
+  }
+
+  &:disabled {
+    background-color: #ffa39e;
+    cursor: not-allowed;
+  }
+`;
+
 // 취소 버튼
 export const cancelButton = css`
   padding: 1rem 2rem;
@@ -260,39 +285,6 @@ export const sectionDivider = css`
   height: 1px;
   background-color: #e0e0e0;
   margin: 2rem 0;
-`;
-
-// 위험 영역 (계정 삭제 등)
-export const dangerZone = css`
-  width: 100%;
-  max-width: 40rem;
-  padding: 1.5rem;
-  border: 2px solid #ff6b6b;
-  border-radius: 1rem;
-  background-color: rgba(255, 107, 107, 0.05);
-  margin-top: 2rem;
-`;
-
-export const dangerTitle = css`
-  color: #ff6b6b;
-  font-weight: bold;
-  font-size: 1.1rem;
-  margin-bottom: 1rem;
-`;
-
-export const dangerButton = css`
-  padding: 0.8rem 1.5rem;
-  background-color: #ff6b6b;
-  color: white;
-  border: none;
-  border-radius: 0.8rem;
-  cursor: pointer;
-  font-size: 1rem;
-  font-weight: 500;
-
-  &:hover {
-    background-color: #ff5252;
-  }
 `;
 
 // 드롭다운 스타일 (회원가입과 동일)
@@ -371,5 +363,93 @@ export const dropdownItem = css`
     display: flex;
     align-items: center;
     width: 100%;
+  }
+`;
+
+export const mypageLayout = css`
+  display: flex;
+  gap: 2rem;
+  width: 100%;
+  margin: 0;
+  padding: 2rem;
+  box-sizing: border-box;
+  background-color: #fafafa;
+  min-height: 100vh;
+`;
+
+export const leftSection = css`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;  /* 좌우 중앙 정렬 */
+  justify-content: flex-start;
+`;
+
+export const rightSection = css`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+`;
+
+export const moimHeader = css`
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+`;
+
+export const moimCard = css`
+  display: flex;
+  gap: 1rem;
+  padding: 1rem 0; 
+  margin-bottom: 1rem;
+  border-radius: 0.8rem;
+  background-color: #fafafa; 
+  align-items: flex-start;
+  cursor: pointer;
+`;
+
+export const moimImageContainer = css`
+  width: 100px;
+  height: 100px;
+  flex-shrink: 0;
+  overflow: hidden;
+  border-radius: 0.8rem;
+  background-color: #e0e0e0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+export const moimImage = css`
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+`;
+
+export const moimDefaultImage = css`
+  font-size: 2rem;
+`;
+
+export const moimContent = css`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+
+  h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: bold;
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #555;
+  }
+
+  span {
+    font-size: 0.8rem;
+    color: #777;
   }
 `;

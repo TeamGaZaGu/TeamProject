@@ -1,6 +1,6 @@
 /** @jsxImportSource @emotion/react */
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import useMoimQuery from '../../queries/useMoimQuery';
 import * as s from './styles';
 import useCategoryQuery from '../../queries/useCategoryQuery';
@@ -53,6 +53,16 @@ function CategoryPage() {
     console.log(allMoims)
     return (
         <div css={s.containerStyle}>
+            {/* 카테고리 헤더 */}
+            <div css={s.categoryHeaderStyle}>
+                <span css={s.categoryIconStyle}>
+                    {selectCategory?.categoryEmoji || '📂'}
+                </span>
+                <span css={s.categoryNameStyle}>
+                    {selectCategory?.categoryName || '전체'}
+                </span>
+            </div>
+
             {!allMoims || allMoims.length === 0 ? (
                 <div css={s.noMoimStyle}>
                     <div className="icon">📭</div>
@@ -60,19 +70,20 @@ function CategoryPage() {
                     <p>새로운 모임이 곧 추가될 예정입니다.</p>
                 </div>
             ) : (
-                <ul css={s.gridContainerStyle}>
+                <div css={s.moimListStyle}>
                     {allMoims.map((moim) => {
                         const isAvailable = moim.memberCount < moim.maxMember;
                         const hasImage = moim.moimImgPath && moim.moimImgPath !== '';
                         const imageUrl = `${moim.moimImgPath}`;
 
                         return (
-                            <li key={moim.moimId} css={s.moimCardStyle} onClick={() => handleMoimOnClick(moim.moimId)}>
-                                {hasImage ? (
-                                    <div css={s.imageStyle}>
+                            <div key={moim.moimId} css={s.moimItemStyle} onClick={() => handleMoimOnClick(moim.moimId)}>
+                                <div css={s.moimImageContainerStyle}>
+                                    {hasImage ? (
                                         <img 
                                             src={imageUrl} 
                                             alt={moim.title}
+                                            css={s.moimImageStyle}
                                             onError={(e) => {
                                                 e.target.style.display = 'none';
                                                 e.target.parentElement.innerHTML = `
@@ -84,27 +95,37 @@ function CategoryPage() {
                                                         align-items: center;
                                                         justify-content: center;
                                                         color: white;
-                                                        font-size: 18px;
+                                                        font-size: 14px;
                                                         font-weight: bold;
+                                                        text-align: center;
+                                                        padding: 8px;
+                                                        border-radius: 8px;
                                                     ">
                                                         ${moim.title}
                                                     </div>
                                                 `;
                                             }}
                                         />
-                                    </div>
-                                ) : (
-                                    <div css={s.defaultImageStyle}>
-                                        {moim.title}
-                                    </div>
-                                )}
+                                    ) : (
+                                        <div css={s.defaultImageStyle}>
+                                            {moim.title}
+                                        </div>
+                                    )}
+                                </div>
 
-                                <div css={s.contentStyle}>
-                                    <h3 css={s.titleStyle}>{moim.title}</h3>
-                                    <p css={s.descriptionStyle}>
+                                <div css={s.moimContentStyle}>
+                                    <div css={s.moimTitleRowStyle}>
+                                        <h3 css={s.moimTitleStyle}>{moim.title}</h3>
+                                        <div css={s.statusBadgeStyle} className={isAvailable ? 'available' : 'full'}>
+                                            {isAvailable ? '모집중' : '모집완료'}
+                                        </div>
+                                    </div>
+                                    
+                                    <p css={s.moimDescriptionStyle}>
                                         {moim.discription || '모임에 대한 자세한 설명이 곧 업데이트됩니다.'}
                                     </p>
-                                    <div css={s.tagsStyle}>
+                                    
+                                    <div css={s.moimTagsStyle}>
                                         <span css={s.locationTagStyle}>{moim.districtName}</span>
                                         <span css={s.categoryTagStyle}>
                                             {categoryId === 1 ? (
@@ -116,22 +137,15 @@ function CategoryPage() {
                                                 `${selectCategory.categoryEmoji} ${selectCategory.categoryName}`
                                             )}
                                         </span>
-                                    </div>
-                                    <div css={s.memberInfoStyle}>
-                                        <div css={s.memberCountStyle}>
-                                            👥 <span className="current">{moim.memberCount}</span>
-                                            <span> / </span>
-                                            <span className="total">{moim.maxMember}명</span>
-                                        </div>
-                                        <div css={s.statusBadgeStyle} className={isAvailable ? 'available' : 'full'}>
-                                            {isAvailable ? '모집중' : '모집완료'}
-                                        </div>
+                                        <span css={s.memberCountTagStyle}>
+                                            👥 {moim.memberCount}/{moim.maxMember}명
+                                        </span>
                                     </div>
                                 </div>
-                            </li>
+                            </div>
                         );
                     })}
-                </ul>
+                </div>
             )}
 
             {/* 스크롤 감지용 div */}
