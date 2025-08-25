@@ -11,8 +11,12 @@ export const reqGetForums = async (moimId) => await api.get(`/api/moims/${moimId
 export const reqGetForumCategories = async () => await api.get("/api/moims/forumCategories");
 
 export const reqDetailForum = async (forumId) => await api.get(`/api/moims/${forumId}`);
+export const reqDetailForumBlob = async ({url, imageConfigsName}) => await api.get(`/api/moims/forums/blobs`, {
+    params: {url, imageConfigsName},
+    responseType: 'blob',
+  });
 
-export const reqModifyForum = async (moimId, forumId, data) => await api.put(`/api/moims/${moimId}/${forumId}/modify`, data);
+export const reqModifyForum = async (forumId, data) => await api.put(`/api/moims/${forumId}/modify`, data);
 
 export const reqDeleteForum = async (forumId, moimId) => await api.delete(`/api/moims/${moimId}/${forumId}/delete`);
 

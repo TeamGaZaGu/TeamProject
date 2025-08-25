@@ -58,6 +58,7 @@ function DescriptionSuggestPage(props) {
         ? respForums
         : respForums.filter(forum => forum.forumCategory.forumCategoryName === forumCategory);
 
+    console.log(filteredForums)
     const fetchMoim = async () => {
         try {
             const response = await reqSelectMoim(moimId);
@@ -436,12 +437,6 @@ function DescriptionSuggestPage(props) {
                 ) : activeTab === "chat" ? (
                     <div>올바른 채팅방 ID가 필요합니다.</div>
                 ) : null}
-
-            <div css={s.bottomActions}>
-                <button css={s.joinButton} >
-                    모임 가입하기
-                </button>
-            </div>
             
             {isModalOpen && selectedUser && (
                 <div css={s.modalOverlay} onClick={handleModalBackdropClick}>

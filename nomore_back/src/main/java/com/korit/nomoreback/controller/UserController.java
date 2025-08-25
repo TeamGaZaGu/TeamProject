@@ -21,13 +21,11 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
-    private final UserMapper userMapper;
     private final UserBlockService userBlockService;
 
 
     @GetMapping("/admin")
     public ResponseEntity<List<User>> allUser() {
-        System.out.println(userService.allUser());
         return ResponseEntity.ok(userService.allUser());
     }
 

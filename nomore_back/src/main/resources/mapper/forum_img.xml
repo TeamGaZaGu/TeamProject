@@ -11,27 +11,23 @@
     </insert>
 
     <insert id="insertMany">
-        insert into forum_img_tb( forum_id, seq,  path )
+        insert into forum_img_tb ( forum_id, seq,  path )
         values
-        <foreach item="forumImg" collection="list" separator=",">
+        <foreach item="forumImg" collection="forumImg" separator=",">
             (#{forumImg.forumId}, #{forumImg.seq},  #{forumImg.path})
         </foreach>
     </insert>
 
     <update id="modifyImg">
-        <foreach collection="imgList" item="img" separator=";">
-            update
-            forum_img_tb
-            <set>
-                <if test="img.seq != null">seq = #{img.seq},</if>
-                <if test="img.path != null">path = #{img.path}</if>
-            </set>
-            where
-            forum_img_id = #{img.forumImgId}
-        </foreach>
+        update forum_img_tb
+        <set>
+            <if test="seq != null">seq = #{seq},</if>
+            <if test="path != null">path = #{path}</if>
+        </set>
+        where forum_img_id = #{forumImgId}
     </update>
 
-    <delete id="deleteImg">
+    <delete id="deleteImg" parameterType="list">
         delete from forum_img_tb
         where forum_img_id in
         <foreach collection="imgIds" item="id" open="(" separator="," close=")">

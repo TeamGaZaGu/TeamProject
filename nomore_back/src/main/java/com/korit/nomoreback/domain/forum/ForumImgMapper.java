@@ -9,9 +9,8 @@ import java.util.List;
 public interface ForumImgMapper {
 
     int insertImg(ForumImg forumImg);
-    int insertMany(List<ForumImg> forumImgs);
-    ForumImg modifyImg(List<ForumImg> forumImgs);
+    int insertMany(@Param("forumImg") List<ForumImg> forumImgs);
+    int modifyImg(ForumImg forumImgs);
     List<ForumImg> findImgById(@Param("forumId") Integer forumId);
     int deleteImg(@Param("imgIds")List<Integer> imgIds);
-
 }
