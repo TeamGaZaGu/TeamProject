@@ -5,6 +5,8 @@ import com.korit.nomoreback.domain.moimRole.MoimRoleMapper;
 import com.korit.nomoreback.dto.forum.*;
 import com.korit.nomoreback.dto.moim.MoimRoleDto;
 import com.korit.nomoreback.security.model.PrincipalUtil;
+import com.korit.nomoreback.util.AppProperties;
+import com.korit.nomoreback.util.ImageUrlUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,15 +26,15 @@ public class ForumService {
     private final ForumLikeMapper forumLikeMapper;
     private final ForumImgMapper forumImgMapper;
     private final MoimRoleMapper moimRoleMapper;
+    private final ImageUrlUtil imageUrlUtil;
+    private final AppProperties appProperties;
 
     @Transactional
     public void registerForum(ForumRegisterDto dto) {
 
         Forum forum = dto.toEntity();
         forumMapper.registerForum(forum);
-        System.out.println("새로 생성된 forumId = " + forum.getForumId());
 
-        final String UPLOAD_PATH = "/forum";
         List<MultipartFile> imageFiles = dto.getForumImages();
 
         if (imageFiles != null && !imageFiles.isEmpty()) {
@@ -58,11 +60,32 @@ public class ForumService {
 
     public Forum getForumById(Integer forumId) {
         Integer userId = principalUtil.getPrincipalUser().getUser().getUserId();
-        return forumMapper.findByForumIdAndUserId(forumId, userId);
+        Forum forum = forumMapper.findByForumIdAndUserId(forumId, userId);
+        List<ForumImg> forumImgs = forumImgMapper.findImgById(forum.getForumId());
+        forumImgs.forEach(img -> img.buildImageUrl(imageUrlUtil));
+        forum.setForumImgList(forumImgs);
+        forum.getUser().buildImageUrl(imageUrlUtil);
+
+        return forum;
     }
+
+    public byte[] getBlob(String url, String imageConfigsName) {
+        String fileName = url.replaceAll(appProperties.getImageConfigs().get(imageConfigsName).getPrefix(), "");
+        String path = appProperties.getImageConfigs().get(imageConfigsName).getDirPath() + fileName;
+        return fileService.convertToBlob(path);
+    }
+
     public List<Forum> getForumsByMoimId(Integer moimId) {
         Integer userId = principalUtil.getPrincipalUser().getUser().getUserId();
-        return forumMapper.findByMoimId(moimId, userId);
+        List<Forum> forums = forumMapper.findByMoimId(moimId, userId);
+
+        for (Forum forum : forums) {
+            List<ForumImg> forumImgs = forumImgMapper.findImgById(forum.getForumId());
+            forumImgs.forEach(img -> img.buildImageUrl(imageUrlUtil));
+            forum.setForumImgList(forumImgs);;
+            forum.getUser().buildImageUrl(imageUrlUtil);
+        }
+        return forums;
     }
 
     public List<Forum> getForumsByCategoryId(Integer moimId, Integer categoryId) {
@@ -71,24 +94,45 @@ public class ForumService {
     }
 
 
-    public void modifyForum(ForumModifyDto forumModifyDto,ForumImgModifyDto forumImgModifyDto){
-
+    public void modifyForum(ForumModifyDto dto){
         Integer userId = principalUtil.getPrincipalUser().getUser().getUserId();
-
-        Integer forumId = forumModifyDto.getForumId();
-
+        Integer forumId = dto.getForumId();
         Forum forum = forumMapper.findByForumId(forumId);
-
         Forum originForum = forumMapper.findByForumIdAndUserId(forumId,userId);
 
-        List<ForumImg> modifiedImgList = forumImgModifyDto.getImgList();
+        List<ForumImg> forumImgs = forumImgMapper.findImgById(forumId);
+        if (forumImgs != null && !forumImgs.isEmpty()) {
+            List<Integer> imgIds = forumImgs.stream()
+                    .map(forumImg -> forumImg.getForumImgId())
+                    .toList();
+
+            forumImgMapper.deleteImg(imgIds);
+        }
+
+        List<MultipartFile> imageFiles = dto.getForumImages();
+        System.out.println("imageFiles" + imageFiles);
+        List<ForumImg> modifiedImgList = new ArrayList<>();
+        if (imageFiles != null) {
+            int seq = 1;
+            for (MultipartFile file : imageFiles) {
+                String storedPath = fileService.uploadFile(file, "forum");
+
+                ForumImg forumImg = ForumImg.builder()
+                        .forumId(forumId)
+                        .seq(seq++)
+                        .path(storedPath)
+                        .build();
+
+                modifiedImgList.add(forumImg);
+            }
+        }
 
         if (userId.equals(forum.getUser().getUserId()) ||
                 moimRoleMapper.findRoleByUserAndMoimId(userId,forum.getMoim().getMoimId()).equals("OWNER")){
-            if (modifiedImgList != null) {
-                forumImgMapper.modifyImg(modifiedImgList);
+            if (modifiedImgList != null && !modifiedImgList.isEmpty()) {
+                forumImgMapper.insertMany(modifiedImgList);
             }
-            forumMapper.modifyForum(forumModifyDto.modify(originForum));
+            forumMapper.modifyForum(dto.modify(originForum));
             return;
         }
 

@@ -12,6 +12,7 @@ function ChattingPage({ moimId }) {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [members, setMembers] = useState([]);
+  console.log("members", members)
   const [onlineUsers, setOnlineUsers] = useState([]);
   const stompClientRef = useRef(null);
   const messageEndRef = useRef(null);
@@ -65,7 +66,6 @@ function ChattingPage({ moimId }) {
     stompClient.onConnect = () => {
       console.log('✅ WebSocket connected');
 
-      // 채팅 메시지 구독
       stompClient.subscribe(`/sub/chat/${moimIdNum}`, (msg) => {
         const chatMessage = JSON.parse(msg.body);
         setMessages((prev) => [...prev, chatMessage]);
@@ -116,7 +116,7 @@ function ChattingPage({ moimId }) {
 
           return (
             <div key={member.userId} css={s.UserItem}>
-              <img src={member.profileImg} alt="프로필" css={s.UserProfileImage} />
+              <img src={member.profileImgPath} alt="프로필" css={s.UserProfileImage} />
               <div css={s.UserDetails}>
                 <span>{member.nickName}</span>
                 <span css={s.RoleTag}>

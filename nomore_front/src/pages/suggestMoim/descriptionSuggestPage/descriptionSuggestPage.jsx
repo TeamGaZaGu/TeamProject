@@ -64,7 +64,6 @@ function DescriptionSuggestPage(props) {
         ? respForums
         : respForums.filter(forum => forum.forumCategory.forumCategoryName === forumCategory);
 
-    // 모임 정보 조회
     const fetchMoim = async () => {
         try {
             const response = await reqSelectMoim(moimId);
@@ -416,10 +415,9 @@ function DescriptionSuggestPage(props) {
                     />
                 ) : (
                     <div>올바른 채팅방 ID가 필요합니다.</div>
-                )
-            )}
 
-            {/* 사용자 정보 모달 */}
+                ) : null}
+           
             {isModalOpen && selectedUser && (
                 <div css={s.modalOverlay} onClick={handleModalBackdropClick}>
                     <div css={s.modalContent}>

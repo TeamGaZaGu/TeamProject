@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -67,6 +68,16 @@ public class FileService {
             return;
         }
         file.delete();
+    }
+
+    public byte[] convertToBlob(String path) {
+        try {
+            File file = new File(path);
+            return Files.readAllBytes(file.toPath()); // readAllBytes -> path의 경로에 있는 실제 파일의 내용을 byte[]로 읽어 반환
+        }catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
 }

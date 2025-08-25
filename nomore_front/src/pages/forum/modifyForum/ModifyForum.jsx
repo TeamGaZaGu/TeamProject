@@ -2,7 +2,7 @@
 import * as s from './styles.js';
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { reqDetailForum, reqModifyForum } from '../../../api/forumApi';
+import { reqDetailForum, reqDetailForumBlob, reqModifyForum } from '../../../api/forumApi';
 import useForumCategoryQuery from '../../../queries/useForumCategoryQuery';
 import { Upload, X } from 'lucide-react';
 import { BsSendArrowUpFill } from 'react-icons/bs';
@@ -25,13 +25,13 @@ function ModifyForum(props) {
         forumImages: [],
         forumCategoryId: "",
     });
-
+    console.log(forumValue)
     useEffect(() => {
         if (forum) {
             setForumValue({
                 forumTitle: forum.forumTitle || '',
                 forumContent: forum.forumContent || '',
-                forumImages: forum.forumImgList || [],
+                forumImages: forum.forumImgList?.map(image => ({file: image.file, dataUrl: image.url})) || [],
                 forumCategoryId: forum.forumCategory?.forumCategoryId || '',
             });
         }
@@ -41,8 +41,25 @@ function ModifyForum(props) {
     useEffect(() => {
         const fetchForum = async () => {
             try {
+                const blobs = [];
                 const response = await reqDetailForum(forumId);
-                setForum(response.data);
+                const getImageBlobPromises = response.data.forumImgList.map(image => {
+                    return new Promise((rs, rj) => {
+                        reqDetailForumBlob({url: image.path, imageConfigsName: "forum"}).then(response => {
+                            rs(response);
+                        });
+                    })
+                });
+                const results = (await Promise.all(getImageBlobPromises));
+                const forumData = {
+                    ...response.data,
+                    forumImgList: response.data.forumImgList.map((img, index) => ({
+                        ...img,
+                        file: new File([results[index].data], img.path.substring(img.path.indexOf("_") + 1), { type: results[index].headers['content-type'] }),
+                        url: URL.createObjectURL(results[index].data),
+                    }))
+                };
+                setForum(forumData);
             } catch (error) {
                 console.error("게시글 불러오기 실패:", error);
             }
@@ -61,6 +78,13 @@ function ModifyForum(props) {
             [e.target.name]: e.target.value
         }));
     };
+
+    const handleOldImgDeleteOnClick = (index) => {
+        setForumValue(prev => ({
+            ...prev,
+            forumImages: prev.forumImages.filter((file, i) => i !== index)
+        }));
+    }
 
     const handleImgDeleteOnClick = (index) => {
         setImages(prev => prev.filter((file, i) => i !== index));
@@ -82,15 +106,18 @@ function ModifyForum(props) {
                 return new Promise(resolve => {
                     const fileReader = new FileReader();
                     fileReader.onload = (e) => {
+                        console.log({file, dataUrl: e.target.result})
                         resolve({file, dataUrl: e.target.result});
                     }
                     fileReader.readAsDataURL(file);
                 });
             })).then(resolves => {
-                setImages(prev => [...prev, ...resolves]);
+                setForumValue(prev => ({...prev, forumImages: [...prev.forumImages, ...resolves]}));
             });
         }
     }
+
+    console.log(forumValue)
 
     const handleModifyOnClick = async () => {
 
@@ -105,7 +132,8 @@ function ModifyForum(props) {
         formData.append("forumContent", forumValue.forumContent);
         formData.append("forumCategoryId", Number(forumValue.forumCategoryId));
 
-        images.forEach((image, index) => {
+        forumValue.forumImages.forEach((image, index) => {
+            console.log("image.file", image.file)
             formData.append("forumImages", image.file);
         });
         for (const pair of formData.entries()) {
@@ -113,7 +141,7 @@ function ModifyForum(props) {
         }
 
         try {
-            await reqModifyForum(forum?.moim?.moimId, forumId, formData)
+            await reqModifyForum(forumId, formData)
             await navigate(`/forum/detail?forumId=${forumId}`);
             await queryClient.invalidateQueries({ queryKey: ['forums', forum?.moim?.moimId] });
         } catch (error) {
@@ -190,13 +218,13 @@ function ModifyForum(props) {
                         </div>
                     }
                     {
-                        forumValue.forumImages?.map((img, index) => (
-                            <div key={`existing-${index}`}>
+                        forumValue.forumImages?.map((image, index) => (
+                            <div key={index}>
                                 <div css={s.previewImg}>
-                                    <img src={`${img.path}`} alt={`forum-img-${index}`} />
+                                    <img src={`${image.dataUrl}`} alt={`forum-img-${index}`} />
                                     <button
                                         type="button"
-                                        onClick={() => handleImgDeleteOnClick(index)}
+                                        onClick={() => handleOldImgDeleteOnClick(index)}
                                         >
                                         <X size={12} />
                                     </button>
@@ -206,7 +234,7 @@ function ModifyForum(props) {
                     }
                     {
                         images.map((img, index) => (
-                            <div key={`new-${index}`}>
+                            <div key={index}>
                                 <div css={s.previewImg}>
                                     <img src={img.dataUrl} alt="" />
                                     <button
