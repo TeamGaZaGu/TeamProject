@@ -183,4 +183,8 @@ public class MoimService {
     public List<User> moimUserList(Integer moimId) {
         return moimMapper.moimUserList(moimId);
     }
+
+    public List<Moim> myMoimList(Integer userId) {
+        return moimMapper.myMoimList(userId);
+    }
 }

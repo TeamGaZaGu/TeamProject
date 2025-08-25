@@ -47,13 +47,12 @@ function SearchPage(props) {
         navigate(`/suggest/description?moimId=${moimId}`);
     };
 
+    console.log(allMoims);
+
     return (
         <div css={s.containerStyle}>
             <div css={s.headerStyle}>
                 <h2>검색 결과</h2>
-                {allMoims && allMoims.length > 0 && (
-                    <p className="result-count">총 {allMoims.length}개의 모임을 찾았습니다</p>
-                )}
             </div>
 
             {!allMoims || allMoims.length === 0 ? (
@@ -68,9 +67,6 @@ function SearchPage(props) {
                             const memberCount = moim.moimMemberCount || moim.memberCount || 0;
                             const maxMember = moim.moimMaxMember || moim.maxMember || 0;
                             const imagePath = moim.moimImagePath || moim.moimImgPath;
-                            const title = moim.moimTitle || moim.title || "제목 없음";
-                            const description = moim.moimDiscription || moim.discription;
-                            const districtName = moim.districtName || "지역 정보 없음";
                             
                             let categoryName = moim.categoryName;
                             if (!categoryName && moim.categoryId) {
@@ -88,7 +84,7 @@ function SearchPage(props) {
                                     <div css={s.imageStyle}>
                                         <img 
                                             src={imageUrl} 
-                                            alt={moim.moimTitle}
+                                            alt={moim.title}
                                             onError={(e) => {
                                                 e.target.style.display = 'none';
                                                 e.target.parentElement.innerHTML = `
@@ -103,7 +99,7 @@ function SearchPage(props) {
                                                         font-size: 18px;
                                                         font-weight: bold;
                                                     ">
-                                                        ${moim.moimTitle}
+                                                        ${moim.title}
                                                     </div>
                                                 `;
                                             }}
@@ -111,19 +107,19 @@ function SearchPage(props) {
                                     </div>
                                 ) : (
                                     <div css={s.defaultImageStyle}>
-                                        {moim.moimTitle}
+                                        {moim.title}
                                     </div>
                                 )}
                                 
                                 <div css={s.contentStyle}>
-                                    <h3 css={s.titleStyle}>{moim.moimTitle}</h3>
+                                    <h3 css={s.titleStyle}>{moim.title}</h3>
                                     
                                     <p css={s.descriptionStyle}>
-                                        {moim.moimDiscription || '모임에 대한 자세한 설명이 곧 업데이트됩니다.'}
+                                        {moim.discription || '모임에 대한 자세한 설명이 곧 업데이트됩니다.'}
                                     </p>
                                     
                                     <div css={s.tagsStyle}>
-                                        <span css={s.locationTagStyle}>📍 {districtName}</span>
+                                        <span css={s.locationTagStyle}>📍 {moim.districtName}</span>
                                         <span css={s.categoryTagStyle}>
                                             {(() => { 
                                                 const found = categoryList.find(c => c.categoryId === (moim.categoryId ?? moim.moimCategoryId));

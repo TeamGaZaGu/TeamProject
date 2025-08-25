@@ -28,4 +28,5 @@ public interface MoimMapper {
 
     void moimMemberDiscount(Integer moimId);
 
+    List<Moim> myMoimList(Integer userId);
 }

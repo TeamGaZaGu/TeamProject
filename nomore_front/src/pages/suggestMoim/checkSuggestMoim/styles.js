@@ -1,10 +1,20 @@
-import { css } from "styled-components";
+import { css } from '@emotion/react';
+
+export const containerStyle = css`
+  width: 100%;
+  margin: 0;
+  padding: 0;         /* 위쪽 여백 제거 */
+  background-color: #ffffff; /* 전체 흰색으로 변경 */
+  min-height: 100vh;  /* 화면 전체 높이 확보 */
+`;
 
 export const layout = css`
-    display: flex;
-    margin: 5rem 5rem 0;
-    justify-content: space-between;
-    align-items: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 3px 40px; /* 상단 패딩은 최소로 */
+  border-bottom: 1px solid #e5e7eb; /* 구분선 */
+  background-color: #ffffff;
 `;
 
 export const createMoim = css`
@@ -25,106 +35,166 @@ export const createMoim = css`
   }
 `;
 
-export const moimContainer = css`
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 2rem;
-  padding: 2rem;
+export const moimListStyle = css`
+  padding: 2rem 5rem;
 `;
 
-export const moimCard = css`
-  background-color: #fff;
-  border-radius: 16px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  padding: 1.5rem;
-  transition: transform 0.2s ease;
+export const moimItemFlatStyle = css`
+  display: flex;
+  padding: 16px 0;
+  border-bottom: 1px solid #e5e7eb;
   cursor: pointer;
 
   &:hover {
-    transform: translateY(-5px);
+    background-color: #f8fafc;
   }
 
-  img {
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 12px;
+  }
+`;
+
+export const moimImageContainerStyle = css`
+  flex-shrink: 0;
+  width: 140px;
+  height: 100px;
+  margin-right: 20px;
+  overflow: hidden;
+  border-radius: 8px;
+
+  @media (max-width: 768px) {
     width: 100%;
-    height: 180px;
-    object-fit: cover;
-    border-radius: 12px;
-    margin-bottom: 1rem;
+    height: 160px;
+    margin-right: 0;
+  }
+`;
+
+export const moimImageStyle = css`
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+`;
+
+export const defaultImageStyle = css`
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 14px;
+  font-weight: bold;
+  text-align: center;
+  padding: 8px;
+  border-radius: 8px;
+`;
+
+export const moimContentStyle = css`
+  flex: 1;
+  min-width: 0;
+`;
+
+export const moimTitleRowStyle = css`
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 8px;
+  gap: 12px;
+`;
+
+export const moimTitleStyle = css`
+  font-size: 17px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+  line-height: 1.4;
+  flex: 1;
+`;
+
+export const moimDescriptionStyle = css`
+  color: #6b7280;
+  font-size: 14px;
+  line-height: 1.5;
+  margin: 0 0 12px 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+`;
+
+export const moimTagsStyle = css`
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+`;
+
+export const locationTagStyle = css`
+  background-color: #dbeafe;
+  color: #1e40af;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+`;
+
+export const categoryTagStyle = css`
+  background-color: #f3e8ff;
+  color: #7c3aed;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+`;
+
+export const memberCountTagStyle = css`
+  color: #6b7280;
+  font-size: 12px;
+  font-weight: 500;
+`;
+
+export const statusBadgeStyle = css`
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
+
+  &.available {
+    background-color: #d1fae5;
+    color: #065f46;
+  }
+
+  &.full {
+    background-color: #fee2e2;
+    color: #991b1b;
+  }
+`;
+
+export const noMoimStyle = css`
+  text-align: center;
+  padding: 60px 20px;
+  color: #6b7280;
+  background: white;
+
+  .icon {
+    font-size: 48px;
+    margin-bottom: 16px;
   }
 
   h3 {
-    font-size: 1.6rem;
-    font-weight: bold;
-    margin-bottom: 0.5rem;
+    font-size: 20px;
+    font-weight: 600;
+    color: #374151;
+    margin: 0 0 8px 0;
   }
 
   p {
-    font-size: 1.4rem;
-    color: #555;
-    margin: 0.25rem 0;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-`;
-
-export const loginContainer = css`
-  display: flex; 
-  flex-direction: column;
-  justify-content: center;  
-  align-items: center;      
-  text-align: center;
-  width: 100%;
-  height: 100%;
-  background-color: #ffffff;
-`;
-
-export const loginBox = css`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 30px;
-  border-radius: 15px;
-  background-color: #7a51c2;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-`;
-
-export const googleLogin = css`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: white;
-  color: black;
-  border: none;
-  padding: 10px 20px;
-  font-size: 16px;
-  border-radius: 8px;
-  margin-bottom: 10px;
-  width: 250px;
-  cursor: pointer;
-
-  img {
-    width: 20px;
-    margin-right: 10px;
-  }
-`;
-
-export const kakaoLogin = css`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #fee500;
-  color: #3c1e1e;
-  border: none;
-  padding: 10px 20px;
-  font-size: 16px;
-  border-radius: 8px;
-  width: 250px;
-  cursor: pointer;
-  
-  img {
-    width: 20px;
-    margin-right: 10px;
+    font-size: 14px;
+    margin: 0;
+    color: #9ca3af;
   }
 `;

@@ -1,15 +1,12 @@
 /** @jsxImportSource @emotion/react */
 import * as s from './styles.js';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useCategoryQuery from '../../../queries/useCategoryQuery.jsx';
-import { reqfindSuggestMoim } from '../../../api/moimApi.js';
 import usePrincipalQuery from '../../../queries/usePrincipalQuery.jsx';
-import { FcGoogle } from 'react-icons/fc';
-import { SiKakaotalk } from 'react-icons/si';
 import useMoimQuery from '../../../queries/useMoimQuery.jsx';
 
-function CheckSuggestMoim(props) {
+function CheckSuggestMoim() {
     const navigate = useNavigate();
     const principalQuery = usePrincipalQuery();
     const categoryId = principalQuery?.data?.data?.user?.categoryId;
@@ -25,23 +22,15 @@ function CheckSuggestMoim(props) {
 
     useEffect(() => {
         const observer = new IntersectionObserver((entries) => {
-            if (entries[0].isIntersecting) {
-                if(moimQuery.hasNextPage) {
-                    moimQuery.fetchNextPage();
-                }
+            if (entries[0].isIntersecting && moimQuery.hasNextPage) {
+                moimQuery.fetchNextPage();
             }
-        }, { 
-            rootMargin: "500px",
-        });
+        }, { rootMargin: "500px" });
 
-        if (loaderRef.current) {
-            observer.observe(loaderRef.current);
-        }
+        if (loaderRef.current) observer.observe(loaderRef.current);
 
         return () => {
-            if (loaderRef.current) {
-                observer.unobserve(loaderRef.current);
-            }
+            if (loaderRef.current) observer.unobserve(loaderRef.current);
         };
     }, [loaderRef.current]);
 
@@ -49,48 +38,81 @@ function CheckSuggestMoim(props) {
         navigate(`/suggest/description?moimId=${moimId}`);
     };
 
-    if (categoryQuery.isLoading) {
-        return <div>카테고리 정보를 불러오는 중...</div>;
-    }
-
     const handleCreateMoimOnClick = () => {
         navigate("/suggest/create");
     };
 
-    if(principalQuery.isFetched && principalQuery.isSuccess) {
+    if (categoryQuery.isLoading) {
+        return <div>카테고리 정보를 불러오는 중...</div>;
+    }
+
+    if (principalQuery.isFetched && principalQuery.isSuccess) {
         return (
-            <div>
+            <div css={s.containerStyle}>
+                {/* 헤더 */}
                 <div css={s.layout}>
                     <h2>추천모임</h2>
                     <button css={s.createMoim} onClick={handleCreateMoimOnClick}>모임 만들기</button>
                 </div>
-                <div css={s.moimContainer}>
-                    {
-                        allMoims.map((moim) => {
+
+                {/* 모임 리스트 */}
+                {!allMoims || allMoims.length === 0 ? (
+                    <div css={s.noMoimStyle}>
+                        <div className="icon">📭</div>
+                        <h3>추천 모임이 없습니다.</h3>
+                        <p>새로운 모임이 곧 추가될 예정입니다.</p>
+                    </div>
+                ) : (
+                    <div css={s.moimListStyle}>
+                        {allMoims.map((moim) => {
                             const category = categories.find(cat => cat.categoryId === moim.categoryId);
-                            const categoryName = category?.categoryName;
-                            const categoryEmoji = category?.categoryEmoji;
+                            const categoryName = category?.categoryName || '카테고리 없음';
+                            const categoryEmoji = category?.categoryEmoji || '📂';
+                            const isAvailable = moim.memberCount < moim.maxMember;
+                            const hasImage = moim.moimImgPath && moim.moimImgPath !== '';
+                            const imageUrl = `${moim.moimImgPath}`;
 
                             return (
-                                <div key={moim.moimId} css={s.moimCard} onClick={() => handleMoimOnClick(moim.moimId)}>
-                                    <img src={`${moim.moimImgPath}`} alt={moim.title} />
-                                    <h3>{moim.title}</h3>
-                                    <p>{moim.discription}</p>
-                                    <div>
-                                        <p>👥 {moim.memberCount}명</p>
-                                        <p>{categoryEmoji}{categoryName}</p>
+                                <div key={moim.moimId} css={s.moimItemFlatStyle} onClick={() => handleMoimOnClick(moim.moimId)}>
+                                    {/* 이미지 */}
+                                    <div css={s.moimImageContainerStyle}>
+                                        {hasImage ? (
+                                            <img src={imageUrl} alt={moim.title} css={s.moimImageStyle} />
+                                        ) : (
+                                            <div css={s.defaultImageStyle}>{moim.title}</div>
+                                        )}
+                                    </div>
+
+                                    {/* 내용 */}
+                                    <div css={s.moimContentStyle}>
+                                        <div css={s.moimTitleRowStyle}>
+                                            <h3 css={s.moimTitleStyle}>{moim.title}</h3>
+                                            <div css={s.statusBadgeStyle} className={isAvailable ? 'available' : 'full'}>
+                                                {isAvailable ? '모집중' : '모집완료'}
+                                            </div>
+                                        </div>
+                                        <p css={s.moimDescriptionStyle}>
+                                            {moim.discription || '모임에 대한 자세한 설명이 곧 업데이트됩니다.'}
+                                        </p>
+                                        <div css={s.moimTagsStyle}>
+                                            <span css={s.locationTagStyle}>{moim.districtName}</span>
+                                            <span css={s.categoryTagStyle}>{categoryEmoji} {categoryName}</span>
+                                            <span css={s.memberCountTagStyle}>👥 {moim.memberCount}/{moim.maxMember}명</span>
+                                        </div>
                                     </div>
                                 </div>
                             );
-                        })
-                    }
-                </div>
-                
-                {/* 스크롤 감지용 div */}
+                        })}
+                    </div>
+                )}
+
+                {/* 로딩 감지 div */}
                 {!isLast && <div ref={loaderRef} style={{ height: "50px" }} />}
             </div>
         );
     }
+
+    return null;
 }
 
 export default CheckSuggestMoim;
