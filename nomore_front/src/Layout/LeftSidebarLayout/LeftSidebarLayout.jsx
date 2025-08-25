@@ -47,7 +47,6 @@ function LeftSidebarLayout(props) {
             <div css={s.sideMenu}>
                 <button onClick={handleHometOnClick}><IoHomeSharp />홈</button>
                 <button onClick={handleSuggestOnClick}><HiUsers />추천모임</button>
-                <button><BsCalendar2EventFill />정모일정</button>
                 {
                     userRole === "ROLE_ADMIN" && (
                         <button onClick={handleUseManagementOnClick}><FaUserSlash />유저관리</button>

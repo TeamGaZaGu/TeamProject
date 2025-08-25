@@ -123,4 +123,10 @@
         public ResponseEntity<List<MoimBan>> banUserList(@PathVariable Integer moimId) {
             return ResponseEntity.ok(moimBanService.banUserList(moimId));
         }
+
+        @GetMapping("/{userId}/moims")
+        public ResponseEntity<List<Moim>> myMoimList(@PathVariable Integer userId) {
+            System.out.println(moimService.myMoimList(userId));
+            return ResponseEntity.ok(moimService.myMoimList(userId));
+        }
     }

@@ -373,3 +373,91 @@ export const dropdownItem = css`
     width: 100%;
   }
 `;
+
+export const mypageLayout = css`
+  display: flex;
+  gap: 2rem;
+  width: 100%;
+  margin: 0;
+  padding: 2rem;
+  box-sizing: border-box;
+  background-color: #fafafa;
+  min-height: 100vh;
+`;
+
+export const leftSection = css`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;  /* 좌우 중앙 정렬 */
+  justify-content: flex-start;
+`;
+
+export const rightSection = css`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+`;
+
+export const moimHeader = css`
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+`;
+
+export const moimCard = css`
+  display: flex;
+  gap: 1rem;
+  padding: 1rem 0; 
+  margin-bottom: 1rem;
+  border-radius: 0.8rem;
+  background-color: #fafafa; 
+  align-items: flex-start;
+  cursor: pointer;
+`;
+
+export const moimImageContainer = css`
+  width: 100px;
+  height: 100px;
+  flex-shrink: 0;
+  overflow: hidden;
+  border-radius: 0.8rem;
+  background-color: #e0e0e0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+export const moimImage = css`
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+`;
+
+export const moimDefaultImage = css`
+  font-size: 2rem;
+`;
+
+export const moimContent = css`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+
+  h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: bold;
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #555;
+  }
+
+  span {
+    font-size: 0.8rem;
+    color: #777;
+  }
+`;
