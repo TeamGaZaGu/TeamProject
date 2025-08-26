@@ -46,38 +46,6 @@ public class WebSocketEventListener {
         }
 
         chatOnlineUsersState.addOnlineUserByMoimId(moimId, userId);
-
-//        template.convertAndSend("/sub/chat/" + moimId + "/online",
-//                onlineUsersByMoim.get(moimId).stream().map(String::valueOf).toList());
-//
-//        System.out.println("Connected: moimId=" + moimId + ", userId=" + userId +
-//                ", 온라인 유저: " + onlineUsersByMoim.get(moimId));
     }
 
-    @EventListener
-    public void handleWebSocketDisconnectListener(SessionDisconnectEvent event) {
-        Map<String, Object> nativeHeaders = (Map<String, Object>) ((GenericMessage) event.getMessage().getHeaders().get("simpConnectMessage")).getHeaders().get("nativeHeaders");
-
-        System.out.println(nativeHeaders);
-
-        List<Object> moimIdList = List.copyOf((List<Object>)nativeHeaders.get("moimId"));
-        List<Object> userIdList = List.copyOf((List<Object>)nativeHeaders.get("userId"));
-        System.out.println(moimIdList);
-
-
-        Integer moimId = Integer.parseInt((String) moimIdList.get(0));
-        Integer userId = Integer.parseInt((String) userIdList.get(0));
-
-        if (moimId == null || userId == null) return;
-
-        chatOnlineUsersState.removeOnlineUserByMoimId(moimId, userId);
-    }
-
-    private Integer parseIntOrNull(String s) {
-        try {
-            return s != null ? Integer.parseInt(s) : null;
-        } catch (NumberFormatException e) {
-            return null;
-        }
-    }
 }

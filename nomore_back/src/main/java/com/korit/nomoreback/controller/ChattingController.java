@@ -58,4 +58,9 @@ public class ChattingController {
         template.convertAndSend("/sub/chat/" + moimId + "/online",
                 chatOnlineUsersState.getOnlineUsersByMoim().get(moimId).stream().map(String::valueOf).toList());
     }
+
+    @MessageMapping("/chat/{moimId}/{userId}/offline")
+    public void getOnlineUserList(@DestinationVariable Integer moimId, @DestinationVariable Integer userId) {
+        chatOnlineUsersState.removeOnlineUserByMoimId(moimId, userId);
+    }
 }

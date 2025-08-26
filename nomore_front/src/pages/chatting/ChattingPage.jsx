@@ -83,6 +83,9 @@ function ChattingPage({ moimId }) {
     stompClientRef.current = stompClient;
 
     return () => {
+      stompClientRef.current.publish({
+        destination: `/pub/chat/${moimIdNum}/${userObj.userId}/offline`});
+      // 이후 연결 종료
       stompClient.deactivate();
       stompClientRef.current.publish({
         destination: `/pub/chat/${moimIdNum}/online`});
