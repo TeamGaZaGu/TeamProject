@@ -407,7 +407,7 @@ function DescriptionSuggestPage(props) {
             )}
             
             {/* 채팅 탭 콘텐츠 */}
-            {activeTab === "chat" && (
+            {activeTab === "chat" && 
                 moimId ? (
                     <ChattingPage 
                         moimId={Number(moimId)}
@@ -416,7 +416,7 @@ function DescriptionSuggestPage(props) {
                 ) : (
                     <div>올바른 채팅방 ID가 필요합니다.</div>
 
-                ) : null}
+                )}
            
             {isModalOpen && selectedUser && (
                 <div css={s.modalOverlay} onClick={handleModalBackdropClick}>
