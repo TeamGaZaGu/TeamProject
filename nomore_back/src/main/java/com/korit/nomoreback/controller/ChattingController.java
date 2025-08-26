@@ -29,13 +29,18 @@ public class ChattingController {
                         @Payload ChatMessageDto chatMessageDto,
                         @Header("simpSessionAttributes") Map<String, Object> sessionAttrs) {
 
+        System.out.println("!!!!");
+
         Object userIdObj = sessionAttrs.get("userId");
+        System.out.println(userIdObj);
         if (userIdObj == null) return;
+        System.out.println("!!!!null");
 
         Integer userId = (userIdObj instanceof Integer) ? (Integer) userIdObj : Integer.parseInt(userIdObj.toString());
         User user = chatService.getUserById(userId); // User 조회 메소드
 
         if (user == null) return;
+        System.out.println("null!!");
 
         chatMessageDto.setUserNickName(user.getNickName());
         chatMessageDto.setMoimId(moimId);

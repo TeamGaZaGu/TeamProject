@@ -5,7 +5,7 @@ import { css } from '@emotion/react';
 export const PageContainer = css`
   display: flex;
   flex: 1;
-  height: 80vh;
+  height: 85vh;
   width: 100%;          /* ✅ 꽉 채우기 */
   max-width: 1200px;    /* ✅ 필요 시 제한 */
   margin-top: 50px ;
@@ -22,12 +22,13 @@ export const UserListContainer = css`
   border-right: 1px solid #ddd;
   overflow-y: auto;
   padding: 16px;
-  
+  align-items: center;
 `;
 
 export const UserItem = css`
   display: flex;
   align-items: center;
+  justify-content:center;
   gap: 8px;
   padding: 8px 0;
   border-bottom: 1px solid #eee;
