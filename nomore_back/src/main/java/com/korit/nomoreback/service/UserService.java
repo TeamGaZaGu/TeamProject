@@ -3,9 +3,11 @@ package com.korit.nomoreback.service;
 import com.korit.nomoreback.domain.user.User;
 import com.korit.nomoreback.domain.user.UserMapper;
 import com.korit.nomoreback.dto.user.UserProfileUpdateReqDto;
+import com.korit.nomoreback.security.model.PrincipalUtil;
 import com.korit.nomoreback.util.ImageUrlUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -19,6 +21,8 @@ public class UserService {
 
     private final UserMapper userMapper;
     private final ImageUrlUtil imageUrlUtil;
+    private final PrincipalUtil principalUtil;
+    private final FileService fileService;
 
     public List<User> allUser() {
         List<User> userList = userMapper.allUser().stream().map(user -> user.buildImageUrl(imageUrlUtil)).collect(Collectors.toList());
@@ -35,35 +39,21 @@ public class UserService {
         userMapper.unBlockUser(userId, userSiteBlock);
     }
 
-    public void updateProfile(Integer userId, UserProfileUpdateReqDto reqDto, MultipartFile profileImg) {
-        String profileImgPath = null;
+    @Transactional(rollbackFor = Exception.class)
+    public void updateProfile(UserProfileUpdateReqDto dto) {
+        User user = principalUtil.getPrincipalUser().getUser();
+        String userImg = user.getProfileImgPath();
+        fileService.deleteFile(userImg);
+        User userEntity = dto.toUser();
 
-        if (profileImg != null && !profileImg.isEmpty()) {
-            String projectRoot = System.getProperty("user.dir");
-            String uploadDir = projectRoot + File.separator + "upload" + File.separator + "profile";
-
-            File uploadDirFile = new File(uploadDir);
-            if (!uploadDirFile.exists()) {
-                uploadDirFile.mkdirs();
-            }
-
-            String originalFileName = profileImg.getOriginalFilename();
-            String newFileName = UUID.randomUUID() + "_" + originalFileName;
-            File saveFile = new File(uploadDirFile, newFileName);
-
-            try {
-                profileImg.transferTo(saveFile);
-                profileImgPath = "/profile/" + newFileName;
-            } catch (Exception e) {
-                throw new RuntimeException("프로필 이미지 저장 실패", e);
-            }
+        if (dto.getProfileImgPath() != null) {
+            String profileImgPath = fileService.uploadFile(dto.getProfileImgPath(), "profile");
+            userEntity.setProfileImgPath(profileImgPath);
         } else {
-            profileImgPath = userMapper.findProfileImgPathByUserId(userId);
+            userEntity.setProfileImgPath("default.jpg");
         }
-
-        reqDto.setProfileImgPath(profileImgPath);
-        reqDto.setUserId(userId);
-        userMapper.updateProfile(reqDto);
+        userEntity.setUserId(user.getUserId());
+        userMapper.updateProfile(userEntity);
     }
 
     public void deleteUser(Integer userId) {

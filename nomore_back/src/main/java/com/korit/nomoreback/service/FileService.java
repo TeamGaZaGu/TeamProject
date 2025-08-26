@@ -20,9 +20,7 @@ public class FileService {
     private final AppProperties appProperties;
 
     public String uploadFile(MultipartFile file, String imageConfigName) {
-        System.out.println("imageConfigName" + imageConfigName);
         String dirPath = appProperties.getImageConfigs().get(imageConfigName).getDirPath();
-        // 원본 파일 명
         String originalFilename = generateFilename(file.getOriginalFilename());
 
         mkdirs(dirPath);
@@ -34,7 +32,6 @@ public class FileService {
             Files.write(path, file.getBytes());
         } catch (Exception e) {
             e.printStackTrace();
-            return null;
         }
 
         return originalFilename;
