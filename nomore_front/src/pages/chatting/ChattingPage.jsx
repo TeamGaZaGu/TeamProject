@@ -45,17 +45,17 @@ function ChattingPage({ moimId }) {
     fetchMembers();
   }, [moimIdNum]);
 
-  // WebSocket 연결
   useEffect(() => {
     const stompClient = new Client({
       brokerURL: undefined,
-      webSocketFactory: () => new SockJS(`http://192.168.2.17:8080/ws`),
+      webSocketFactory: () =>
+        new SockJS(
+          `http://192.168.2.17:8080/ws?access_token=${localStorage.getItem(
+            'accessToken'
+          )}&moimId=${moimIdNum}&userId=${userObj.userId}`
+        ),
       debug: (str) => console.log(str),
       reconnectDelay: 5000,
-      connectHeaders: {
-        moimId: moimIdNum.toString(),
-        userId: userObj.userId.toString(),
-      },
     });
 
     stompClient.onConnect = () => {
@@ -76,7 +76,8 @@ function ChattingPage({ moimId }) {
       });
 
       stompClientRef.current.publish({
-        destination: `/pub/chat/${moimIdNum}/online`});
+        destination: `/pub/chat/${moimIdNum}/online`,
+      });
     };
 
     stompClient.activate();
@@ -84,11 +85,12 @@ function ChattingPage({ moimId }) {
 
     return () => {
       stompClientRef.current.publish({
-        destination: `/pub/chat/${moimIdNum}/${userObj.userId}/offline`});
-      // 이후 연결 종료
+        destination: `/pub/chat/${moimIdNum}/${userObj.userId}/offline`,
+      });
       stompClient.deactivate();
       stompClientRef.current.publish({
-        destination: `/pub/chat/${moimIdNum}/online`});
+        destination: `/pub/chat/${moimIdNum}/online`,
+      });
     };
   }, [moimIdNum, userObj.userId]);
 
@@ -114,6 +116,12 @@ function ChattingPage({ moimId }) {
     setInput('');
   };
 
+  // 유저 ID로 프로필 이미지 찾기
+  const findUserProfile = (nickName) => {
+    const member = members.find((m) => m.nickName === nickName);
+    return member ? `${member.profileImgPath}` : null;
+  };
+
   return (
     <div css={s.PageContainer}>
       {/* 유저 리스트 */}
@@ -125,7 +133,11 @@ function ChattingPage({ moimId }) {
 
           return (
             <div key={member.userId} css={s.UserItem}>
-              <img src={member.profileImg} alt="프로필" css={s.UserProfileImage} />
+              <img
+                src={`${member.profileImgPath}`}
+                alt="프로필"
+                css={s.UserProfileImage}
+              />
               <div css={s.UserDetails}>
                 <span>{member.nickName}</span>
                 <span css={s.RoleTag}>
@@ -151,16 +163,47 @@ function ChattingPage({ moimId }) {
         <div css={s.MessageList}>
           {messages.map((msg, idx) => {
             const isCurrentUser = msg.userNickName === userObj.nickName;
-            return (
-              <div key={idx} css={isCurrentUser ? s.MyMessageItem : s.OtherUserMessage}>
-                <strong>{msg.userNickName}:</strong> {msg.chattingContent}
-                {msg.chattedAt && (
-                  <span css={s.Timestamp}>
-                    ({new Date(msg.chattedAt).toLocaleTimeString()})
-                  </span>
-                )}
-              </div>
-            );
+
+            if (isCurrentUser) {
+              // 내 메시지 (닉네임/프로필 없음)
+              return (
+                <div key={idx} css={s.MyMessageWrapper}>
+                  <div css={s.MyMessageItem}>
+                    {msg.chattingContent}
+                    {msg.chattedAt && (
+                      <span css={s.Timestamp}>
+                        {new Date(msg.chattedAt).toLocaleTimeString()}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              );
+            } else {
+              // 다른 유저 메시지 (닉네임 위, 아래 프로필+메시지)
+              return (
+                <div key={idx} style={{ marginBottom: "12px" }}>
+                  {/* 닉네임 한 줄 위에 */}
+                  <div style={{ fontSize: "12px", marginLeft: "32px", marginBottom: "2px", color: "#444" }}>
+                    {msg.userNickName}
+                  </div>
+                  <div css={s.OtherMessageWrapper}>
+                    <img
+                      src={findUserProfile(msg.userNickName)}
+                      alt="프로필"
+                      css={s.SmallProfileImage}
+                    />
+                    <div css={s.OtherUserMessage}>
+                      {msg.chattingContent}
+                      {msg.chattedAt && (
+                        <span css={s.Timestamp}>
+                          {new Date(msg.chattedAt).toLocaleTimeString()}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            }
           })}
           <div ref={messageEndRef}></div>
         </div>

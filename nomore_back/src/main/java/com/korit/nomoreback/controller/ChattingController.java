@@ -5,6 +5,7 @@ import com.korit.nomoreback.domain.user.User;
 import com.korit.nomoreback.dto.chat.ChatMessageDto;
 import com.korit.nomoreback.event.ChatOnlineUsersState;
 import com.korit.nomoreback.service.ChatService;
+import com.korit.nomoreback.service.MoimService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.*;
@@ -23,24 +24,31 @@ public class ChattingController {
     private final ChatService chatService;
     private final SimpMessagingTemplate template;
     private final ChatOnlineUsersState chatOnlineUsersState;
+    private final MoimService moimService;
 
     @MessageMapping("/chat/{moimId}")
     public void message(@DestinationVariable Integer moimId,
                         @Payload ChatMessageDto chatMessageDto,
                         @Header("simpSessionAttributes") Map<String, Object> sessionAttrs) {
 
-        System.out.println("!!!!");
+
 
         Object userIdObj = sessionAttrs.get("userId");
-        System.out.println(userIdObj);
+
         if (userIdObj == null) return;
-        System.out.println("!!!!null");
+
 
         Integer userId = (userIdObj instanceof Integer) ? (Integer) userIdObj : Integer.parseInt(userIdObj.toString());
         User user = chatService.getUserById(userId); // User 조회 메소드
 
         if (user == null) return;
-        System.out.println("null!!");
+
+        boolean isMember = moimService.moimUserList(moimId).stream().anyMatch(m -> m.getUserId().equals(userId));
+
+        if (!isMember){
+            System.out.println("❌채팅 권한이 없습니다❌");
+            return;
+        }
 
         chatMessageDto.setUserNickName(user.getNickName());
         chatMessageDto.setMoimId(moimId);
@@ -52,7 +60,7 @@ public class ChattingController {
 
     @GetMapping("/{moimId}/messages")
     public List<Chat> getMessages(@PathVariable Integer moimId,
-                                  @RequestParam(defaultValue = "50") Integer limit,
+                                  @RequestParam(defaultValue = "70") Integer limit,
                                   @RequestParam(defaultValue = "0") Integer offset){
         return chatService.getMessages(moimId, limit, offset);
     }

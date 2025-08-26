@@ -28,7 +28,8 @@ public class WebSocketEventListener {
     @EventListener
     public void handleWebSocketConnectListener(SessionConnectedEvent event) {
 
-        Map<String, Object> nativeHeaders = (Map<String, Object>) ((GenericMessage) event.getMessage().getHeaders().get("simpConnectMessage")).getHeaders().get("nativeHeaders");
+        Map<String, Object> nativeHeaders = (Map<String, Object>) ((GenericMessage) event.getMessage()
+                .getHeaders().get("simpConnectMessage")).getHeaders().get("nativeHeaders");
 
         System.out.println(nativeHeaders);
 

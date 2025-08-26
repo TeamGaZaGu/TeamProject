@@ -414,8 +414,7 @@ function DescriptionSuggestPage(props) {
                         userId={principalQuery?.data?.data?.user?.nickName}
                     />
                 ) : (
-                    <div>올바른 채팅방 ID가 필요합니다.</div>
-
+                    null
                 )}
            
             {isModalOpen && selectedUser && (
