@@ -74,60 +74,59 @@ public class MoimController {
 //            return moimService.findMoimByCategoryId(categoryId);
 //        }
 
-      @PatchMapping(value = "/{moimId}/modify", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-      public ResponseEntity<?> updateMoim(@PathVariable Integer moimId, @ModelAttribute MoimModifyDto dto) {
-          System.out.println(dto);
-          Integer userId = principalUtil.getPrincipalUser().getUser().getUserId();
-          dto.setMoimId(moimId);
-          moimService.modifyMoim(dto, userId);
-          return ResponseEntity.ok("수정 완");
-      }
+    @PatchMapping(value = "/{moimId}/modify", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> updateMoim(@PathVariable Integer moimId, @ModelAttribute MoimModifyDto dto) {
+      System.out.println(dto);
+      Integer userId = principalUtil.getPrincipalUser().getUser().getUserId();
+      dto.setMoimId(moimId);
+      moimService.modifyMoim(dto, userId);
+      return ResponseEntity.ok("수정 완");
+    }
 
-      @DeleteMapping("/{moimId}/delete")
-      public ResponseEntity<?> remove(@PathVariable Integer moimId) {
-          moimService.deleteMoimById(moimId);
-          return ResponseEntity.ok("삭제 완");
-      }
+    @DeleteMapping("/{moimId}/delete")
+    public ResponseEntity<?> remove(@PathVariable Integer moimId) {
+      moimService.deleteMoimById(moimId);
+      return ResponseEntity.ok("삭제 완");
+    }
 
-      @GetMapping("/search")
-      public ResponseEntity<List<MoimListRespDto>> searchMoim(
-              @RequestParam(required = false) Integer districtId,
-              @RequestParam(required = false) Integer categoryId,
-              @RequestParam(required = false) String keyword
-      ) {
-          MoimSearchReqDto searchReqDto = new MoimSearchReqDto();
-          searchReqDto.setDistrictId(districtId);
-          searchReqDto.setCategoryId(categoryId);
-          searchReqDto.setKeyword(keyword);
+    @GetMapping("/search")
+    public ResponseEntity<List<MoimListRespDto>> searchMoim(
+          @RequestParam(required = false) Integer districtId,
+          @RequestParam(required = false) Integer categoryId,
+          @RequestParam(required = false) String keyword
+    ) {
+      MoimSearchReqDto searchReqDto = new MoimSearchReqDto();
+      searchReqDto.setDistrictId(districtId);
+      searchReqDto.setCategoryId(categoryId);
+      searchReqDto.setKeyword(keyword);
 
-          List<MoimListRespDto> moimList = moimService.searchMoim(searchReqDto);
-          System.out.println("검색 파라미터: " + searchReqDto);
-          return ResponseEntity.ok(moimList);
-      }
+      List<MoimListRespDto> moimList = moimService.searchMoim(searchReqDto);
+      System.out.println("검색 파라미터: " + searchReqDto);
+      return ResponseEntity.ok(moimList);
+    }
 
-      @GetMapping("/userList")
-      public ResponseEntity<List<User>> moimUserList(@RequestParam Integer moimId) {
-          System.out.println(moimService.moimUserList(moimId));
-          return ResponseEntity.ok(moimService.moimUserList(moimId));
-      }
+    @GetMapping("/userList")
+    public ResponseEntity<List<User>> moimUserList(@RequestParam Integer moimId) {
+      System.out.println(moimService.moimUserList(moimId));
+      return ResponseEntity.ok(moimService.moimUserList(moimId));
+    }
 
-      @PostMapping("/{moimId}/ban/{userId}")
-      public ResponseEntity<ResponseDto<?>> banUser(
-              @PathVariable Integer moimId,
-              @PathVariable Integer userId) {
-          moimBanService.banUser(moimId, userId);
-          return ResponseEntity.ok(ResponseDto.success("사용자를 모임에서 강퇴했습니다."));
-      }
+    @PostMapping("/{moimId}/ban/{userId}")
+    public ResponseEntity<ResponseDto<?>> banUser(
+          @PathVariable Integer moimId,
+          @PathVariable Integer userId) {
+      moimBanService.banUser(moimId, userId);
+      return ResponseEntity.ok(ResponseDto.success("사용자를 모임에서 강퇴했습니다."));
+    }
 
-      @GetMapping("/{moimId}/ban")
-      public ResponseEntity<List<MoimBan>> banUserList(@PathVariable Integer moimId) {
-          return ResponseEntity.ok(moimBanService.banUserList(moimId));
-      }
+    @GetMapping("/{moimId}/ban")
+    public ResponseEntity<List<MoimBan>> banUserList(@PathVariable Integer moimId) {
+      return ResponseEntity.ok(moimBanService.banUserList(moimId));
+    }
 
-      @GetMapping("/{userId}/moims")
-      public ResponseEntity<List<Moim>> myMoimList(@PathVariable Integer userId) {
-          System.out.println(moimService.myMoimList(userId));
-          return ResponseEntity.ok(moimService.myMoimList(userId));
-      }
+    @GetMapping("/{userId}/moims")
+    public ResponseEntity<List<Moim>> myMoimList(@PathVariable Integer userId) {
+      System.out.println(moimService.myMoimList(userId));
+      return ResponseEntity.ok(moimService.myMoimList(userId));
     }
 }
