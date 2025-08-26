@@ -1,14 +1,19 @@
 /** @jsxImportSource @emotion/react */
 import { css } from '@emotion/react';
 
+
 export const PageContainer = css`
   display: flex;
-  height: 85vh;
-  width: 80%;
-  margin: 0 auto;
+  flex: 1;
+  height: 80vh;
+  width: 100%;          /* ✅ 꽉 채우기 */
+  max-width: 1200px;    /* ✅ 필요 시 제한 */
+  margin-top: 50px ;
+  margin-left: auto;
+  margin-right: auto;
   border: 1px solid #ddd;
   border-radius: 8px;
-  overflow: hidden;
+  overflow: hidden;     /* ✅ 전체 스크롤 방지 */
 `;
 
 export const UserListContainer = css`
@@ -17,6 +22,7 @@ export const UserListContainer = css`
   border-right: 1px solid #ddd;
   overflow-y: auto;
   padding: 16px;
+  
 `;
 
 export const UserItem = css`
@@ -48,17 +54,20 @@ export const ChatContainer = css`
   flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
+  overflow: hidden;      /* ✅ 여기서도 외부 스크롤 차단 */
 `;
+
+
 
 export const MessageList = css`
   flex: 1;
-  overflow-y: auto;
+  overflow-y: auto;      /* ✅ 오직 여기만 스크롤 */
   padding: 16px;
   display: flex;
   flex-direction: column;
   gap: 8px;
 `;
+
 
 export const MyMessageItem = css`
   align-self: flex-end;
