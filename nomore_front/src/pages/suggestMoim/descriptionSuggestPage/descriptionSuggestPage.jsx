@@ -209,7 +209,6 @@ function DescriptionSuggestPage(props) {
 
     // 현재 사용자가 모임에 가입되어 있는지 확인
     const isUserJoined = userList.find(user => user.userId === userId);
-
     return (
         <div css={s.container}>
             {/* 탭 헤더 */}

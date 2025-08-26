@@ -14,7 +14,7 @@ import java.io.File;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/moims")
+@RequestMapping("/api/forum")
 @RequiredArgsConstructor
 public class ForumController {
 

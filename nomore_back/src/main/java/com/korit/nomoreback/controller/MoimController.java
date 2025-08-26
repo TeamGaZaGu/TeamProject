@@ -39,7 +39,6 @@ public class MoimController {
 
     @PostMapping("/{moimId}/join")
     public ResponseEntity<?> join(@PathVariable Integer moimId) {
-
         Integer userId = principalUtil.getPrincipalUser().getUser().getUserId();
         moimService.joinMoim(moimId, userId);
         return ResponseEntity.ok("가입 완");
@@ -107,7 +106,6 @@ public class MoimController {
 
     @GetMapping("/userList")
     public ResponseEntity<List<User>> moimUserList(@RequestParam Integer moimId) {
-      System.out.println(moimService.moimUserList(moimId));
       return ResponseEntity.ok(moimService.moimUserList(moimId));
     }
 
