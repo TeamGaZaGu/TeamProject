@@ -38,4 +38,10 @@
             and user_id = #{userId}
     </delete>
 
+    <delete id="deleteUser">
+        delete from moim_role_tb
+        where
+            user_id = #{userId}
+    </delete>
+
 </mapper>

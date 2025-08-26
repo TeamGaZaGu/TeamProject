@@ -1,5 +1,7 @@
 package com.korit.nomoreback.service;
 
+import com.korit.nomoreback.domain.moim.MoimMapper;
+import com.korit.nomoreback.domain.moimRole.MoimRoleMapper;
 import com.korit.nomoreback.domain.user.User;
 import com.korit.nomoreback.domain.user.UserMapper;
 import com.korit.nomoreback.dto.user.UserProfileUpdateReqDto;
@@ -20,6 +22,8 @@ import java.util.stream.Collectors;
 public class UserService {
 
     private final UserMapper userMapper;
+    private final MoimRoleMapper moimRoleMapper;
+    private final MoimMapper moimMapper;
     private final ImageUrlUtil imageUrlUtil;
     private final PrincipalUtil principalUtil;
     private final FileService fileService;
@@ -57,6 +61,9 @@ public class UserService {
     }
 
     public void deleteUser(Integer userId) {
+
         userMapper.deleteUser(userId);
+        moimMapper.deleteUser(userId);
+        moimRoleMapper.deleteUser(userId);
     }
 }
