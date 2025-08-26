@@ -121,7 +121,7 @@ function ChattingPage({ moimId }) {
         {members.map((member) => {
           const isMe = member.userId === userObj.userId;
           const isOnline = onlineUsers.includes(member.userId);
-          const circleColor = isMe ? 'red' : isOnline ? 'green' : 'gray';
+          const circleColor = isMe ? 'blue' : isOnline ? 'green' : 'gray';
 
           return (
             <div key={member.userId} css={s.UserItem}>
@@ -134,10 +134,11 @@ function ChattingPage({ moimId }) {
               </div>
               <div
                 style={{
-                  width: 10,
-                  height: 10,
+                  width: 12,
+                  height: 12,
                   borderRadius: '50%',
                   background: circleColor,
+                  marginLeft: 'auto',
                 }}
               />
             </div>
