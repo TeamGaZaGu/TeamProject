@@ -8,12 +8,13 @@ export const PageContainer = css`
   height: 85vh;
   width: 100%;          /* ✅ 꽉 채우기 */
   max-width: 1200px;    /* ✅ 필요 시 제한 */
-  margin-top: 50px ;
+  margin-top: 55px ;
   margin-left: auto;
   margin-right: auto;
-  border: 1px solid #ddd;
+  border: 1px solid #9bbbd4;
   border-radius: 8px;
   overflow: hidden;     /* ✅ 전체 스크롤 방지 */
+  background-color: skyblue;
 `;
 
 export const UserListContainer = css`
@@ -22,7 +23,7 @@ export const UserListContainer = css`
   border-right: 1px solid #ddd;
   overflow-y: auto;
   padding: 16px;
-  align-items: center;
+
 `;
 
 export const UserItem = css`
@@ -68,31 +69,53 @@ export const MessageList = css`
   flex-direction: column;
   gap: 8px;
 `;
+export const MyMessageWrapper = css`
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 8px;
+`;
+
+export const OtherMessageWrapper = css`
+  display: flex;
+  align-items: flex-end;
+  margin-bottom: 8px;
+`;
 
 
 export const MyMessageItem = css`
   align-self: flex-end;
-  background-color: #4f93ff;
-  color: white;
+  background-color: #fef01b;
+  color: black;
   padding: 8px 12px;
   border-radius: 16px;
   max-width: 60%;
   word-break: break-word;
+
+  strong {
+    display: none;
+  }
+
 `;
 
 export const OtherUserMessage = css`
   align-self: flex-start;
-  background-color: #f1f1f1;
+  background-color: #ffffff;
   color: black;
   padding: 8px 12px;
   border-radius: 16px;
   max-width: 60%;
   word-break: break-word;
 `;
+export const SmallProfileImage = css`
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  margin-right: 8px;
+`;
 
 export const Timestamp = css`
   font-size: 10px;
-  color: #888;
+  color: #556677;
   margin-left: 4px;
 `;
 
@@ -101,6 +124,7 @@ export const InputContainer = css`
   padding: 8px;
   border-top: 1px solid #ddd;
   gap: 8px;
+  background-color: #ffffff;
   input {
     flex: 1;
     padding: 8px 12px;
