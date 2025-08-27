@@ -65,6 +65,98 @@ export const Transaction = css`
     }
 `;
 
+// 사용자 액션 컨테이너 (가입/탈퇴 버튼과 신고 버튼을 함께 배치)
+export const userActionContainer = css`
+    display: flex;
+    align-items: center;
+    gap: 8px;
+`;
+
+// 모임 신고 버튼 (일반 사용자용)
+export const reportMoimButton = css`
+    background: none;
+    border: 1px solid #ff4757;
+    color: #ff4757;
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    min-width: 44px;
+    height: 44px;
+    
+    &:hover {
+        background-color: #ff4757;
+        color: white;
+    }
+    
+    &:active {
+        transform: translateY(1px);
+    }
+`;
+
+// 모임 신고 버튼 (관리자/방장용 - 헤더 우측에 배치)
+export const reportMoimButtonAdmin = css`
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    margin-left: 1rem;
+    padding: 8px;
+    color: #ff4757;
+    border-radius: 50%;
+    
+    &:hover {
+        background-color: #ff475720;
+    }
+`;
+
+// 기존 가입/탈퇴 버튼 스타일 수정 (컨테이너 안에서 사용할 때)
+export const joinMoimButtonInline = css`
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    white-space: nowrap;
+    
+    &:hover {
+        background-color: #0056b3;
+    }
+    
+    &:active {
+        transform: translateY(1px);
+    }
+`;
+
+export const exitMoimButtonInline = css`
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    white-space: nowrap;
+    
+    &:hover {
+        background-color: #c82333;
+    }
+    
+    &:active {
+        transform: translateY(1px);
+    }
+`;
+
 export const mainContent = css`
   display: flex;
   flex-direction: column;

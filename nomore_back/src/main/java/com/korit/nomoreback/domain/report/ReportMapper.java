@@ -10,4 +10,6 @@ public interface ReportMapper {
     List<Report> reqAllReport();
 
     void reportUser(Report report);
+
+    void reportComplete(Integer reportId);
 }

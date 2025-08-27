@@ -22,6 +22,12 @@
         )
     </insert>
 
+    <update id="reportComplete">
+        update report_tb
+        set status = 2
+        where report_id = #{reportId}
+    </update>
+
     <select id="reqAllReport" resultType="com.korit.nomoreback.domain.report.Report">
         select
             rt.report_id as reportId,
@@ -31,14 +37,23 @@
             rt.target_id as targetId,
             case
                 when rt.target_type = 1 then tu.nick_name
-                else null
+                when rt.target_type = 2 then mt.moim_title
+                when rt.target_type = 3 then ft.forum_title
+            else null
             end as targetNickName,
+            case
+                when rt.target_type = 3 then ft.moim_id
+                else null
+            end as moimId,
             rt.reason,
             rt.status,
             rt.created_at as createdAt
         from
             report_tb rt
-            left join user_tb ut on(ut.user_id = rt.reporter_id)
-            left join user_tb tu on(tu.user_id = rt.target_id and rt.target_type = 1)
+            left join user_tb ut on ut.user_id = rt.reporter_id
+            left join user_tb tu on tu.user_id = rt.target_id and rt.target_type = 1
+            left join moim_tb mt on mt.moim_id = rt.target_id and rt.target_type = 2
+            left join forum_tb ft on ft.forum_id = rt.target_id and rt.target_type = 3
     </select>
+
 </mapper>
