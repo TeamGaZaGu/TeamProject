@@ -22,28 +22,34 @@ import java.util.concurrent.ConcurrentHashMap;
 @RequiredArgsConstructor
 public class WebSocketEventListener {
 
-    private final SimpMessagingTemplate template;
     private final ChatOnlineUsersState chatOnlineUsersState;
 
     @EventListener
     public void handleWebSocketConnectListener(SessionConnectedEvent event) {
 
-        Map<String, Object> nativeHeaders = (Map<String, Object>) ((GenericMessage) event.getMessage().getHeaders().get("simpConnectMessage")).getHeaders().get("nativeHeaders");
+        Map<String, Object> nativeHeaders = (Map<String, Object>) ((GenericMessage) event.getMessage()
+                .getHeaders().get("simpConnectMessage")).getHeaders().get("nativeHeaders");
 
         System.out.println(nativeHeaders);
 
-        List<Object> moimIdList = List.copyOf((List<Object>)nativeHeaders.get("moimId"));
-        List<Object> userIdList = List.copyOf((List<Object>)nativeHeaders.get("userId"));
-        System.out.println(userIdList);
+        Object moimRaw = nativeHeaders.get("moimId");
+        Object userRaw = nativeHeaders.get("userId");
 
+        if (moimRaw == null || userRaw == null) {
+            System.out.println("연결에 필요한 정보 없음.!!! 연결 무시됨");
+            return;
+        }
 
-        Integer moimId = Integer.parseInt((String) moimIdList.get(0));
-        Integer userId = Integer.parseInt((String) userIdList.get(0));
+        List<Object> moimIdList = List.copyOf((List<Object>) moimRaw);
+        List<Object> userIdList = List.copyOf((List<Object>) userRaw);
 
-        if (moimId == null || userId == null) {
+        if (moimIdList.isEmpty() || userIdList.isEmpty()) {
             System.out.println("연결에 필요한 정보 없음. 연결 무시됨");
             return;
         }
+
+        Integer moimId = Integer.parseInt((String) moimIdList.get(0));
+        Integer userId = Integer.parseInt((String) userIdList.get(0));
 
         chatOnlineUsersState.addOnlineUserByMoimId(moimId, userId);
     }
