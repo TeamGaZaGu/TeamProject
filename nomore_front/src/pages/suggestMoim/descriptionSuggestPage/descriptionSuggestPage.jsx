@@ -367,12 +367,18 @@ function DescriptionSuggestPage(props) {
                             <button css={s.Transaction} onClick={handleNavigateToEdit}><FaPen />수정</button>
                             <button css={s.Transaction} onClick={handleDeleteMoim}><FaTrashAlt />삭제</button>
                         </>
-                    ) : isUserJoined ? (
-                        // 가입한 사용자인 경우
-                        <button css={s.exitMoimButton} onClick={handleExitMoim}>모임 탈퇴하기</button>
                     ) : (
-                        // 미가입 사용자인 경우
-                        <button css={s.joinMoimButton} onClick={handleJoinMoim}>모임 가입하기</button>
+                        // 일반 사용자인 경우 - 가입/탈퇴 버튼과 신고 버튼을 함께 배치
+                        <div css={s.userActionContainer}>
+                            {isUserJoined ? (
+                                <button css={s.exitMoimButtonInline} onClick={handleExitMoim}>모임 탈퇴하기</button>
+                            ) : (
+                                <button css={s.joinMoimButtonInline} onClick={handleJoinMoim}>모임 가입하기</button>
+                            )}
+                            <button css={s.reportMoimButton} onClick={handleReportMoimOnClick}>
+                                <MdReport />
+                            </button>
+                        </div>
                     )}
                 </div>
             </div>
@@ -386,7 +392,6 @@ function DescriptionSuggestPage(props) {
                         <div css={s.moimTextInfo}>
                             <h1 css={s.moimTitle}>
                                 {moim.title}
-                                <button onClick={handleReportMoimOnClick}><MdReport /></button>
                             </h1>
                             <div css={s.moimMeta}>
                                 <span>{getCategory?.categoryEmoji}{getCategory?.categoryName}</span> · 

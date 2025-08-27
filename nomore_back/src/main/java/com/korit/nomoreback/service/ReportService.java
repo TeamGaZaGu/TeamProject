@@ -21,4 +21,8 @@ public class ReportService {
     public void reportUser(ReportDto dto) {
         reportMapper.reportUser(dto.toEntity());
     }
+
+    public void reportComplete(Integer reportId) {
+        reportMapper.reportComplete(reportId);
+    }
 }

@@ -219,6 +219,12 @@ export const commentText = css`
   color: #374151;
 `;
 
+export const commentActions = css`
+  display: flex;
+  gap: 12px;
+  margin: 6px 0;
+`;
+
 export const tagText = css`
   margin-right: 0.5rem;
   color: #3aa3ff;
@@ -226,9 +232,25 @@ export const tagText = css`
 `;
 
 export const recomment = css`
-  margin: 6px 0;
+  margin: 0;
   color: #888888;
   cursor: pointer;
+  font-size: 12px;
+  
+  &:hover {
+    color: #666666;
+  }
+`;
+
+export const reportComment = css`
+  margin: 0;
+  color: #ff4757;
+  cursor: pointer;
+  font-size: 12px;
+  
+  &:hover {
+    color: #ff3838;
+  }
 `;
 
 export const transactionButton = css`
@@ -367,7 +389,132 @@ export const closeButton = css`
   }
 `;
 
-// 신고 모달 오버레이 (DescriptionSuggestPage와 동일)
+// 사용자 프로필 모달 관련 스타일
+export const modalOverlay = css`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+`;
+
+export const modalContent = css`
+  background: white;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 400px;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+`;
+
+export const modalHeader = css`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid #e5e7eb;
+  
+  h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #111827;
+  }
+`;
+
+export const modalHeaderButtons = css`
+  display: flex;
+  gap: 8px;
+  align-items: center;
+`;
+
+export const modalBody = css`
+  padding: 20px;
+`;
+
+export const userProfile = css`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+`;
+
+export const modalProfileImageLarge = css`
+  width: 6rem;
+  height: 6rem;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 16px;
+  border: 3px solid #f3f4f6;
+`;
+
+export const userDetails = css`
+  width: 100%;
+`;
+
+export const userNameRow = css`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  
+  h4 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+    color: #111827;
+  }
+`;
+
+export const userCategory = css`
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 8px;
+  text-align: center;
+`;
+
+export const userIntroduction = css`
+  margin: 0 0 16px 0;
+  font-size: 14px;
+  line-height: 1.5;
+  padding: 12px;
+  background-color: #f9fafb;
+  border-radius: 8px;
+  text-align: left;
+`;
+
+export const modalButtonContainer = css`
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+  justify-content: center;
+  
+  button {
+    padding: 8px 16px;
+    border: 1px solid #d1d5db;
+    background-color: #ffffff;
+    color: #374151;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background-color: #f3f4f6;
+      border-color: #9ca3af;
+    }
+  }
+`;
+
+// 신고 모달 오버레이
 export const reportModalOverlay = css`
   position: fixed;
   top: 0;
@@ -382,7 +529,7 @@ export const reportModalOverlay = css`
   z-index: 1001;
 `;
 
-// 신고 모달 컨텐츠 (DescriptionSuggestPage와 동일)
+// 신고 모달 컨텐츠
 export const reportModalContent = css`
   background: white;
   border-radius: 12px;
@@ -403,7 +550,7 @@ export const reportModalContent = css`
   }
 `;
 
-// 신고 모달 헤더 (DescriptionSuggestPage와 동일)
+// 신고 모달 헤더
 export const reportModalHeader = css`
   display: flex;
   justify-content: space-between;
@@ -419,12 +566,12 @@ export const reportModalHeader = css`
   }
 `;
 
-// 신고 모달 바디 (DescriptionSuggestPage와 동일)
+// 신고 모달 바디
 export const reportModalBody = css`
   padding: 20px 24px 24px;
 `;
 
-// 신고 모달 설명 (DescriptionSuggestPage와 동일)
+// 신고 모달 설명
 export const reportModalDescription = css`
   margin: 0 0 16px 0;
   color: #666;
@@ -432,7 +579,7 @@ export const reportModalDescription = css`
   line-height: 1.4;
 `;
 
-// 신고 사유 목록 (DescriptionSuggestPage와 동일)
+// 신고 사유 목록
 export const reasonList = css`
   display: flex;
   flex-direction: column;
@@ -440,7 +587,7 @@ export const reasonList = css`
   margin-bottom: 20px;
 `;
 
-// 신고 사유 아이템 (DescriptionSuggestPage와 동일)
+// 신고 사유 아이템
 export const reasonItem = css`
   display: flex;
   align-items: center;
@@ -455,7 +602,7 @@ export const reasonItem = css`
   }
 `;
 
-// 신고 사유 텍스트 (DescriptionSuggestPage와 동일)
+// 신고 사유 텍스트
 export const reasonText = css`
   font-size: 14px;
   color: #333;
@@ -463,7 +610,7 @@ export const reasonText = css`
   cursor: pointer;
 `;
 
-// 기타 사유 입력창 (DescriptionSuggestPage와 동일)
+// 기타 사유 입력창
 export const customReasonInput = css`
   width: 100%;
   min-height: 80px;
@@ -486,13 +633,13 @@ export const customReasonInput = css`
   }
 `;
 
-// 신고 모달 푸터 (DescriptionSuggestPage와 동일)
+// 신고 모달 푸터
 export const reportModalFooter = css`
   display: flex;
   justify-content: flex-end;
 `;
 
-// 신고 제출 버튼 (DescriptionSuggestPage와 동일)
+// 신고 제출 버튼
 export const submitReportButton = css`
   background-color: #dc3545;
   color: white;
