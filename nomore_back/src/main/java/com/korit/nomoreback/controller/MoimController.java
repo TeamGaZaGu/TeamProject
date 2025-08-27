@@ -13,12 +13,14 @@ import com.korit.nomoreback.security.model.PrincipalUtil;
 import com.korit.nomoreback.service.MoimBanService;
 import com.korit.nomoreback.service.MoimService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -39,6 +41,7 @@ public class MoimController {
 
     @PostMapping("/{moimId}/join")
     public ResponseEntity<?> join(@PathVariable Integer moimId) {
+
         Integer userId = principalUtil.getPrincipalUser().getUser().getUserId();
         moimService.joinMoim(moimId, userId);
         return ResponseEntity.ok("가입 완");
@@ -106,6 +109,7 @@ public class MoimController {
 
     @GetMapping("/userList")
     public ResponseEntity<List<User>> moimUserList(@RequestParam Integer moimId) {
+      System.out.println(moimService.moimUserList(moimId));
       return ResponseEntity.ok(moimService.moimUserList(moimId));
     }
 
@@ -126,5 +130,54 @@ public class MoimController {
     public ResponseEntity<List<Moim>> myMoimList(@PathVariable Integer userId) {
       System.out.println(moimService.myMoimList(userId));
       return ResponseEntity.ok(moimService.myMoimList(userId));
+    }
+
+    @PostMapping("/transfer-ownership/{moimId}")
+    public ResponseEntity<?> transferOwnership(
+            @PathVariable Integer moimId,
+            @RequestBody Map<String, Integer> request) {
+
+        try {
+            Integer newOwnerId = request.get("newOwnerId");
+            Integer currentUserId = request.get("currentUserId");
+
+            moimService.transferOwnership(moimId, newOwnerId, currentUserId);
+            return ResponseEntity.ok("권한이 성공적으로 이양되었습니다");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("권한 이양 중 오류가 발생했습니다");
+        }
+    }
+
+    @GetMapping("/members/{moimId}")
+    public ResponseEntity<?> getAllMoimMembers(@PathVariable Integer moimId) {
+        try {
+            List<MoimRoleDto> members = moimService.getAllMoimMembers(moimId);
+            return ResponseEntity.ok(members);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("멤버 목록 조회 중 오류가 발생했습니다");
+        }
+    }
+
+    @PostMapping("/transfer-ownership-direct/{moimId}/{newOwnerId}")
+    public ResponseEntity<?> transferOwnershipDirect(
+            @PathVariable Integer moimId,
+            @PathVariable Integer newOwnerId,
+            @PathVariable Integer currentUserId) {
+
+        try {
+            moimService.transferOwnership(moimId, newOwnerId, currentUserId);
+            return ResponseEntity.ok("권한이 성공적으로 이양되었습니다");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("권한 이양 중 오류가 발생했습니다");
+        }
     }
 }

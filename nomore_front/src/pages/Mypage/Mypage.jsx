@@ -149,7 +149,7 @@ function Mypage(props) {
         formData.append("nickName", mypageModify.nickName);
         formData.append("introduction", mypageModify.introduction);
         formData.append("categoryId", choice?.categoryId || user.categoryId);
-        if (profileImageFile) formData.append("profileImgPath", profileImageFile);
+        if (profileImageFile) formData.append("profileImg", profileImageFile);
 
         try {
             await api.put("/api/user/profile", formData, {
