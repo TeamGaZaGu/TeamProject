@@ -25,4 +25,6 @@ public interface ForumMapper {
 
     List<ForumCategory> getFourumCategories();
     List<Forum> findAllByMoimId(@Param("moimId") Integer moimId);
+
+    List<Forum> findForumsByUserId(@Param("userId") Integer userId);
 }

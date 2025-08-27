@@ -110,4 +110,9 @@
             user_tb
     </select>
 
+    <select id="findUserById" resultMap="UserMap">
+        select *
+        from user_tb
+        where user_id = #{userId}
+    </select>
 </mapper>

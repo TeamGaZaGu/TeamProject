@@ -17,9 +17,13 @@ public class UserBlockService {
     private final UserBlockMapper userBlockMapper;
     private final PrincipalUtil principalUtil;
 
+    public Integer getCurrentUserId() {
+        return principalUtil.getPrincipalUser().getUser().getUserId();
+    }
+
     @Transactional(rollbackFor = Exception.class)
     public void blockUser(int blockedId) {
-        Integer blockerId = principalUtil.getPrincipalUser().getUser().getUserId();
+        Integer blockerId = getCurrentUserId();
 
         UserBlock existingBlock = userBlockMapper.findByBlockerIdAndBlockedId(blockerId, blockedId);
         if (existingBlock != null) {
@@ -40,7 +44,7 @@ public class UserBlockService {
 
     @Transactional(rollbackFor = Exception.class)
     public void unblockUser(int blockedId) {
-        int blockerId = principalUtil.getPrincipalUser().getUser().getUserId();
+        int blockerId = getCurrentUserId();
 
         UserBlock existingBlock = userBlockMapper.findByBlockerIdAndBlockedId(blockerId, blockedId);
         if (existingBlock == null) {
@@ -51,7 +55,7 @@ public class UserBlockService {
     }
 
     public boolean isBlocked(int targetUserId) {
-        int currentUserId = principalUtil.getPrincipalUser().getUser().getUserId();
+        int currentUserId = getCurrentUserId();
         return userBlockMapper.findByBlockerIdAndBlockedId(currentUserId, targetUserId) != null;
     }
 
@@ -66,12 +70,12 @@ public class UserBlockService {
     }
 
     public List<Integer> getBlockerIds() {
-        int blockedId = principalUtil.getPrincipalUser().getUser().getUserId();
+        int blockedId = getCurrentUserId();
         return userBlockMapper.findBlockerIdsByBlockedId(blockedId);
     }
 
     public List<UserBlock> getBlockedUsers() {
-        int blockerId = principalUtil.getPrincipalUser().getUser().getUserId();
+        int blockerId = getCurrentUserId();
         return userBlockMapper.findBlockedUsersByBlockerId(blockerId);
     }
 }

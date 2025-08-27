@@ -264,4 +264,10 @@
         where ft.moim_id = #{moimId}
         order by ft.created_at desc
     </select>
+    <select id="findForumsByUserId" resultType="com.korit.nomoreback.domain.forum.Forum">
+        select *
+        from forum_tb
+        where user_id = #{userId}
+        order by forum_created_at DESC
+    </select>
 </mapper>

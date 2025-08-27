@@ -19,14 +19,11 @@ import java.util.List;
 public class ForumController {
 
     private final ForumService forumService;
-    private final PrincipalUtil principalUtil;
 
     @PostMapping(value = "/{moimId}/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> registerForum(@PathVariable Integer moimId ,
-                                        @ModelAttribute ForumRegisterDto dto) {
-        Integer userId = principalUtil.getPrincipalUser().getUser().getUserId();
+                                           @ModelAttribute ForumRegisterDto dto) {
         dto.setMoimId(moimId);
-        dto.setUserId(userId);
 
         forumService.registerForum(dto);
         return ResponseEntity.ok("게시글작성");
@@ -98,7 +95,7 @@ public class ForumController {
         forumService.modifyComment(modifyDto,forumId);
         return ResponseEntity.ok("댓글 수정 완료");
     }
-  
+
     @GetMapping("/forumCategories")
     public ResponseEntity<?> getFourumCategories() {
         return ResponseEntity.ok(forumService.getFourumCategories());
@@ -109,7 +106,7 @@ public class ForumController {
         List<ForumComment> comments = forumService.getCommentsByForumId(forumId);
         return ResponseEntity.ok(comments);
     }
-  
+
     @DeleteMapping("/{moimId}/{forumId}/comment/delete/{forumCommentId}")
     public ResponseEntity<?> deleteComment(@PathVariable Integer moimId,
                                            @PathVariable Integer forumId,
@@ -123,17 +120,11 @@ public class ForumController {
         forumService.like(forumId);
         return ResponseEntity.ok("좋아요");
     }
-  
+
     @DeleteMapping("/{forumId}/dislike")
     public ResponseEntity<?> dislike(@PathVariable Integer forumId) {
         forumService.dislike(forumId);
         return ResponseEntity.ok("좋아요 삭제 요청 완료");
-    }
-
-    @GetMapping("/forums")
-    public ResponseEntity<?> getForums(@PathVariable Integer moimId) {
-        List<Forum> forums = forumService.getForumsByMoimId(moimId);
-        return ResponseEntity.ok(forums);
     }
 
 }

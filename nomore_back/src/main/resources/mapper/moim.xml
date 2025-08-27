@@ -245,4 +245,12 @@
             mrt.user_id = #{userId}
     </select>
 
+    <select id="findMoimsByUserId" resultMap="MoimResultMap">
+        select m.*
+        from moim_tb m
+        join moim_role_tb mr ON m.moim_id = mr.moim_id
+        left join district_tb dt ON m.district_id = dt.district_id
+        where mr.user_id = #{userId}
+        order by m.moim_id DESC
+    </select>
 </mapper>

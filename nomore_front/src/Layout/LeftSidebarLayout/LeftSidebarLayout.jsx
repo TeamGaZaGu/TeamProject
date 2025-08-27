@@ -12,6 +12,8 @@ import usePrincipalQuery from '../../queries/usePrincipalQuery';
 import { useNavigate } from 'react-router-dom';
 import { FaUserSlash } from 'react-icons/fa';
 import { reqAllUser } from '../../api/userApi';
+import { reqReport } from '../../api/reportApi';
+import { MdReport } from 'react-icons/md';
 
 function LeftSidebarLayout(props) {
     const navigate = useNavigate();
@@ -32,9 +34,15 @@ function LeftSidebarLayout(props) {
         navigate(`/category?categoryId=${categoryId}`);
     }
 
-    const handleUseManagementOnClick =  async () => {
+    const handleUserManagementOnClick =  async () => {
         const response =  await reqAllUser();
         navigate(`/userManagement`, {state: response?.data});
+    }
+    
+    const handleReportManagementOnClick =  async () => {
+        const response =  await reqReport();
+        // console.log(response?.data?.body);
+        navigate(`/reportManagement`, {state: response?.data?.body});
     }
 
     return (
@@ -49,7 +57,10 @@ function LeftSidebarLayout(props) {
                 <button onClick={handleSuggestOnClick}><HiUsers />추천모임</button>
                 {
                     userRole === "ROLE_ADMIN" && (
-                        <button onClick={handleUseManagementOnClick}><FaUserSlash />유저관리</button>
+                        <>
+                            <button onClick={handleUserManagementOnClick}><FaUserSlash />유저관리</button>
+                            <button onClick={handleReportManagementOnClick}><MdReport />신고관리</button>
+                        </>
                     )
                 }
             </div>
