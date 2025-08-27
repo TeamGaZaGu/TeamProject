@@ -94,7 +94,7 @@ export const infoContainer = css`
   display: flex;
   flex-direction: column;
   width: 100%;
-  max-width: 40rem;
+  max-width: 48rem;   /* 기존 40rem → 48rem 로 확대 */
   gap: 1.5rem;
   margin-bottom: 2rem;
 `;
@@ -180,7 +180,7 @@ export const buttonContainer = css`
   gap: 1rem;
   justify-content: center;
   width: 100%;
-  max-width: 40rem;
+  max-width: 48rem;
 `;
 
 // 저장 버튼 (회원가입 버튼과 동일한 스타일)
@@ -367,22 +367,28 @@ export const dropdownItem = css`
 `;
 
 export const mypageLayout = css`
-  display: flex;
-  gap: 2rem;
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;   
   width: 100%;
   margin: 0;
   padding: 2rem;
   box-sizing: border-box;
   background-color: #fafafa;
   min-height: 100vh;
+  align-items: start;
+
+    @media (max-width: 1200px) {
+    grid-template-columns: 1fr;
+  }
 `;
 
 export const leftSection = css`
   flex: 1;
   display: flex;
   flex-direction: column;
-  align-items: center;  /* 좌우 중앙 정렬 */
+  align-items: center;
   justify-content: flex-start;
+  min-width: 520px;   /* 왼쪽이 너무 눌리지 않도록 최소폭 가드 */
 `;
 
 export const rightSection = css`
@@ -451,5 +457,52 @@ export const moimContent = css`
   span {
     font-size: 0.8rem;
     color: #777;
+  }
+`;
+
+export const rightTwoCol = css`
+  display: grid;
+  grid-template-columns: 1fr 1fr;  /* 좌: 내가 참여한 모임 / 우: 내가 쓴 글 */
+  gap: 2rem;
+  align-items: start;
+  width: 100%;
+`;
+
+/* [추가] 두 패널 공통 스타일 */
+export const panel = css`
+  background: #fff;
+  border-radius: 0.8rem;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  padding: 1rem;
+`;
+
+/* [추가] 내가 쓴 글 목록 스타일 (간단) */
+export const postList = css`
+  display: grid;
+  gap: 0.75rem;
+
+  .item {
+    padding: 0.75rem 0.9rem;
+    border: 1px solid #eee;
+    border-radius: 0.8rem;
+    background: #fff;
+    cursor: pointer;
+  }
+
+  .title {
+    font-weight: 600;
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .meta {
+    font-size: 0.85rem;
+    color: #777;
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
   }
 `;

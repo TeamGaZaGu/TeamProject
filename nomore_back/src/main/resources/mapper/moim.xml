@@ -183,7 +183,6 @@
         </where>
         ORDER BY m.moim_id DESC
     </select>
-
     <select id="moimUserList" resultType="com.korit.nomoreback.domain.user.User">
         select
             ut.*,

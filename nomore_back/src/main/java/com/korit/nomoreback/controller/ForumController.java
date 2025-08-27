@@ -130,4 +130,10 @@ public class ForumController {
         return ResponseEntity.ok("좋아요 삭제 요청 완료");
     }
 
+    @GetMapping("/forums")
+    public ResponseEntity<?> getForums(@PathVariable Integer moimId) {
+        List<Forum> forums = forumService.getForumsByMoimId(moimId);
+        return ResponseEntity.ok(forums);
+    }
+
 }

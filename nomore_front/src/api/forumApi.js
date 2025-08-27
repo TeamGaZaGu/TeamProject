@@ -8,7 +8,9 @@ export const reqRegisterForum = async (data, moimId) => await api.post(`/api/moi
 
 export const reqGetForums = async (moimId) => await api.get(`/api/forum/${moimId}/forums`);
 
-export const reqGetForumCategories = async () => await api.get("/api/forum/forumCategories");
+export const reqGetForumsWithParams = async (moimId, params) => await api.get(`/api/moims/${moimId}/forums`, { params });
+
+export const reqGetForumCategories = async () => await api.get("/api/moims/forumCategories");
 
 export const reqDetailForum = async (forumId) => await api.get(`/api/forum/${forumId}`);
 
