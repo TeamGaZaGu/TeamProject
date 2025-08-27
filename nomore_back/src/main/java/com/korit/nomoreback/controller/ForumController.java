@@ -40,6 +40,7 @@ public class ForumController {
     @GetMapping("/forums")
     public ResponseEntity<ResponseDto<?>> getForumList(ForumSearchReqDto dto) {
         return ResponseEntity.ok(ResponseDto.success(forumService.getForumsByMoimId(dto)));
+    }
 
     @GetMapping("/forums/blobs")
     public ResponseEntity<byte[]> getImage(@RequestParam String url, @RequestParam String imageConfigsName) {
@@ -52,13 +53,6 @@ public class ForumController {
 
         return ResponseEntity.ok().headers(headers).body(data);
     }
-
-    @GetMapping("/{moimId}/forums")
-    public ResponseEntity<List<Forum>> getForumList(@PathVariable Integer moimId) {
-        List<Forum> forums = forumService.getForumsByMoimId(moimId);
-        return ResponseEntity.ok(forums);
-    }
-
 
     @GetMapping("/{moimId}/forums/category/{categoryId}")
     public ResponseEntity<List<Forum>> getForumListByCategory(@PathVariable Integer moimId,
