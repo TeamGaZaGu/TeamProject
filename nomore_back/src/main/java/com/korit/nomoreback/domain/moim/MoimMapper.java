@@ -29,4 +29,6 @@ public interface MoimMapper {
     void moimMemberDiscount(Integer moimId);
 
     List<Moim> myMoimList(Integer userId);
+
+    List<Moim> findMoimsByUserId(@Param("userId") Integer userId);
 }

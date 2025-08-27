@@ -58,6 +58,7 @@ public class SecurityConfig {
             auth.requestMatchers("/moim/**").permitAll();
             auth.requestMatchers("/api/admin/**").hasRole("ADMIN");
             auth.requestMatchers("/ws/**").permitAll();
+            auth.requestMatchers("/api/user/**").permitAll();
             auth.anyRequest().authenticated();
         });
 

@@ -69,4 +69,8 @@ public class UserService {
     public void deleteUser(Integer userId) {
         userMapper.deleteUser(userId);
     }
+
+    public User findUserById(Integer userId) {
+        return userMapper.findUserById(userId);
+    }
 }

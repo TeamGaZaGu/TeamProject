@@ -2,6 +2,7 @@ package com.korit.nomoreback.domain.user;
 
 import com.korit.nomoreback.dto.user.UserProfileUpdateReqDto;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -25,4 +26,6 @@ public interface UserMapper {
     String findProfileImgPathByUserId(int userId);
 
     void deleteUser(Integer userId);
+
+    User findUserById(@Param("userId") Integer userId);
 }

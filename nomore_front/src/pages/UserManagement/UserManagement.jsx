@@ -2,13 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { reqAllUser, reqBlockUser, reqUnBlockUser } from '../../api/userApi';
 /** @jsxImportSource @emotion/react */
 import * as s from './styles';
+import { useNavigate } from 'react-router-dom';
 
 function UserManagement(props) {
     const [allUser, setAllUser] = useState([]);
     const [loading, setLoading] = useState(true);
+    const navigate = useNavigate();
 
-    console.log(allUser)
-    // 컴포넌트 마운트 시 사용자 목록 가져오기
     useEffect(() => {
         fetchUsers();
     }, []);
@@ -109,7 +109,13 @@ function UserManagement(props) {
                                         )}
                                     </td>
                                     <td css={s.tableCell}>{user.nickName}</td>
-                                    <td css={s.tableCell}>{user.fullName}</td>
+                                    <td 
+                                        css={s.tableCell} 
+                                        onClick={() => navigate(`/admin/user/${user.userId}`)}
+                                        style={{ cursor: 'pointer', textDecoration: 'underline' }}
+                                    >
+                                        {user.fullName}
+                                    </td>
                                     <td css={s.tableCell}>{user.email}</td>
                                     <td css={s.tableCell}>{user.gender}</td>
                                     <td css={s.tableCell}>{user.birthDate}</td>

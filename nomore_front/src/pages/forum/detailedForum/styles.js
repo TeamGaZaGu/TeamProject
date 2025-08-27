@@ -1,4 +1,4 @@
-import { css } from "styled-components";
+import { css } from "@emotion/react";
 
 export const forumCard = css`
   background: #fff;
@@ -67,7 +67,7 @@ export const actionButton = css`
 
 export const editButton = css`
   ${actionButton};
-  background-color: #3b82f6; /* 파랑 */
+  background-color: #3b82f6;
   color: white;
 
   &:hover {
@@ -77,11 +77,29 @@ export const editButton = css`
 
 export const deleteButton = css`
   ${actionButton};
-  background-color: #ef4444; /* 빨강 */
+  background-color: #ef4444;
   color: white;
 
   &:hover {
     background-color: #dc2626;
+  }
+`;
+
+export const reportButton = css`
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  color: #ff4757;
+  padding: 6px 12px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: background-color 0.2s ease;
+  
+  &:hover {
+    background-color: #ff475720;
   }
 `;
 
@@ -123,16 +141,12 @@ export const forumFooter = css`
   }
 `;
 
-export const likeButton = css`
-  color: blue !important;
-`;
-
 export const comments = css`
   margin-top: 16px;
-  background: #fff; /* 회색 배경 */
+  background: #fff;
   border-radius: 8px;
   padding: 16px;
-  min-height: 365px; /* 댓글 박스 높이 확보 */
+  min-height: 365px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -171,6 +185,11 @@ export const commentProfileImage = css`
   border-radius: 50%;
   object-fit: cover;
   margin-right: 10px;
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: scale(1.05);
+  }
 `;
 
 export const commentBody = css`
@@ -186,6 +205,11 @@ export const commentAuthor = css`
   font-weight: 600;
   margin: 2px 0;
   color: #111827;
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: #3b82f6;
+  }
 `;
 
 export const commentText = css`
@@ -226,13 +250,6 @@ export const transactionButton = css`
       background: #dc2626;
     }
   }
-`;
-
-export const subCommentGridContainer = css`
-  display: grid;
-  grid-template-columns: 6rem 31rem;
-  margin-left: 5rem;
-  width: 37rem;
 `;
 
 export const writeComment = css`
@@ -281,17 +298,18 @@ export const loginContainer = css`
   width: 100%;
   height: 100%;
   background-color: #ffffff;
+  min-height: 60vh;
+  padding: 40px;
+  background-color: #f9f9f9;
 `;
 
 export const loginBox = css`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+  display: inline-block;
   padding: 30px;
   border-radius: 15px;
-  background-color: #d66df0;
+  background-color: #7a51c2;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  text-align: center;
 `;
 
 export const googleLogin = css`
@@ -330,5 +348,172 @@ export const kakaoLogin = css`
   img {
     width: 20px;
     margin-right: 10px;
+  }
+`;
+
+export const closeButton = css`
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: #6b7280;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  &:hover {
+    color: #374151;
+  }
+`;
+
+// 신고 모달 오버레이 (DescriptionSuggestPage와 동일)
+export const reportModalOverlay = css`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 100px;
+  z-index: 1001;
+`;
+
+// 신고 모달 컨텐츠 (DescriptionSuggestPage와 동일)
+export const reportModalContent = css`
+  background: white;
+  border-radius: 12px;
+  width: 400px;
+  max-width: 90vw;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  animation: slideDown 0.3s ease-out;
+  
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+`;
+
+// 신고 모달 헤더 (DescriptionSuggestPage와 동일)
+export const reportModalHeader = css`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid #f0f0f0;
+  
+  h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+  }
+`;
+
+// 신고 모달 바디 (DescriptionSuggestPage와 동일)
+export const reportModalBody = css`
+  padding: 20px 24px 24px;
+`;
+
+// 신고 모달 설명 (DescriptionSuggestPage와 동일)
+export const reportModalDescription = css`
+  margin: 0 0 16px 0;
+  color: #666;
+  font-size: 14px;
+  line-height: 1.4;
+`;
+
+// 신고 사유 목록 (DescriptionSuggestPage와 동일)
+export const reasonList = css`
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+`;
+
+// 신고 사유 아이템 (DescriptionSuggestPage와 동일)
+export const reasonItem = css`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  padding: 8px 0;
+  
+  input[type="radio"] {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+  }
+`;
+
+// 신고 사유 텍스트 (DescriptionSuggestPage와 동일)
+export const reasonText = css`
+  font-size: 14px;
+  color: #333;
+  line-height: 1.4;
+  cursor: pointer;
+`;
+
+// 기타 사유 입력창 (DescriptionSuggestPage와 동일)
+export const customReasonInput = css`
+  width: 100%;
+  min-height: 80px;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 1.4;
+  resize: vertical;
+  margin-bottom: 20px;
+  
+  &:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.1);
+  }
+  
+  &::placeholder {
+    color: #999;
+  }
+`;
+
+// 신고 모달 푸터 (DescriptionSuggestPage와 동일)
+export const reportModalFooter = css`
+  display: flex;
+  justify-content: flex-end;
+`;
+
+// 신고 제출 버튼 (DescriptionSuggestPage와 동일)
+export const submitReportButton = css`
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  
+  &:hover {
+    background-color: #c82333;
+  }
+  
+  &:active {
+    background-color: #bd2130;
+  }
+  
+  &:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
   }
 `;

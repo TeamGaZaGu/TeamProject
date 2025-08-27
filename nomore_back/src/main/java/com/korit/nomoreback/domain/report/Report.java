@@ -22,6 +22,4 @@ public class Report {
     private String reason;
     private Integer status;
     private LocalDateTime createdAt;
-
-    private Integer moimId;
 }
