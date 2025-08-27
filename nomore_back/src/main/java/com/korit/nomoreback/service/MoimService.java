@@ -180,4 +180,52 @@ public class MoimService {
     public List<Moim> myMoimList(Integer userId) {
         return moimMapper.myMoimList(userId);
     }
+
+    public void transferOwnership(Integer moimId, Integer newOwnerId, Integer currentUserId) {
+        MoimRoleDto currentRole = moimRoleMapper.findRoleByUserAndMoimId(currentUserId, moimId);
+        if (currentRole == null || !"OWNER".equals(currentRole.getMoimRole())) {
+            throw new IllegalArgumentException("권한이 없습니다");
+        }
+
+        boolean isNewOwnerMember = moimRoleMapper.isMoimIdAndUserId(moimId, newOwnerId);
+        if (!isNewOwnerMember) {
+            throw new IllegalArgumentException("모임 멤버만 권한을 받을 수 있습니다");
+        }
+
+        MoimRoleDto newOwnerRole = moimRoleMapper.findRoleByUserAndMoimId(newOwnerId, moimId);
+        if (newOwnerRole == null || !"MEMBER".equals(newOwnerRole.getMoimRole())) {
+            throw new IllegalArgumentException("MEMBER 권한을 가진 유저만 OWNER가 될 수 있습니다");
+        }
+
+        moimRoleMapper.updateMoimRole(currentUserId, moimId, "MEMBER");
+        moimRoleMapper.updateMoimRole(newOwnerId, moimId, "OWNER");
+    }
+
+    // 모임 멤버 목록 조회 (권한 이양용 - OWNER만 조회 가능)
+    public List<MoimRoleDto> getMoimMembersForTransfer(Integer moimId) {
+        Integer currentUserId = principalUtil.getPrincipalUser().getUser().getUserId();
+
+        // 현재 유저가 OWNER인지 확인
+        MoimRoleDto currentRole = moimRoleMapper.findRoleByUserAndMoimId(currentUserId, moimId);
+        if (currentRole == null || !"OWNER".equals(currentRole.getMoimRole())) {
+            throw new IllegalArgumentException("권한이 없습니다");
+        }
+
+        // 현재 유저를 제외한 MEMBER들만 반환
+        return moimRoleMapper.findMembersByMoimIdExceptUser(moimId, currentUserId);
+    }
+
+    // 모임 전체 멤버 목록 조회 (모든 멤버가 볼 수 있음)
+    public List<MoimRoleDto> getAllMoimMembers(Integer moimId) {
+        Integer currentUserId = principalUtil.getPrincipalUser().getUser().getUserId();
+
+        // 현재 유저가 이 모임 멤버인지 확인
+        boolean isMember = moimRoleMapper.isMoimIdAndUserId(moimId, currentUserId);
+        if (!isMember) {
+            throw new IllegalArgumentException("모임 멤버만 조회할 수 있습니다");
+        }
+
+        // 모든 멤버 반환
+        return moimRoleMapper.findAllMembersByMoimId(moimId);
+    }
 }

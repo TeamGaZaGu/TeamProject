@@ -29,7 +29,7 @@ public class ForumService {
     private final ImageUrlUtil imageUrlUtil;
     private final AppProperties appProperties;
 
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional
     public void registerForum(ForumRegisterDto dto) {
 
         Forum forum = dto.toEntity();
@@ -93,7 +93,7 @@ public class ForumService {
         return forumMapper.findByCategoryId(moimId, categoryId, userId);
     }
 
-    @Transactional(rollbackFor = Exception.class)
+
     public void modifyForum(ForumModifyDto dto){
         Integer userId = principalUtil.getPrincipalUser().getUser().getUserId();
         Integer forumId = dto.getForumId();

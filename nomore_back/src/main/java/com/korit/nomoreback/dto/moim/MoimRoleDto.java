@@ -8,4 +8,7 @@ public class MoimRoleDto {
     private String moimRole;
     private Integer moimId;
     private Integer userId;
+
+    private String nickName;
+    private String profileImgPath;
 }

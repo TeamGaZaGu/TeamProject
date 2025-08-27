@@ -32,6 +32,4 @@ public class User {
         this.profileImgPath = imageUrlUtil.buildImageUrl(this.profileImgPath, "profile");
         return this;
     }
-
-
 }
