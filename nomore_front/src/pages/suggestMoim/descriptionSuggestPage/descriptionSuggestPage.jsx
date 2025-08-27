@@ -40,6 +40,8 @@ function DescriptionSuggestPage(props) {
     const principalQuery = usePrincipalQuery();
     const userId = principalQuery?.data?.data?.user?.userId;
     const userRole = principalQuery?.data?.data?.user?.userRole;
+    const moimRole = userList.find( user => user.userId === userId ) ?.moimRole;
+
     
     const categoryQuery = useCategoryQuery();
     const categories = categoryQuery?.data?.data || [];
@@ -280,7 +282,7 @@ function DescriptionSuggestPage(props) {
                             <button css={s.Transaction} onClick={handleNavigateToEdit}><FaPen />수정</button>
                             <button css={s.Transaction} onClick={handleDeleteMoim}><FaTrashAlt />삭제</button>
                         </>
-                    ) : userId === moim?.userId ? (
+                    ) : moimRole === "OWNER" ? (
                         // 모임 생성자인 경우
                         <>
                             <button css={s.Transaction} onClick={handleNavigateToEdit}><FaPen />수정</button>
@@ -446,15 +448,14 @@ function DescriptionSuggestPage(props) {
             )}
             
             {/* 채팅 탭 콘텐츠 */}
-            {activeTab === "chat" && 
-                moimId ? (
+             {activeTab === "chat" && 
+                moimId ? ( userList.find(user => user.userId === userId) ?
                     <ChattingPage 
                         moimId={Number(moimId)}
                         userId={principalQuery?.data?.data?.user?.nickName}
-                    />
+                    /> : toast.error("모임 가입이 필요한 페이지입니다")
                 ) : (
-                    <div>올바른 채팅방 ID가 필요합니다.</div>
-
+                    null
                 )}
            
             {isModalOpen && selectedUser && (
