@@ -28,4 +28,6 @@ public interface UserMapper {
     void deleteUser(Integer userId);
 
     User findUserById(@Param("userId") Integer userId);
+
+    User findByUserId(@Param("userId") Integer userId);
 }

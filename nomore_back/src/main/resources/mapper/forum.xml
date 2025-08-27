@@ -311,6 +311,17 @@
             forum_tb f
         where
             f.moim_id = #{moimId}
+    </select>
 
+    <select id="findPostsByUserId" resultType="com.korit.nomoreback.domain.forum.Forum">
+        select
+            f.forum_id as forumId,
+            f.forum_title as forumTitle,
+            f.forum_content as forumContent,
+            f.moim_id as moimId
+        from
+            forum_tb f
+        where
+            f.user_id = #{userId}
     </select>
 </mapper>

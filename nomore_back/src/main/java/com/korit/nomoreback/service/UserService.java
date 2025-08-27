@@ -73,4 +73,12 @@ public class UserService {
     public User findUserById(Integer userId) {
         return userMapper.findUserById(userId);
     }
+
+    public User getUserDetail(Integer userId) {
+        User user = userMapper.findByUserId(userId);
+        if (user == null) {
+            throw new RuntimeException("사용자를 찾을 수 없습니다.");
+        }
+        return user;
+    }
 }

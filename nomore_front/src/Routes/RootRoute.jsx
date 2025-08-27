@@ -36,14 +36,14 @@ function RootRoute(props) {
     return (
         <MainLayout>
             <Routes>
-                <Route path='/suggest/*' element={ <SuggestRoute /> } />
-                <Route path='/forum/*' element={ <ForumRoute /> } />
-                <Route path='/searchpage' element={ <SearchPage /> } />
+                <Route path='/suggest/*' element={<SuggestRoute />} />
+                <Route path='/forum/*' element={<ForumRoute />} />
+                <Route path='/searchpage' element={<SearchPage />} />
                 <Route path='/oauth2/login' element={<Oauth2Redirect />} />
-                <Route path='/auth/signup' element={ <Signup /> } />
-                <Route path='/chatting/:moimId' element={ <ChattingPage /> } />
-                <Route path='/mypage' element={ <Mypage /> } />
-                <Route path='/category/*' element={ <CatogoryPage /> } />
+                <Route path='/auth/signup' element={<Signup />} />
+                <Route path='/chatting/:moimId' element={<ChattingPage />} />
+                <Route path='/mypage' element={<Mypage />} />
+                <Route path='/category/*' element={<CatogoryPage />} />
                 {user?.userRole === "ROLE_ADMIN" && (
                     <>
                         <Route path='/userManagement' element={<UserManagement />} />
@@ -51,8 +51,8 @@ function RootRoute(props) {
                         <Route path="/admin/user/:userId" element={<UserDetailPage />} />
                     </>
                 )}
-                <Route path='/' element={ <Home />} />
-                <Route path='*' element={ <NotFound /> } />
+                <Route path='/' element={<Home />} />
+                <Route path='*' element={<NotFound />} />
             </Routes>
         </MainLayout>
     );
