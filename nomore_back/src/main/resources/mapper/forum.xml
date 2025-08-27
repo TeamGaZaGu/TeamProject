@@ -250,4 +250,18 @@
         where forum_id = #{forumId}
         order by seq
     </select>
+    <select id="findAllByMoimId" resultType="com.korit.nomoreback.domain.forum.Forum">
+        select
+            ft.forum_id,
+            ft.forum_title,
+            ft.forum_content,
+            ft.created_at,
+            ft.user_id,
+            ut.fullName,
+            ut.profile_img_path
+        from forum_tb ft
+        left join user_tb ut on ft.user_id = ut.user_id
+        where ft.moim_id = #{moimId}
+        order by ft.created_at desc
+    </select>
 </mapper>

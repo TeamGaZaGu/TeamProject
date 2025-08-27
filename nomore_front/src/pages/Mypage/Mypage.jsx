@@ -7,6 +7,7 @@ import usePrincipalQuery from '../../queries/usePrincipalQuery';
 import { reqMyMoimList } from '../../api/moimApi';
 import { useNavigate } from 'react-router-dom';
 import { deleteUser } from '../../api/userApi';
+import { reqGetForumsWithParams } from '../../api/forumApi';
 
 function Mypage(props) {
 
@@ -15,12 +16,13 @@ function Mypage(props) {
     const categories = categoryQuery?.data?.data || []
     const principalQuery = usePrincipalQuery();
     const user = principalQuery?.data?.data?.user;
-    const [ categoryList, setCategoryList ] = useState([]);
+    const [categoryList, setCategoryList] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState('');
     const [isCategoryOpen, setIsCategoryOpen] = useState(false);
     const oldCategory = categories.find(prev => prev.categoryId === user.categoryId)
 
     const [myMoims, setMyMoims] = useState([]);
+    const [myPosts, setMyPosts] = useState([]); // [추가]
 
     // 내가 참여한 모임 가져오기
     useEffect(() => {
@@ -36,6 +38,66 @@ function Mypage(props) {
         }
     }, [user]);
 
+    // 내가 참여한 모임별 게시판을 불러와 "내가 쓴 글"만 모으기 
+    useEffect(() => {
+        let alive = true;
+
+        (async () => {
+            try {
+                if (!user?.userId || myMoims.length === 0) {
+                    if (alive) setMyPosts([]);
+                    return;
+                }
+
+                const params = { page: 1, size: 10, writerId: user.userId, userId: user.userId };
+
+                const results = await Promise.all(
+                    myMoims.map(m =>
+                        reqGetForumsWithParams(m.moimId, params)
+                            .then(resp => {
+                                console.log(`✅ 모임 ${m.moimId} 성공:`, resp);
+
+                                // 실제 데이터 추출
+                                let list = [];
+                                if (Array.isArray(resp.data)) {
+                                    list = resp.data;
+                                } else if (resp.data?.contents) {
+                                    list = resp.data.contents;
+                                }
+
+                                return { moimId: m.moimId, list };
+                            })
+                            .catch(err => {
+                                console.error(`❌ 모임 ${m.moimId} 실패:`, err);
+                                return { moimId: m.moimId, list: [] };
+                            })
+                    )
+                );
+
+                // 병합
+                const allPosts = results.flatMap(({ moimId, list }) =>
+                    list.map(post => ({ ...post, moimId }))
+                );
+
+                // 필터링 (user 객체 안의 userId 확인)
+                const myPosts = allPosts.filter(post => {
+                    console.log('필터링 체크:', post.user?.userId, '===', user.userId);
+                    return post.user?.userId === user.userId;
+                });
+
+                console.log('전체 글:', allPosts);
+                console.log('내가 쓴 글:', myPosts);
+
+                if (alive) setMyPosts(myPosts);
+            } catch (e) {
+                console.error(e);
+                if (alive) setMyPosts([]);
+            }
+        })();
+
+        return () => { alive = false; };
+    }, [user?.userId, myMoims]);
+
     const handleToggleCategoryOnClick = () => {
         setIsCategoryOpen((prev) => !prev);
         setCategoryList(categories);
@@ -45,13 +107,13 @@ function Mypage(props) {
         setSelectedCategory(e.target.value);
         setIsCategoryOpen(false);
     }
- 
+
     const mypageInputEmpty = {
         nickName: user?.nickName || '',
         introduction: user?.introduction || '',
     }
 
-    const [ mypageModify, setMypageModify ] = useState(mypageInputEmpty);
+    const [mypageModify, setMypageModify] = useState(mypageInputEmpty);
 
     const handleMypageModifyOnChange = (e) => {
         setMypageModify(prev => ({
@@ -121,17 +183,24 @@ function Mypage(props) {
     const handleMoimOnClick = (moimId) => {
         navigate(`/suggest/description?moimId=${moimId}`);
     };
-    
+
+    const handleMyForumOnClick = (mf) => {
+        const forumId = mf.forumId ?? mf.id ?? mf.postId;
+        const moimId = mf.moimId ?? mf.moim?.moimId;
+        if (!forumId || !moimId) return;
+        navigate(`/forum/detail?moimId=${moimId}&forumId=${forumId}`);
+    };
+
     return (
         <div css={s.mypageLayout}>
             {/* 왼쪽 섹션 - 개인정보 수정 */}
             <div css={s.leftSection}>
                 <h1 css={s.pageTitle}>마이페이지</h1>
-                
+
                 {/* 프로필 이미지 섹션 */}
                 <div css={s.profileSection}>
                     <div css={s.profileImage}>
-                        <img 
+                        <img
                             src={profileImagePreview || `${user?.profileImgPath}`}
                             alt="프로필"
                             onError={(e) => {
@@ -148,7 +217,7 @@ function Mypage(props) {
                         style={{ display: 'none' }}
                         onChange={handleProfileImageChange}
                     />
-                    <button 
+                    <button
                         css={s.profileImageUpload}
                         type="button"
                         onClick={() => document.getElementById('profileImageInput').click()}
@@ -161,10 +230,10 @@ function Mypage(props) {
                 <div css={s.infoContainer}>
                     <div css={s.infoItem}>
                         <label css={s.infoLabel}>닉네임</label>
-                        <input 
+                        <input
                             css={s.inputStyle}
-                            type="text" 
-                            name='nickName' 
+                            type="text"
+                            name='nickName'
                             value={mypageModify.nickName}
                             onChange={handleMypageModifyOnChange}
                         />
@@ -172,10 +241,10 @@ function Mypage(props) {
 
                     <div css={s.infoItem}>
                         <label css={s.infoLabel}>한줄 소개</label>
-                        <input 
+                        <input
                             css={s.inputStyle}
-                            type="text" 
-                            name='introduction' 
+                            type="text"
+                            name='introduction'
                             value={mypageModify.introduction}
                             onChange={handleMypageModifyOnChange}
                         />
@@ -221,29 +290,62 @@ function Mypage(props) {
                 </div>
             </div>
 
-            {/* 오른쪽 섹션 - 내가 참여한 모임 */}
-            <div css={s.rightSection}>
-                <h2 css={s.moimHeader}>내가 참여한 모임</h2>
-                {myMoims.length === 0 ? (
-                    <p>참여한 모임이 없습니다.</p>
-                ) : (
-                    myMoims.map(moim => (
-                        <div key={moim.moimId} css={s.moimCard} onClick={() => handleMoimOnClick(moim.moimId)}>
-                            <div css={s.moimImageContainer}>
-                                {moim.moimImgPath ? (
-                                    <img src={moim.moimImgPath} alt={moim.title} css={s.moimImage}/>
-                                ) : (
-                                    <div css={s.moimDefaultImage}>📭</div>
-                                )}
+            <div css={s.rightTwoCol}>
+                {/* [추가] 패널 1: 내가 참여한 모임 */}
+                <section css={s.panel}>
+                    <h2 css={s.moimHeader}>내가 참여한 모임</h2>
+                    {myMoims.length === 0 ? (
+                        <p>참여한 모임이 없습니다.</p>
+                    ) : (
+                        myMoims.map(moim => (
+                            <div key={moim.moimId} css={s.moimCard} onClick={() => handleMoimOnClick(moim.moimId)}>
+                                <div css={s.moimImageContainer}>
+                                    {moim.moimImgPath ? (
+                                        <img
+                                            src={`${baseURL}/image${moim.moimImgPath}`.replace('//', '/')}
+                                            alt={moim.title}
+                                            css={s.moimImage}
+                                        />
+                                    ) : (
+                                        <div css={s.moimDefaultImage}>📭</div>
+                                    )}
+                                </div>
+                                <div css={s.moimContent}>
+                                    <h3>{moim.title}</h3>
+                                    <p>{moim.discription}</p>
+                                    <span>👥 {moim.memberCount}/{moim.maxMember}명</span>
+                                </div>
                             </div>
-                            <div css={s.moimContent}>
-                                <h3>{moim.title}</h3>
-                                <p>{moim.discription}</p>
-                                <span>👥 {moim.memberCount}/{moim.maxMember}명</span>
-                            </div>
+                        ))
+                    )}
+                </section>
+
+                {/* [추가] 패널 2: 내가 쓴 글 */}
+                <section css={s.panel}>
+                    <h2 css={s.moimHeader}>내가 쓴 글</h2>
+                    {myPosts.length === 0 ? (
+                        <p>작성한 글이 없습니다.</p>
+                    ) : (
+                        <div css={s.postList}>
+                            {myPosts.map((p) => (
+                                <div
+                                    key={p.forumId ?? p.id ?? p.postId}
+                                    className="item"
+                                    onClick={() => handleMyForumOnClick(p)}
+                                >
+                                    <div className="title">{p.forumTitle ?? p.postTitle ?? '(제목 없음)'}</div>
+                                    <div className="meta">
+                                        <span>
+                                            📅 {new Date(p.createdAt ?? p.regDate ?? p.created_at ?? Date.now())
+                                                .toLocaleDateString()}
+                                        </span>
+                                        {p.moimTitle && <span>🏷 {p.moimTitle}</span>}
+                                    </div>
+                                </div>
+                            ))}
                         </div>
-                    ))
-                )}
+                    )}
+                </section>
             </div>
         </div>
     );
