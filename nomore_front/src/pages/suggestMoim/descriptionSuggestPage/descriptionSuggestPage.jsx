@@ -493,9 +493,11 @@ function DescriptionSuggestPage(props) {
                                         <p css={s.userIntroduction}>{selectedUser.introduction}</p>
                                     )}
                                     <div css={s.modalButtonContainer}>
-                                        <button onClick={() => handleToggleUserBlock(selectedUser.userId, selectedUser.nickName)}>
-                                            {isBlockedUser ? '차단 해제' : '차단하기'}
-                                        </button>
+                                        {selectedUser.userId !== userId && (
+                                            <button onClick={() => handleToggleUserBlock(selectedUser.userId, selectedUser.nickName)}>
+                                                {isBlockedUser ? '차단 해제' : '차단하기'}
+                                            </button>
+                                        )}
                                         
                                         {/* 현재 유저의 모임 내 역할을 다시 확인 */}
                                         {(() => {
