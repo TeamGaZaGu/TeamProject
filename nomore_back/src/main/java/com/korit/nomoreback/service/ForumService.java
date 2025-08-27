@@ -87,6 +87,13 @@ public class ForumService {
         List<Forum> foundForums = forumMapper.findAllOfOptions(dto.toOption(userId));
         boolean isLast = foundForums.size() < dto.getSize();
 
+        for (Forum forum : foundForums) {
+            List<ForumImg> forumImgs = forumImgMapper.findImgById(forum.getForumId());
+            forumImgs.forEach(img -> img.buildImageUrl(imageUrlUtil));
+            forum.setForumImgList(forumImgs);;
+            forum.getUser().buildImageUrl(imageUrlUtil);
+        }
+
         return ForumSearchRespDto.builder()
                 .contents(foundForums)
                 .totalElements(totalElements)
@@ -184,6 +191,13 @@ public class ForumService {
         Integer totalPages = (int) Math.ceil(totalElements.doubleValue() / dto.getSize().doubleValue());
         List<ForumComment> foundForums = forumCommentMapper.findAllOfOptions(dto.toOption());
         boolean isLast = foundForums.size() < dto.getSize();
+//
+//        for (ForumComment forumComment : foundForums) {
+//            List<ForumImg> forumImgs = forumImgMapper.findImgById(forumComment.getForumId());
+//            forumImgs.forEach(img -> img.buildImageUrl(imageUrlUtil));
+//            forumComment.getUser().getProfileImgPath();;
+//            forumComment.getUser().buildImageUrl(imageUrlUtil);
+//        }
 
         return ForumCommentSearchRespDto.builder()
                 .contents(foundForums)
