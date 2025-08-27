@@ -23,12 +23,15 @@ public class MoimBanService {
 
     @Transactional(rollbackFor = Exception.class)
     public void banUser(Integer moimId, Integer userId) {
+
         moimRoleMapper.deleteByMoimIdAndUserId(moimId, userId);
+
         MoimBan moimBan = MoimBan.builder()
                 .moimId(moimId)
                 .userId(userId)
                 .build();
         moimBanMapper.insertBan(moimBan);
+
         moimMapper.moimMemberDiscount(moimId);
     }
 

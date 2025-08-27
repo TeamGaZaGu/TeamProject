@@ -29,19 +29,10 @@ public class ForumService {
     private final ImageUrlUtil imageUrlUtil;
     private final AppProperties appProperties;
 
-    public Integer getCurrentUser(){
-        return principalUtil.getPrincipalUser().getUser().getUserId();
-    }
-
     @Transactional
     public void registerForum(ForumRegisterDto dto) {
 
-        Integer userId = getCurrentUser();
-
         Forum forum = dto.toEntity();
-
-        dto.setUserId(userId);
-
         forumMapper.registerForum(forum);
 
         List<MultipartFile> imageFiles = dto.getForumImages();
@@ -68,7 +59,7 @@ public class ForumService {
     }
 
     public Forum getForumById(Integer forumId) {
-        Integer userId = getCurrentUser();
+        Integer userId = principalUtil.getPrincipalUser().getUser().getUserId();
         Forum forum = forumMapper.findByForumIdAndUserId(forumId, userId);
         List<ForumImg> forumImgs = forumImgMapper.findImgById(forum.getForumId());
         forumImgs.forEach(img -> img.buildImageUrl(imageUrlUtil));
@@ -85,7 +76,7 @@ public class ForumService {
     }
 
     public List<Forum> getForumsByMoimId(Integer moimId) {
-        Integer userId = getCurrentUser();
+        Integer userId = principalUtil.getPrincipalUser().getUser().getUserId();
         List<Forum> forums = forumMapper.findByMoimId(moimId, userId);
 
         for (Forum forum : forums) {
@@ -98,12 +89,13 @@ public class ForumService {
     }
 
     public List<Forum> getForumsByCategoryId(Integer moimId, Integer categoryId) {
-        Integer userId = getCurrentUser();
+        Integer userId = principalUtil.getPrincipalUser().getUser().getUserId();
         return forumMapper.findByCategoryId(moimId, categoryId, userId);
     }
 
+
     public void modifyForum(ForumModifyDto dto){
-        Integer userId = getCurrentUser();
+        Integer userId = principalUtil.getPrincipalUser().getUser().getUserId();
         Integer forumId = dto.getForumId();
         Forum forum = forumMapper.findByForumId(forumId);
         Forum originForum = forumMapper.findByForumIdAndUserId(forumId,userId);
@@ -113,6 +105,7 @@ public class ForumService {
             List<Integer> imgIds = forumImgs.stream()
                     .map(forumImg -> forumImg.getForumImgId())
                     .toList();
+
             forumImgMapper.deleteImg(imgIds);
         }
 
@@ -123,11 +116,13 @@ public class ForumService {
             int seq = 1;
             for (MultipartFile file : imageFiles) {
                 String storedPath = fileService.uploadFile(file, "forum");
+
                 ForumImg forumImg = ForumImg.builder()
                         .forumId(forumId)
                         .seq(seq++)
                         .path(storedPath)
                         .build();
+
                 modifiedImgList.add(forumImg);
             }
         }
@@ -140,25 +135,30 @@ public class ForumService {
             forumMapper.modifyForum(dto.modify(originForum));
             return;
         }
+
         throw new IllegalArgumentException("권한 없음");
     }
 
     public void deleteForum(Integer forumId,Integer moimId) {
-        Integer userId = getCurrentUser();
+        Integer userId = principalUtil.getPrincipalUser().getUser().getUserId();
+
         Forum forum = forumMapper.findByForumId(forumId);
+
         List<ForumImg> forumImgs = forumImgMapper.findImgById(forumId);
+
         List<Integer> imgIds = forumImgs.stream()
                 .map(ForumImg::getForumImgId)
                 .toList();
 
         if (userId.equals(forum.getUser().getUserId()) ||
-                moimRoleMapper.findRoleByUserAndMoimId(userId,moimId).equals("OWNER")){
+            moimRoleMapper.findRoleByUserAndMoimId(userId,moimId).equals("OWNER")){
             if (!imgIds.isEmpty()) {
                 forumImgMapper.deleteImg(imgIds);
             }
             forumMapper.deleteForum(forumId);
             return;
         }
+
         throw new IllegalArgumentException("권한 없음");
     }
 
@@ -167,8 +167,11 @@ public class ForumService {
     }
 
     public Integer registerComment(ForumCommentRegDto dto) {
-        Integer userId = getCurrentUser();
+
+        Integer userId = principalUtil.getPrincipalUser().getUser().getUserId();
+
         forumCommentMapper.insert(dto.toEntity(userId));
+
         return forumCommentMapper.getCountByForumId(dto.getForumId());
     }
 
@@ -180,14 +183,14 @@ public class ForumService {
 
     public void modifyComment (ForumCommentModifyDto modifyDto,Integer forumId) {
         List<ForumComment> forumCommentList = forumCommentMapper.findAllByForumId(forumId);
-        Integer userId = getCurrentUser();
+        Integer userId = principalUtil.getPrincipalUser().getUser().getUserId();
         forumCommentList
                 .stream().filter(comment -> comment.getUserId().equals(userId))
                 .forEach(forumComment -> forumCommentMapper.modifyComment(modifyDto.toEntity(forumComment)));
     }
 
     public void deleteComment(Integer forumCommentId, Integer forumId, Integer moimId) {
-        Integer userId = getCurrentUser();
+        Integer userId = principalUtil.getPrincipalUser().getUser().getUserId();
         ForumComment comment = forumCommentMapper.findByCommentId(forumCommentId);
         MoimRoleDto moimRoleDto = moimRoleMapper.findRoleByUserAndMoimId(userId,moimId);
 
@@ -202,13 +205,15 @@ public class ForumService {
         forumCommentMapper.deleteComment(forumCommentId);
     }
 
+
     public void like(Integer forumId) {
-        Integer userId = getCurrentUser();
+        Integer userId = principalUtil.getPrincipalUser().getUser().getUserId();
         forumLikeMapper.insertLike(forumId, userId);
     }
 
     public void dislike(Integer forumId) {
-        Integer userId = getCurrentUser();
+        Integer userId = principalUtil.getPrincipalUser().getUser().getUserId();
         forumLikeMapper.deleteLike(forumId, userId);
     }
+
 }

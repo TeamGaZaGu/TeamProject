@@ -7,6 +7,8 @@ function UserManagement(props) {
     const [allUser, setAllUser] = useState([]);
     const [loading, setLoading] = useState(true);
 
+    console.log(allUser)
+    // 컴포넌트 마운트 시 사용자 목록 가져오기
     useEffect(() => {
         fetchUsers();
     }, []);
