@@ -78,6 +78,30 @@ public class ForumService {
         return forum;
     }
 
+    public ForumSearchRespDto getForumsByMoimId(ForumSearchReqDto dto) {
+        Integer userId = principalUtil.getPrincipalUser().getUser().getUserId();
+        Integer totalElements = forumMapper.getCountOfOptions(dto.toOption(userId));
+        Integer totalPages = (int) Math.ceil(totalElements.doubleValue() / dto.getSize().doubleValue());
+        List<Forum> foundForums = forumMapper.findAllOfOptions(dto.toOption(userId));
+        boolean isLast = foundForums.size() < dto.getSize();
+
+        for (Forum forum : foundForums) {
+            List<ForumImg> forumImgs = forumImgMapper.findImgById(forum.getForumId());
+            forumImgs.forEach(img -> img.buildImageUrl(imageUrlUtil));
+            forum.setForumImgList(forumImgs);;
+            forum.getUser().buildImageUrl(imageUrlUtil);
+        }
+
+        return ForumSearchRespDto.builder()
+                .contents(foundForums)
+                .totalElements(totalElements)
+                .totalPages(totalPages)
+                .page(dto.getPage())
+                .size(dto.getSize())
+                .isLast(isLast)
+                .build();
+    }
+
     public byte[] getBlob(String url, String imageConfigsName) {
         String fileName = url.replaceAll(appProperties.getImageConfigs().get(imageConfigsName).getPrefix(), "");
         String path = appProperties.getImageConfigs().get(imageConfigsName).getDirPath() + fileName;
@@ -172,10 +196,27 @@ public class ForumService {
         return forumCommentMapper.getCountByForumId(dto.getForumId());
     }
 
-    public List<ForumComment> getCommentsByForumId(Integer forumId) {
+    public ForumCommentSearchRespDto getCommentsByForumId(ForumCommentSearchReqDto dto) {
+        Integer totalElements = forumCommentMapper.getCountOfOptions(dto.toOption());
+        Integer totalPages = (int) Math.ceil(totalElements.doubleValue() / dto.getSize().doubleValue());
+        List<ForumComment> foundForums = forumCommentMapper.findAllOfOptions(dto.toOption());
+        boolean isLast = foundForums.size() < dto.getSize();
+//
+//        for (ForumComment forumComment : foundForums) {
+//            List<ForumImg> forumImgs = forumImgMapper.findImgById(forumComment.getForumId());
+//            forumImgs.forEach(img -> img.buildImageUrl(imageUrlUtil));
+//            forumComment.getUser().getProfileImgPath();;
+//            forumComment.getUser().buildImageUrl(imageUrlUtil);
+//        }
 
-        return forumCommentMapper.findAllByForumId(forumId);
-
+        return ForumCommentSearchRespDto.builder()
+                .contents(foundForums)
+                .totalElements(totalElements)
+                .totalPages(totalPages)
+                .page(dto.getPage())
+                .size(dto.getSize())
+                .isLast(isLast)
+                .build();
     }
 
     public void modifyComment (ForumCommentModifyDto modifyDto,Integer forumId) {
