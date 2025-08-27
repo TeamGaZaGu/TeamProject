@@ -45,52 +45,63 @@ function ChattingPage({ moimId }) {
     fetchMembers();
   }, [moimIdNum]);
 
+  // WebSocket 연결
   useEffect(() => {
-    const stompClient = new Client({
+    const client = new Client({
       brokerURL: undefined,
-      webSocketFactory: () =>
-        new SockJS(
-          `http://192.168.2.17:8080/ws?access_token=${localStorage.getItem(
-            'accessToken'
-          )}&moimId=${moimIdNum}&userId=${userObj.userId}`
-        ),
+      webSocketFactory: () => new SockJS('http://192.168.2.17:8080/ws'),
       debug: (str) => console.log(str),
       reconnectDelay: 5000,
+      connectHeaders: {
+        moimId: moimIdNum.toString(),
+        userId: userObj.userId.toString(),
+      },
     });
 
-    stompClient.onConnect = () => {
+    client.onConnect = () => {
       console.log('✅ WebSocket connected');
 
       // 메시지 구독
-      stompClient.subscribe(`/sub/chat/${moimIdNum}`, (msg) => {
+      client.subscribe(`/sub/chat/${moimIdNum}`, (msg) => {
         const chatMessage = JSON.parse(msg.body);
         setMessages((prev) => [...prev, chatMessage]);
         messageEndRef.current?.scrollIntoView({ behavior: 'smooth' });
       });
 
       // 온라인 유저 구독
-      stompClient.subscribe(`/sub/chat/${moimIdNum}/online`, (msg) => {
+      client.subscribe(`/sub/chat/${moimIdNum}/online`, (msg) => {
         const onlineData = JSON.parse(msg.body);
         setOnlineUsers(onlineData.map((id) => Number(id)));
         console.log('온라인 유저:', onlineData);
       });
 
-      stompClientRef.current.publish({
-        destination: `/pub/chat/${moimIdNum}/online`,
-      });
+      // 변경: 연결 직후 온라인 신호를 보낼 때 "실제 연결됨"을 확인하여 publish 오류 방지
+      if (stompClientRef.current && stompClientRef.current.connected) {
+        stompClientRef.current.publish({
+          destination: `/pub/chat/${moimIdNum}/online`,
+        });
+      }
     };
 
-    stompClient.activate();
-    stompClientRef.current = stompClient;
+    // 변경: ref에 먼저 담아두고 activate 호출
+    stompClientRef.current = client;
+    client.activate();
 
     return () => {
-      stompClientRef.current.publish({
-        destination: `/pub/chat/${moimIdNum}/${userObj.userId}/offline`,
-      });
-      stompClient.deactivate();
-      stompClientRef.current.publish({
-        destination: `/pub/chat/${moimIdNum}/online`,
-      });
+      // 변경: 정리 순서 고정 - 오프라인 전송 → 잠깐 대기 → deactivate (전송 누락/유령 온라인 방지)
+      if (stompClientRef.current && stompClientRef.current.connected) {
+        try {
+          stompClientRef.current.publish({
+            destination: `/pub/chat/${moimIdNum}/${userObj.userId}/offline`,
+          });
+          setTimeout(() => {
+            stompClientRef.current?.deactivate();
+          }, 100); 
+        } catch (error) {
+          console.log('STOMP cleanup error:', error);
+          stompClientRef.current?.deactivate(); // 변경: 오류가 나도 연결은 반드시 종료
+        }
+      }
     };
   }, [moimIdNum, userObj.userId]);
 
@@ -116,12 +127,6 @@ function ChattingPage({ moimId }) {
     setInput('');
   };
 
-  // 유저 ID로 프로필 이미지 찾기
-  const findUserProfile = (nickName) => {
-    const member = members.find((m) => m.nickName === nickName);
-    return member ? `${member.profileImgPath}` : null;
-  };
-
   return (
     <div css={s.PageContainer}>
       {/* 유저 리스트 */}
@@ -129,15 +134,11 @@ function ChattingPage({ moimId }) {
         {members.map((member) => {
           const isMe = member.userId === userObj.userId;
           const isOnline = onlineUsers.includes(member.userId);
-          const circleColor = isMe ? 'blue' : isOnline ? 'green' : 'gray';
+          const circleColor = isMe ? 'red' : isOnline ? 'green' : 'gray';
 
           return (
             <div key={member.userId} css={s.UserItem}>
-              <img
-                src={`${member.profileImgPath}`}
-                alt="프로필"
-                css={s.UserProfileImage}
-              />
+              <img src={member.profileImg} alt="프로필" css={s.UserProfileImage} />
               <div css={s.UserDetails}>
                 <span>{member.nickName}</span>
                 <span css={s.RoleTag}>
@@ -146,11 +147,10 @@ function ChattingPage({ moimId }) {
               </div>
               <div
                 style={{
-                  width: 12,
-                  height: 12,
+                  width: 10,
+                  height: 10,
                   borderRadius: '50%',
                   background: circleColor,
-                  marginLeft: 'auto',
                 }}
               />
             </div>
@@ -163,47 +163,16 @@ function ChattingPage({ moimId }) {
         <div css={s.MessageList}>
           {messages.map((msg, idx) => {
             const isCurrentUser = msg.userNickName === userObj.nickName;
-
-            if (isCurrentUser) {
-              // 내 메시지 (닉네임/프로필 없음)
-              return (
-                <div key={idx} css={s.MyMessageWrapper}>
-                  <div css={s.MyMessageItem}>
-                    {msg.chattingContent}
-                    {msg.chattedAt && (
-                      <span css={s.Timestamp}>
-                        {new Date(msg.chattedAt).toLocaleTimeString()}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              );
-            } else {
-              // 다른 유저 메시지 (닉네임 위, 아래 프로필+메시지)
-              return (
-                <div key={idx} style={{ marginBottom: "12px" }}>
-                  {/* 닉네임 한 줄 위에 */}
-                  <div style={{ fontSize: "12px", marginLeft: "32px", marginBottom: "2px", color: "#444" }}>
-                    {msg.userNickName}
-                  </div>
-                  <div css={s.OtherMessageWrapper}>
-                    <img
-                      src={findUserProfile(msg.userNickName)}
-                      alt="프로필"
-                      css={s.SmallProfileImage}
-                    />
-                    <div css={s.OtherUserMessage}>
-                      {msg.chattingContent}
-                      {msg.chattedAt && (
-                        <span css={s.Timestamp}>
-                          {new Date(msg.chattedAt).toLocaleTimeString()}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              );
-            }
+            return (
+              <div key={idx} css={isCurrentUser ? s.MyMessageItem : s.OtherUserMessage}>
+                <strong>{msg.userNickName}:</strong> {msg.chattingContent}
+                {msg.chattedAt && (
+                  <span css={s.Timestamp}>
+                    ({new Date(msg.chattedAt).toLocaleTimeString()})
+                  </span>
+                )}
+              </div>
+            );
           })}
           <div ref={messageEndRef}></div>
         </div>
@@ -215,7 +184,7 @@ function ChattingPage({ moimId }) {
             onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
             placeholder="메시지를 입력하세요"
           />
-          <button onClick={sendMessage}>전송</button>
+        <button onClick={sendMessage}>전송</button>
         </div>
       </div>
     </div>
