@@ -19,9 +19,17 @@ public class ChatOnlineUsersState {
 
     public void removeOnlineUserByMoimId(Integer moimId, Integer userId) {
         Set<Integer> onlineUserSet = onlineUsersByMoim.get(moimId);
+
+        if (onlineUserSet == null) {
+            return;
+        }
+
         onlineUserSet.remove(userId);
-        onlineUsersByMoim.put(moimId, onlineUserSet);
-        System.out.println("!!!!");
+
+        if (onlineUserSet.isEmpty()) {
+            onlineUsersByMoim.remove(moimId);
+        }
+
         System.out.println(onlineUsersByMoim);
     }
 
