@@ -33,7 +33,7 @@ export const headerStyle = css`
 
 // 콘텐츠 래퍼
 export const contentWrapperStyle = css`
-  max-width: 1200px;
+  max-width: 1600px;
   margin: 0 auto;
   padding: 0 20px;
   

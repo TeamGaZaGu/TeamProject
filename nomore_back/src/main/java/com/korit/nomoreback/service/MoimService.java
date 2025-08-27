@@ -178,6 +178,7 @@ public class MoimService {
     }
 
     public List<Moim> myMoimList(Integer userId) {
-        return moimMapper.myMoimList(userId);
+        List<Moim> foundMoims = moimMapper.myMoimList(userId).stream().map(moim -> moim.buildImageUrl(imageUrlUtil)).collect(Collectors.toList());
+        return foundMoims;
     }
 }

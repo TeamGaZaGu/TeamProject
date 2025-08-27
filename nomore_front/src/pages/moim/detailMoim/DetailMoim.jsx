@@ -2,7 +2,7 @@
 import * as s from './styles.js';
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { reqDeleteMoim, reqExitMoim, reqJoinMoim, reqMoimBanUserList, reqMoimUserList, reqSelectMoim } from '../../../api/moimApi';
+import { reqDeleteMoim, reqExitMoim, reqJoinMoim, reqMoimBanUserList, reqMoimUserList, reqSelectMoim } from '../../../api/moimApi.js';
 import useCategoryQuery from '../../../queries/useCategoryQuery.jsx';
 import { IoChatbubbleEllipses, IoChatbubbleEllipsesOutline, IoClipboard, IoClipboardOutline, IoClose } from 'react-icons/io5';
 import { RiHome7Fill, RiHome7Line } from 'react-icons/ri';
@@ -18,8 +18,9 @@ import ChattingPage from '../../chatting/ChattingPage.jsx';
 import { FcGoogle } from 'react-icons/fc';
 import { SiKakaotalk } from 'react-icons/si';
 import toast, { Toaster } from 'react-hot-toast';
+import Oauth2 from '../../../Oauth2/Oauth2.jsx';
 
-function DescriptionSuggestPage(props) {
+function DetailMoim(props) {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
     const [searchParam] = useSearchParams();
@@ -51,7 +52,9 @@ function DescriptionSuggestPage(props) {
 
     // 포럼 관련 데이터
     const forumQuery = useForumQuery(moimId);
-    const respForums = forumQuery?.data?.data || []; 
+    const respForums = forumQuery?.data?.data || [];
+    const allImages = respForums.flatMap(forum => forum.forumImgList || []);
+    console.log(respForums)
 
     const forumCategoryQuery = useForumCategoryQuery();
     const respForumCategories = forumCategoryQuery?.data?.data || [];
@@ -207,7 +210,6 @@ function DescriptionSuggestPage(props) {
         }
     }
 
-    // 현재 사용자가 모임에 가입되어 있는지 확인
     const isUserJoined = userList.find(user => user.userId === userId);
     return (
         <div css={s.container}>
@@ -262,55 +264,66 @@ function DescriptionSuggestPage(props) {
             
             {/* Home 탭 콘텐츠 */}
             {activeTab === "home" && (
-                <div css={s.mainContent}>
-                    {/* 모임 기본 정보 */}
-                    <div css={s.moimInfo}>
-                        <img src={`${moim.moimImgPath}`} alt="모임 썸네일" />
-                        <div css={s.moimTextInfo}>
-                            <h1 css={s.moimTitle}>{moim.title}</h1>
-                            <div css={s.moimMeta}>
-                                <span>{getCategory?.categoryEmoji}{getCategory?.categoryName}</span> · 
-                                <span>{moim.districtName}</span> · 
-                                <span>{moim.memberCount}/{moim.maxMember}</span>
+                <div css={s.homeLayout}>    
+                    <div css={s.mainContent}>
+                        {/* 모임 기본 정보 */}
+                        <div css={s.moimInfo}>
+                            <img src={`${moim.moimImgPath}`} alt="모임 썸네일" />
+                            <div css={s.moimTextInfo}>
+                                <h1 css={s.moimTitle}>{moim.title}</h1>
+                                <div css={s.moimMeta}>
+                                    <span>{getCategory?.categoryEmoji}{getCategory?.categoryName}</span> · 
+                                    <span>{moim.districtName}</span> · 
+                                    <span>{moim.memberCount}/{moim.maxMember}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* 모임 소개 */}
+                        <div css={s.section}>
+                            <h2 css={s.sectionTitle}>모임 소개</h2>
+                            <div css={s.description}>
+                                <p>{moim.discription}</p>
+                            </div>
+                        </div>
+
+                        {/* 모임 멤버 */}
+                        <div css={s.section}>
+                            <h2 css={s.sectionTitle}>모임 멤버</h2>
+                            <div css={s.memberSection}>
+                                {userList?.map((user) => {
+                                    const roleEmoji = user.moimRole === "OWNER" ? "👑" : "👤";
+                                    const isBlocked = userBlockList?.includes(user.userId);
+
+                                    return (
+                                        <div key={user.userId} css={s.memberCard} onClick={() => handleOpenUserModal(user.userId)}>
+                                            <img
+                                                src={`${user.profileImgPath}`}
+                                                alt="프로필"
+                                                css={s.profileImage}
+                                            /> 
+                                            <div css={s.defaultAvatar}>{roleEmoji}</div>
+                                            <div css={s.memberInfo}>
+                                                <span css={s.memberRole}>{user.nickName}</span>
+                                                <span css={s.memberName}>{user.introduction}</span>
+                                            </div>
+                                            {isBlocked && (
+                                                <div css={s.blockedUserText}>차단한 유저</div>
+                                            )}
+                                        </div>
+                                    );
+                                })}
                             </div>
                         </div>
                     </div>
-
-                    {/* 모임 소개 */}
-                    <div css={s.section}>
-                        <h2 css={s.sectionTitle}>모임 소개</h2>
-                        <div css={s.description}>
-                            <p>{moim.discription}</p>
-                        </div>
-                    </div>
-
-                    {/* 모임 멤버 */}
-                    <div css={s.section}>
-                        <h2 css={s.sectionTitle}>모임 멤버</h2>
-                        <div css={s.memberSection}>
-                            {userList?.map((user) => {
-                                const roleEmoji = user.moimRole === "OWNER" ? "👑" : "👤";
-                                const isBlocked = userBlockList?.includes(user.userId);
-
-                                return (
-                                    <div key={user.userId} css={s.memberCard} onClick={() => handleOpenUserModal(user.userId)}>
-                                        <img
-                                            src={`${user.profileImgPath}`}
-                                            alt="프로필"
-                                            css={s.profileImage}
-                                        /> 
-                                        <div css={s.defaultAvatar}>{roleEmoji}</div>
-                                        <div css={s.memberInfo}>
-                                            <span css={s.memberRole}>{user.nickName}</span>
-                                            <span css={s.memberName}>{user.introduction}</span>
-                                        </div>
-                                        {isBlocked && (
-                                            <div css={s.blockedUserText}>차단한 유저</div>
-                                        )}
-                                    </div>
-                                );
-                            })}
-                        </div>
+                    <div css={s.rightSidebar}>
+                        {allImages.length > 0 ? (
+                            allImages.slice(0, 15).map((img) => (
+                                <img key={img.forumImgId} src={img.path} alt="forum image" />
+                            ))
+                        ) : (
+                            <p>등록된 이미지가 없습니다</p>
+                        )}
                     </div>
                 </div>
             )}
@@ -340,21 +353,7 @@ function DescriptionSuggestPage(props) {
                     
                     {/* 포럼 목록 */}
                     <div css={s.forumGrid}>
-                        {userId === undefined ? (
-                            // 비로그인 사용자
-                            <div css={s.loginContainer}>
-                                <h2>로그인이 필요한 페이지입니다</h2>
-                                <div css={s.loginBox}>
-                                    <button css={s.googleLogin} onClick={() => { window.location.href = "http://localhost:8080/oauth2/authorization/google"; }}>
-                                        <FcGoogle />구글 로그인
-                                    </button>
-                                    <button css={s.kakaoLogin} onClick={() => { window.location.href = "http://localhost:8080/oauth2/authorization/kakao"; }}>
-                                        <SiKakaotalk />카카오 로그인
-                                    </button>
-                                </div>
-                            </div>
-                        ) : filteredForums.length === 0 ? (
-                            // 게시글이 없는 경우
+                        {filteredForums.length === 0 ? (
                             <div css={s.register}>
                                 <h3>게시글을 등록해주세요</h3>
                             </div>
@@ -475,4 +474,4 @@ function DescriptionSuggestPage(props) {
     );
 }
 
-export default DescriptionSuggestPage;
+export default DetailMoim;

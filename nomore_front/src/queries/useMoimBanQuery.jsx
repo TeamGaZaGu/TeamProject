@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
     reqMoimBanUser,
     reqMoimUnbanUser,
-    reqCheckMoimBanStatus,
+    reqFindMoimBanStatus,
     reqMoimBanList,
 } from "../api/moimBanApi";
 
@@ -15,10 +15,10 @@ export const useGetMoimBannedUsersQuery = (moimId) =>
         staleTime: 1000 * 60 * 5,
     });
 
-export const useCheckMoimBanStatusQuery = (moimId, userId) =>
+export const useFindMoimBanStatusQuery = (moimId, userId) =>
     useQuery({
         queryKey: ["moimBanStatus", moimId, userId],
-        queryFn: () => reqCheckMoimBanStatus(moimId, userId),
+        queryFn: () => reqFindMoimBanStatus(moimId, userId),
         select: (res) => res?.data,
         enabled: !!moimId && !!userId,
     });

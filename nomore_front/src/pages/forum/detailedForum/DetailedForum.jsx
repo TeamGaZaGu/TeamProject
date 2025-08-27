@@ -10,6 +10,7 @@ import usePrincipalQuery from '../../../queries/usePrincipalQuery.jsx';
 import { SiKakaotalk } from 'react-icons/si';
 import { FcGoogle } from 'react-icons/fc';
 import { X } from 'lucide-react';
+import Oauth2 from '../../../Oauth2/Oauth2.jsx';
 
 function DetailedForum(props) {
     const navigate = useNavigate();
@@ -24,6 +25,7 @@ function DetailedForum(props) {
     const [ commentValue, setCommentValue ] = useState("");
     const [ recomment, setRecomment ] = useState(null);
     console.log("recomment",recomment)
+    console.log(comments)
     
     const [ forum, setForum ] = useState([]);
     console.log(forum)
@@ -256,14 +258,7 @@ function DetailedForum(props) {
         <div css={s.loginContainer}>
             <h2>로그인이 필요한 페이지입니다</h2>
             <div css={s.loginBox}>
-            <button css={s.googleLogin} onClick={() => { window.location.href = "http://localhost:8080/oauth2/authorization/google"; }}>
-                <FcGoogle />
-                구글 로그인
-            </button>
-            <button css={s.kakaoLogin} onClick={() => { window.location.href = "http://localhost:8080/oauth2/authorization/kakao"; }}>
-                <SiKakaotalk />
-                카카오 로그인
-            </button>
+                <Oauth2 />
             </div>
         </div>
     );

@@ -283,17 +283,6 @@ export const loginContainer = css`
   background-color: #ffffff;
 `;
 
-export const loginBox = css`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 30px;
-  border-radius: 15px;
-  background-color: #d66df0;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-`;
-
 export const googleLogin = css`
   display: flex;
   align-items: center;

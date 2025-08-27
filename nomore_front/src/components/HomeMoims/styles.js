@@ -1,18 +1,14 @@
 import { css } from '@emotion/react';
-
-// 카테고리 컨테이너 - 배경색 제거하여 통일감 조성
 export const categoryContainerStyle = css`
   margin-bottom: 32px;
-  /* background 제거로 페이지 통일감 향상 */
 `;
 
-// 카테고리 헤더 - 왼쪽 끝까지 사용
 export const categoryHeaderStyle = css`
   font-size: 24px;
   font-weight: 700;
   color: #333333;
   margin-bottom: 20px;
-  padding: 0; /* 패딩 완전 제거 */
+  padding: 0; 
   display: flex;
   align-items: center;
   gap: 8px;
@@ -22,8 +18,6 @@ export const categoryHeaderStyle = css`
     margin-bottom: 16px;
   }
 `;
-
-// styles.js에 추가할 스타일들
 
 export const countStyle = css`
     color: #666;

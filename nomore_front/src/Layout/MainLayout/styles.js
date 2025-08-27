@@ -4,7 +4,13 @@ export const containerStyle = css`
   display: flex;
   flex-direction: column;
   height: 100vh;
-  overflow: hidden;
+  flex-shrink: 0;
+  overflow: auto;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
 `;
 
 export const headerStyle = css`
@@ -18,47 +24,21 @@ export const body = css`
 `;
 
 export const sidebarStyle = css`
-  flex-shrink: 0; /* 사이드바 크기 고정 */
-  overflow-y: auto; /* 사이드바 독립 스크롤 */
+  overflow-y: auto; 
   
-  /* 스크롤바 스타일링 */
+   scrollbar-width: none;
+
   &::-webkit-scrollbar {
-    width: 6px;
-  }
-  
-  &::-webkit-scrollbar-track {
-    background: #f1f1f1;
-  }
-  
-  &::-webkit-scrollbar-thumb {
-    background: #c1c1c1;
-    border-radius: 3px;
-    
-    &:hover {
-      background: #a8a8a8;
-    }
+    display: none; 
   }
 `;
 
 export const main = css`
   flex: 1;
-  overflow-y: auto; /* 메인 영역 독립 스크롤 */
-  
-  /* 스크롤바 스타일링 */
+  overflow-y: auto;
+  scrollbar-width: none;
+
   &::-webkit-scrollbar {
-    width: 6px;
-  }
-  
-  &::-webkit-scrollbar-track {
-    background: #f1f1f1;
-  }
-  
-  &::-webkit-scrollbar-thumb {
-    background: #c1c1c1;
-    border-radius: 3px;
-    
-    &:hover {
-      background: #a8a8a8;
-    }
+    display: none; 
   }
 `;

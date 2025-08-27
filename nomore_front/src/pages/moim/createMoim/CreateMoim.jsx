@@ -1,14 +1,14 @@
 /** @jsxImportSource @emotion/react */
 import { useNavigate } from 'react-router-dom';
 import { reqDistrict } from '../../../api/searchApi';
-import { reqCreateSuggestMoim } from '../../../api/moimApi';
+import { reqCreateMoim } from '../../../api/moimApi';
 import useCategoryQuery from '../../../queries/useCategoryQuery';
 import usePrincipalQuery from '../../../queries/usePrincipalQuery';
 import * as s from './styles';
 import React, { useEffect, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 
-function CreateSuggestpage(props) {
+function CreateMoim(props) {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
     const principalQuery = usePrincipalQuery();
@@ -128,7 +128,7 @@ function CreateSuggestpage(props) {
         }));
     }
 
-    const handleCreateSuggestMoimOnClick = async () => {
+    const handleCreateMoimOnClick = async () => {
         const { title, maxMembers, districtId, categoryId } = inputValue;
 
         if (!title || !maxMembers || !districtId || !categoryId) {
@@ -154,7 +154,7 @@ function CreateSuggestpage(props) {
         }
 
         try {
-            await reqCreateSuggestMoim(formData);
+            await reqCreateMoim(formData);
             alert("모임 생성 성공!")
             queryClient.invalidateQueries(["moimpage"])
             navigate("/")
@@ -263,9 +263,9 @@ function CreateSuggestpage(props) {
                     )}
                 </div>
             </div>
-            <button css={s.button} onClick={handleCreateSuggestMoimOnClick}>모임 만들기</button>
+            <button css={s.button} onClick={handleCreateMoimOnClick}>모임 만들기</button>
         </div>
     );
 }
 
-export default CreateSuggestpage;
+export default CreateMoim;

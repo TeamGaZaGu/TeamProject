@@ -6,7 +6,7 @@ import { reqModifyMoim, reqSelectMoim } from '../../../api/moimApi';
 import useCategoryQuery from '../../../queries/useCategoryQuery';
 import { reqDistrict } from '../../../api/searchApi';
 
-function ModifySuggestMoim(props) {
+function ModifyMoim(props) {
     const navigate = useNavigate();
     const [ searchParam ] = useSearchParams();
     const moimId = searchParam.get("moimId");
@@ -163,7 +163,7 @@ function ModifySuggestMoim(props) {
         }));
     }
 
-    const handleCreateSuggestMoimOnClick = async () => {
+    const handleCreateMoimOnClick = async () => {
     const { title, maxMember, districtId, categoryId, discription, moimImgFile } = inputValue;
 
     const formData = new FormData();
@@ -286,9 +286,9 @@ function ModifySuggestMoim(props) {
                         )}
                     </div>
                 </div>
-                <button css={s.button} onClick={handleCreateSuggestMoimOnClick}>모임 수정</button>
+                <button css={s.button} onClick={handleCreateMoimOnClick}>모임 수정</button>
             </div>
     )};
 }
 
-export default ModifySuggestMoim;
+export default ModifyMoim;

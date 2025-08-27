@@ -22,7 +22,8 @@ function Mypage(props) {
 
     const [myMoims, setMyMoims] = useState([]);
 
-    // 내가 참여한 모임 가져오기
+    console.log(myMoims)
+
     useEffect(() => {
         if (user?.userId) {
             reqMyMoimList(user.userId)
@@ -221,7 +222,6 @@ function Mypage(props) {
                 </div>
             </div>
 
-            {/* 오른쪽 섹션 - 내가 참여한 모임 */}
             <div css={s.rightSection}>
                 <h2 css={s.moimHeader}>내가 참여한 모임</h2>
                 {myMoims.length === 0 ? (
