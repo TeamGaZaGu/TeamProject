@@ -45,13 +45,15 @@ function DescriptionSuggestPage(props) {
     const [customReason, setCustomReason] = useState('');
     
     // React Query hooks
-    const categoryQuery = useCategoryQuery();
-    const categories = categoryQuery?.data?.data || [];
-    const getCategory = categories.find(category => category.categoryId === moim.categoryId);
-    
     const principalQuery = usePrincipalQuery();
     const userId = principalQuery?.data?.data?.user?.userId;
     const userRole = principalQuery?.data?.data?.user?.userRole;
+    const moimRole = userList.find( user => user.userId === userId ) ?.moimRole;
+
+    
+    const categoryQuery = useCategoryQuery();
+    const categories = categoryQuery?.data?.data || [];
+    const getCategory = categories.find(category => category.categoryId === moim.categoryId);
     
     const userBlockListQuery = useUserBlockListQuery({userId});
     const userBlockList = userBlockListQuery?.data?.data?.body;
@@ -81,6 +83,41 @@ function DescriptionSuggestPage(props) {
     const filteredForums = forumCategory === "전체"
         ? respForums
         : respForums.filter(forum => forum.forumCategory.forumCategoryName === forumCategory);
+
+    // 권한 이양 함수
+    const handleTransferOwner = async (targetUser) => {
+        const isConfirmed = window.confirm(
+            `"${targetUser.nickName}"님에게 모임장 권한을 넘기시겠습니까?\n권한을 넘기면 되돌릴 수 없습니다.`
+        );
+        
+        if (!isConfirmed) return;
+
+        try {
+            const response = await fetch(`http://localhost:8080/api/moim/transfer-ownership/${moimId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ 
+                    newOwnerId: targetUser.userId,
+                    currentUserId: userId 
+                })
+            });
+
+            if (response.ok) {
+                alert('권한이 성공적으로 이양되었습니다.');
+                await fetchMoimUserList();
+                await fetchMoim();
+                handleCloseModal();
+            } else {
+                const errorText = await response.text();
+                alert(errorText);
+            }
+        } catch (error) {
+            console.error('권한 이양 실패:', error);
+            alert('권한 이양에 실패했습니다.');
+        }
+    };
 
     const fetchMoim = async () => {
         try {
@@ -168,13 +205,13 @@ function DescriptionSuggestPage(props) {
     }
 
     // 사용자 프로필 모달 열기
-    const handleOpenUserModal = (targetUserId) => {
+    const handleMemberClick = (targetUserId) => {
         const user = userList.find(u => u.userId === targetUserId);
         if (user) {
             setSelectedUser(user);
             setIsModalOpen(true);
         }
-    }
+    };
 
     // 모달 닫기
     const handleCloseModal = () => {
@@ -288,7 +325,7 @@ function DescriptionSuggestPage(props) {
 
     // 현재 사용자가 모임에 가입되어 있는지 확인
     const isUserJoined = userList.find(user => user.userId === userId);
-    
+
     return (
         <div css={s.container}>
             {/* 탭 헤더 */}
@@ -324,7 +361,7 @@ function DescriptionSuggestPage(props) {
                             <button css={s.Transaction} onClick={handleNavigateToEdit}><FaPen />수정</button>
                             <button css={s.Transaction} onClick={handleDeleteMoim}><FaTrashAlt />삭제</button>
                         </>
-                    ) : userId === moim?.userId ? (
+                    ) : moimRole === "OWNER" ? (
                         // 모임 생성자인 경우
                         <>
                             <button css={s.Transaction} onClick={handleNavigateToEdit}><FaPen />수정</button>
@@ -376,7 +413,11 @@ function DescriptionSuggestPage(props) {
                                 const isBlocked = userBlockList?.includes(user.userId);
 
                                 return (
-                                    <div key={user.userId} css={s.memberCard} onClick={() => handleOpenUserModal(user.userId)}>
+                                    <div 
+                                        key={user.userId} 
+                                        css={s.memberCard} 
+                                        onClick={() => handleMemberClick(user.userId)}
+                                    >
                                         <img
                                             src={`${user.profileImgPath}`}
                                             alt="프로필"
@@ -489,12 +530,12 @@ function DescriptionSuggestPage(props) {
             )}
             
             {/* 채팅 탭 콘텐츠 */}
-            {activeTab === "chat" && 
-                moimId ? (
+             {activeTab === "chat" && 
+                moimId ? ( userList.find(user => user.userId === userId) ?
                     <ChattingPage 
                         moimId={Number(moimId)}
                         userId={principalQuery?.data?.data?.user?.nickName}
-                    />
+                    /> : toast.error("모임 가입이 필요한 페이지입니다")
                 ) : (
                     null
                 )}
@@ -541,9 +582,24 @@ function DescriptionSuggestPage(props) {
                                         <p css={s.userIntroduction}>{selectedUser.introduction}</p>
                                     )}
                                     <div css={s.modalButtonContainer}>
-                                        <button onClick={() => handleToggleUserBlock(selectedUser.userId, selectedUser.nickName)}>
-                                            {isBlockedUser ? '차단 해제' : '차단하기'}
-                                        </button>
+                                        {selectedUser.userId !== userId && (
+                                            <button onClick={() => handleToggleUserBlock(selectedUser.userId, selectedUser.nickName)}>
+                                                {isBlockedUser ? '차단 해제' : '차단하기'}
+                                            </button>
+                                        )}
+                                        
+                                        {/* 현재 유저의 모임 내 역할을 다시 확인 */}
+                                        {(() => {
+                                            const currentUserInMoim = userList.find(u => u.userId === userId);
+                                            const isCurrentUserOwner = currentUserInMoim?.moimRole === "OWNER";
+                                            
+                                            return isCurrentUserOwner && selectedUser.moimRole === "MEMBER" && selectedUser.userId !== userId && (
+                                                <button css={s.transferOwnershipButton} onClick={() => handleTransferOwner(selectedUser)}>
+                                                    👑 모임장 권한 넘기기
+                                                </button>
+                                            );
+                                        })()}
+                                        
                                         {/* 방장이고 자신이 아닌 경우만 강퇴 버튼 표시 */}
                                         {userList.find(u => u.userId === userId)?.moimRole === "OWNER" && 
                                          selectedUser.userId !== userId && (

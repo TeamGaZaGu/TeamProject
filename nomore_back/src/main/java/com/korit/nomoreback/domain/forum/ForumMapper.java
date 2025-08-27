@@ -24,4 +24,5 @@ public interface ForumMapper {
     List<ForumImg> findImgsByForumId(@Param("forumId") Integer forumId);
 
     List<ForumCategory> getFourumCategories();
+    List<Forum> findAllByMoimId(@Param("moimId") Integer moimId);
 }

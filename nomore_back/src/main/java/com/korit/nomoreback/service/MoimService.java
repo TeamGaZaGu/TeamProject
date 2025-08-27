@@ -24,10 +24,19 @@ public class MoimService {
     private final FileService fileService;
     private final ImageUrlUtil imageUrlUtil;
 
+    public Integer getCurrentUser() {
+        return principalUtil.getPrincipalUser().getUser().getUserId();
+    }
+
+    public String getCurrentUserRole() {
+        return principalUtil.getPrincipalUser().getUser().getUserRole();
+    }
+
     public MoimCategoryRespDto categoryMoim(MoimCategoryReqDto dto) {
         Integer totalElements = moimMapper.getCountOfOptions(dto.toOption());
         Integer totalPages = (int) Math.ceil(totalElements.doubleValue() / dto.getSize().doubleValue());
-        List<Moim> foundMoims = moimMapper.findAllOfOptions(dto.toOption()).stream().map(moim -> moim.buildImageUrl(imageUrlUtil)).collect(Collectors.toList());
+        List<Moim> foundMoims =
+                moimMapper.findAllOfOptions(dto.toOption()).stream().map(moim -> moim.buildImageUrl(imageUrlUtil)).collect(Collectors.toList());
         boolean isLast = foundMoims.size() < dto.getSize();
 
         return MoimCategoryRespDto.builder()
@@ -38,15 +47,17 @@ public class MoimService {
                 .size(dto.getSize())
                 .isLast(isLast)
                 .build();
-
     }
-
     public void createMoim(MoimCreateDto dto) {
 
         Moim moimEntity = dto.toEntity();
 
         String moimImgPath = fileService.uploadFile(dto.getMoimImg(), "moim");
         moimEntity.setMoimImgPath(moimImgPath);
+
+        Integer userId = getCurrentUser();
+
+        moimEntity.setUserId(userId);
 
         moimMapper.createMoim(moimEntity);
 
@@ -58,7 +69,9 @@ public class MoimService {
     }
 
 
-    public void joinMoim(Integer moimId, Integer userId) {
+    public void joinMoim(Integer moimId) {
+
+        Integer userId = getCurrentUser();
 
         Moim moim = moimMapper.findByMoimId(moimId);
         if (moim == null){
@@ -83,7 +96,18 @@ public class MoimService {
         moimMapper.increaseMoimCount(moimId);
     }
 
-    public void exitMoim(Integer moimId, Integer userId) {
+    public void exitMoim(Integer moimId) {
+
+        Integer userId = getCurrentUser();
+
+        MoimRoleDto isOwner = moimRoleMapper.findRoleByUserAndMoimId(userId,moimId);
+
+        if ("OWNER".equals(isOwner.getMoimRole())){
+            System.out.println("모임 관리자는 탈퇴 불가능");
+            return;
+        }
+
+        moimMapper.moimMemberDiscount(moimId);
         moimRoleMapper.exitMoim(moimId, userId);
     }
 
@@ -92,12 +116,10 @@ public class MoimService {
         return findMoim;
     }
 
-
-
-
-    public void modifyMoim(MoimModifyDto modifyDto, Integer userId) {
+    public void modifyMoim(MoimModifyDto modifyDto) {
+        Integer userId = getCurrentUser();
         MoimRoleDto roleDto = moimRoleMapper.findRoleByUserAndMoimId(userId, modifyDto.getMoimId());
-        String userRole =  principalUtil.getPrincipalUser().getUser().getUserRole();
+        String userRole = getCurrentUserRole();
 
         if ("ROLE_ADMIN".equals(userRole)) {
             Moim originMoim = moimMapper.findByMoimId(modifyDto.getMoimId());
@@ -132,15 +154,14 @@ public class MoimService {
                 String savedFileName = fileService.uploadFile(newImgFile, "moim");
                 originMoim.setMoimImgPath(savedFileName); // 저장된 파일명만 넣기
             }
-
             Moim moim = modifyDto.modify(originMoim);
             moimMapper.updateMoim(moim);
         }
     }
 
     public void deleteMoimById(Integer moimId) {
-        Integer userId = principalUtil.getPrincipalUser().getUser().getUserId();
-        String userRole =  principalUtil.getPrincipalUser().getUser().getUserRole();
+        Integer userId = getCurrentUser();
+        String userRole = getCurrentUserRole();
         MoimRoleDto roleDto = moimRoleMapper.findRoleByUserAndMoimId(userId, moimId);
 
         if ("ROLE_ADMIN".equals(userRole)) {
@@ -157,9 +178,8 @@ public class MoimService {
         }
     }
 
-
     public List<Moim> findMoimByCategoryIdInUserId() {
-        Integer userId = principalUtil.getPrincipalUser().getUser().getUserId();
+        Integer userId = getCurrentUser();
 
         if (userId == null) {
             throw new IllegalArgumentException("로그인 필요");
