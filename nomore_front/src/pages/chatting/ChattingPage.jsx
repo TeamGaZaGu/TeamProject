@@ -47,9 +47,9 @@ function ChattingPage({ moimId }) {
 
   // WebSocket 연결
   useEffect(() => {
-    const stompClient = new Client({
+    const client = new Client({
       brokerURL: undefined,
-      webSocketFactory: () => new SockJS(`http://192.168.2.17:8080/ws`),
+      webSocketFactory: () => new SockJS('http://192.168.2.17:8080/ws'),
       debug: (str) => console.log(str),
       reconnectDelay: 5000,
       connectHeaders: {
@@ -58,37 +58,50 @@ function ChattingPage({ moimId }) {
       },
     });
 
-    stompClient.onConnect = () => {
+    client.onConnect = () => {
       console.log('✅ WebSocket connected');
 
       // 메시지 구독
-      stompClient.subscribe(`/sub/chat/${moimIdNum}`, (msg) => {
+      client.subscribe(`/sub/chat/${moimIdNum}`, (msg) => {
         const chatMessage = JSON.parse(msg.body);
         setMessages((prev) => [...prev, chatMessage]);
         messageEndRef.current?.scrollIntoView({ behavior: 'smooth' });
       });
 
       // 온라인 유저 구독
-      stompClient.subscribe(`/sub/chat/${moimIdNum}/online`, (msg) => {
+      client.subscribe(`/sub/chat/${moimIdNum}/online`, (msg) => {
         const onlineData = JSON.parse(msg.body);
         setOnlineUsers(onlineData.map((id) => Number(id)));
         console.log('온라인 유저:', onlineData);
       });
 
-      stompClientRef.current.publish({
-        destination: `/pub/chat/${moimIdNum}/online`});
+      // 변경: 연결 직후 온라인 신호를 보낼 때 "실제 연결됨"을 확인하여 publish 오류 방지
+      if (stompClientRef.current && stompClientRef.current.connected) {
+        stompClientRef.current.publish({
+          destination: `/pub/chat/${moimIdNum}/online`,
+        });
+      }
     };
 
-    stompClient.activate();
-    stompClientRef.current = stompClient;
+    // 변경: ref에 먼저 담아두고 activate 호출
+    stompClientRef.current = client;
+    client.activate();
 
     return () => {
-      stompClientRef.current.publish({
-        destination: `/pub/chat/${moimIdNum}/${userObj.userId}/offline`});
-      // 이후 연결 종료
-      stompClient.deactivate();
-      stompClientRef.current.publish({
-        destination: `/pub/chat/${moimIdNum}/online`});
+      // 변경: 정리 순서 고정 - 오프라인 전송 → 잠깐 대기 → deactivate (전송 누락/유령 온라인 방지)
+      if (stompClientRef.current && stompClientRef.current.connected) {
+        try {
+          stompClientRef.current.publish({
+            destination: `/pub/chat/${moimIdNum}/${userObj.userId}/offline`,
+          });
+          setTimeout(() => {
+            stompClientRef.current?.deactivate();
+          }, 100); 
+        } catch (error) {
+          console.log('STOMP cleanup error:', error);
+          stompClientRef.current?.deactivate(); // 변경: 오류가 나도 연결은 반드시 종료
+        }
+      }
     };
   }, [moimIdNum, userObj.userId]);
 
@@ -171,7 +184,7 @@ function ChattingPage({ moimId }) {
             onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
             placeholder="메시지를 입력하세요"
           />
-          <button onClick={sendMessage}>전송</button>
+        <button onClick={sendMessage}>전송</button>
         </div>
       </div>
     </div>
