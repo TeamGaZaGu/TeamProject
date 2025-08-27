@@ -2,13 +2,12 @@
 import * as s from './styles.js';
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { reqDeleteMoim, reqExitMoim, reqJoinMoim, reqMoimBanUserList, reqMoimUserBan, reqMoimUserList, reqSelectMoim } from '../../../api/moimApi';
+import { reqDeleteMoim, reqExitMoim, reqJoinMoim, reqMoimBanUserList, reqMoimUserList, reqSelectMoim } from '../../../api/moimApi';
 import useCategoryQuery from '../../../queries/useCategoryQuery.jsx';
 import { IoChatbubbleEllipses, IoChatbubbleEllipsesOutline, IoClipboard, IoClipboardOutline, IoClose } from 'react-icons/io5';
 import { RiHome7Fill, RiHome7Line } from 'react-icons/ri';
 import { FaPen, FaRegComment, FaTrashAlt } from 'react-icons/fa';
 import { useQueryClient } from '@tanstack/react-query';
-import { baseURL } from '../../../api/axios.js';
 import { reqUserBlock, reqUserUnBlock } from '../../../api/userBlockApi.js';
 import usePrincipalQuery from '../../../queries/usePrincipalQuery.jsx';
 import useUserBlockListQuery from '../../../queries/useUserBlockListQuery.jsx';
@@ -19,6 +18,9 @@ import ChattingPage from '../../chatting/ChattingPage.jsx';
 import { FcGoogle } from 'react-icons/fc';
 import { SiKakaotalk } from 'react-icons/si';
 import toast, { Toaster } from 'react-hot-toast';
+import { MdReport } from 'react-icons/md';
+import axios from 'axios';
+import { submitReport } from '../../../api/reportApi.js';
 
 function DescriptionSuggestPage(props) {
     const navigate = useNavigate();
@@ -26,39 +28,97 @@ function DescriptionSuggestPage(props) {
     const [ searchParam ] = useSearchParams();
     const moimId = parseInt(searchParam.get("moimId"));
 
+    // 탭 상태
     const [activeTab, setActiveTab] = useState("home");
-
-    const [ moim, setMoim ] = useState("");
-    const [ userList, setUserList ] = useState([]);
     
+    // 모임 정보 및 사용자 목록
+    const [moim, setMoim] = useState("");
+    const [userList, setUserList] = useState([]);
+    
+    // 모달 상태
     const [selectedUser, setSelectedUser] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    
+    // 신고 모달 상태
+    const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+    const [selectedReason, setSelectedReason] = useState('');
+    const [customReason, setCustomReason] = useState('');
+    
+    // React Query hooks
+    const principalQuery = usePrincipalQuery();
+    const userId = principalQuery?.data?.data?.user?.userId;
+    const userRole = principalQuery?.data?.data?.user?.userRole;
+    const moimRole = userList.find( user => user.userId === userId ) ?.moimRole;
+
     
     const categoryQuery = useCategoryQuery();
     const categories = categoryQuery?.data?.data || [];
     const getCategory = categories.find(category => category.categoryId === moim.categoryId);
     
-    const principalQuery = usePrincipalQuery();
-    const userId = principalQuery?.data?.data?.user?.userId;
     const userBlockListQuery = useUserBlockListQuery({userId});
     const userBlockList = userBlockListQuery?.data?.data?.body;
+    const isBlockedUser = userBlockList?.includes(selectedUser?.userId);
 
     const isBlockedUser = userBlockList?.includes(selectedUser?.userId)
 
     const forumQuery = useForumQuery({ size: 10, moimId });
     const allForums = forumQuery?.data?.pages?.map(page => page.data.body.contents).flat() || [];
-    console.log("-------------------")
-    console.log(allForums)
 
     const forumCategoryQuery = useForumCategoryQuery();
     const respForumCategories = forumCategoryQuery?.data?.data || [];
     
-    const [ forumCategory, setForumCategory ] = useState("전체");
+    const [forumCategory, setForumCategory] = useState("전체");
     const categoriesWithAll = [{ forumCategoryId: 0, forumCategoryName: '전체' }, ...respForumCategories];
 
+    // 신고 사유 옵션
+    const reportReasons = [
+        '스팸 / 광고성 활동',
+        '욕설 / 비방 / 혐오 발언',
+        '음란물 / 불건전한 내용',
+        '사기 / 도용 / 사칭',
+        '불법 행위 (범죄, 불법거래 등)',
+        '기타'
+    ];
+
+    // 선택된 카테고리에 따른 포럼 필터링
     const filteredForums = forumCategory === "전체"
         ? allForums
         : allForums.filter(forum => forum.forumCategory.forumCategoryName === forumCategory);
+
+    // 권한 이양 함수
+    const handleTransferOwner = async (targetUser) => {
+        const isConfirmed = window.confirm(
+            `"${targetUser.nickName}"님에게 모임장 권한을 넘기시겠습니까?\n권한을 넘기면 되돌릴 수 없습니다.`
+        );
+        
+        if (!isConfirmed) return;
+
+        try {
+            const response = await fetch(`http://localhost:8080/api/moim/transfer-ownership/${moimId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ 
+                    newOwnerId: targetUser.userId,
+                    currentUserId: userId 
+                })
+            });
+
+            if (response.ok) {
+                alert('권한이 성공적으로 이양되었습니다.');
+                await fetchMoimUserList();
+                await fetchMoim();
+                handleCloseModal();
+            } else {
+                const errorText = await response.text();
+                alert(errorText);
+            }
+        } catch (error) {
+            console.error('권한 이양 실패:', error);
+            alert('권한 이양에 실패했습니다.');
+        }
+    };
 
     const fetchMoim = async () => {
         try {
@@ -69,6 +129,7 @@ function DescriptionSuggestPage(props) {
         }
     };
 
+    // 모임 사용자 목록 조회
     const fetchMoimUserList = async () => {
         try {
             const response = await reqMoimUserList(moimId);
@@ -79,16 +140,16 @@ function DescriptionSuggestPage(props) {
     }
 
     useEffect(() => {
-
         if (moimId) {
             fetchMoim();
             fetchMoimUserList();
         }
-    }, []);
+    }, [moimId]);
 
     // 모임 가입 후 즉시 반영되도록 수정
     const handleJoinMoimOnClick = async () => {
         try {
+            // 밴 리스트 체크
             const response = await reqMoimBanUserList(moimId);
             const banList = response?.data;
             
@@ -98,10 +159,8 @@ function DescriptionSuggestPage(props) {
                 alert("해당 모임에 가입하실 수 없습니다.");
                 return;
             }
-            
+          
             const joinResponse = await reqJoinMoim(moimId);
-            
-            // 가입 후 즉시 데이터 새로고침
             await fetchMoim();
             await fetchMoimUserList();
             
@@ -117,13 +176,12 @@ function DescriptionSuggestPage(props) {
         }
     }
 
-    // 모임 탈퇴 후 즉시 반영되도록 수정
     const handleExitMoimOnClick = async () => {
         const isConfirmed = window.confirm("이 모임에서 탈퇴하시겠습니까?")
 
-        if (!isConfirmed) {
-            return;
-        }
+
+        if (!isConfirmed) return;
+        
         if (userId !== moim?.userId) {
             try {
                 await reqExitMoim(moimId);
@@ -145,11 +203,11 @@ function DescriptionSuggestPage(props) {
         }
     }
 
-    const handleModifyOnClick = () => {
-        navigate(`/suggest/modify?moimId=${moimId}`)
+    // 모임 수정 페이지로 이동
+    const handleNavigateToEdit = () => {
+        navigate(`/suggest/modify?moimId=${moimId}`);
     }
 
-    // 모임 삭제 후 즉시 반영되도록 수정
     const handleDeleteMoimOnClick = async () => {
         const isConfirmed = window.confirm("모임을 삭제하시겠습니까?");
         
@@ -167,49 +225,107 @@ function DescriptionSuggestPage(props) {
             
             alert("모임 삭제 성공");
             await navigate("/");
-            
         } catch (error) {
             console.error("모임 삭제 실패:", error);
             alert("모임 삭제에 실패했습니다.");
         }
     }
 
-    const handleUserInformationOnClick = (userId) => {
-        const user = userList.find(u => u.userId === userId);
+    // 사용자 프로필 모달 열기
+    const handleMemberClick = (targetUserId) => {
+        const user = userList.find(u => u.userId === targetUserId);
         if (user) {
             setSelectedUser(user);
             setIsModalOpen(true);
         }
-    }
+    };
 
+    // 모달 닫기
     const handleCloseModal = () => {
         setIsModalOpen(false);
         setSelectedUser(null);
     }
 
+    // 모달 배경 클릭 시 닫기
     const handleModalBackdropClick = (e) => {
         if (e.target === e.currentTarget) {
             handleCloseModal();
         }
     }
 
-    // 사용자 차단/해제 후 즉시 반영되도록 수정
-    const handleUserBlockOnClick = async (userId, nickName) => {
-        
-        const action = isBlockedUser ? '차단해제' : '차단';
-        
-        const isConfirmed = window.confirm(`"${nickName}" 님을 ${action}하시겠습니까?`);
-        
-        if (!isConfirmed) {
+    // --- 상태 추가 ---
+    const [reportTarget, setReportTarget] = useState(null);
+
+    // --- 모임 신고 버튼 핸들러 ---
+    const handleReportMoimOnClick = () => {
+        setReportTarget("moim");
+        setIsReportModalOpen(true);
+    };
+
+    // --- 유저 신고 버튼 수정 ---
+    const handleReportOnClick = () => {
+        setReportTarget("user");
+        setIsReportModalOpen(true);
+    };
+
+    // 신고 모달 닫기
+    const handleCloseReportModal = () => {
+        setIsReportModalOpen(false);
+        setSelectedReason('');
+        setCustomReason('');
+    }
+
+    // 신고 사유 선택
+    const handleReasonChange = (reason) => {
+        setSelectedReason(reason);
+        if (reason !== '기타') {
+            setCustomReason('');
+        }
+    }
+
+    // 신고 제출
+    const handleSubmitReport = async () => {
+        if (!selectedReason) {
+            alert('신고 사유를 선택해주세요.');
             return;
-            
+        }
+
+        if (selectedReason === '기타' && !customReason.trim()) {
+            alert('기타 사유를 입력해주세요.');
+            return;
         }
 
         try {
+            const reportData = {
+                userId: userId,
+                targetType: reportTarget === "user" ? 1 : 2,
+                targetId: reportTarget === "user" ? selectedUser.userId : moim.moimId,
+                reason: selectedReason === '기타' ? customReason : selectedReason
+            };
+
+            await submitReport(reportData);
+            
+            toast.success('신고가 접수되었습니다');
+            handleCloseReportModal();
+            
+        } catch (error) {
+            console.error('신고 제출 실패:', error);
+            toast.error('신고 제출에 실패했습니다.');
+        }
+    }
+
+    // 사용자 차단/해제 토글
+    const handleToggleUserBlock = async (targetUserId, nickName) => {
+        const action = isBlockedUser ? '차단해제' : '차단';
+        const isConfirmed = window.confirm(`"${nickName}" 님을 ${action}하시겠습니까?`);
+        
+        if (!isConfirmed) return;
+
+        try {
             if (isBlockedUser) {
-                await reqUserUnBlock(userId);
+                await reqUserUnBlock(targetUserId);
             } else {
-                await reqUserBlock(userId);
+                await reqUserBlock(targetUserId);
             }
             
             // 차단 목록 쿼리 즉시 무효화
@@ -226,34 +342,22 @@ function DescriptionSuggestPage(props) {
         }
     }
 
-    const handleKickUserOnClick = async (userId, nickName) => {
-        const isConfirmed = window.confirm(`"${nickName}" 님을 강퇴하시겠습니까?`);
-        
-        if (!isConfirmed) {
-            return;
-        }
+    // 게시글 작성 페이지로 이동
+    const handleNavigateToCreateForum = () => {
+        navigate(`/forum/create?moimId=${moimId}`);
+    }
 
-        try {
-            console.log(`${nickName} 강퇴 처리`);
-            alert(`${nickName}님을 강퇴했습니다.`);
-            handleCloseModal();
-        } catch(error) {
-            console.log('강퇴 실패:', error);
-            alert('강퇴에 실패했습니다. 다시 시도해주세요.');
+    // 포럼 상세 페이지로 이동
+    const handleNavigateToForumDetail = (forumId) => {
+        if (userList.find(user => user.userId === userId)) {
+            navigate(`/forum/detail?moimId=${moimId}&forumId=${forumId}`);
+        } else {
+            toast.error("모임 가입이 필요한 페이지입니다");
         }
     }
 
-    // 게시글 작성 페이지로 이동 (작성 완료 후 돌아올 때 새 게시글 반영됨)
-    const handleWriteForumOnClick = () => {
-         navigate(`/forum/create?moimId=${moimId}`)
-    }
-
-    const handleJoinForumOnClick = (forumId) => {
-        userList.find(user => user.userId === userId) ?
-        navigate(`/forum/detail?moimId=${moimId}&forumId=${forumId}`)
-        :
-        toast.error("모임 가입이 필요한 페이지입니다")
-    }
+    // 현재 사용자가 모임에 가입되어 있는지 확인
+    const isUserJoined = userList.find(user => user.userId === userId);
 
     const handleLoadMore = () => {
         forumQuery.fetchNextPage();
@@ -269,74 +373,75 @@ function DescriptionSuggestPage(props) {
 
     return (
         <div css={s.container}>
+            {/* 탭 헤더 */}
             <div css={s.header}>
                 <div>
                     <button 
                         css={activeTab === "home" ? s.click : s.unClick}
                         onClick={() => setActiveTab("home")}
                     >
-                        {
-                            activeTab === "home" ?
-                            <RiHome7Fill />
-                            :
-                            <RiHome7Line />
-                        }
+                        {activeTab === "home" ? <RiHome7Fill /> : <RiHome7Line />}
                         Home
                     </button>
                     <button
                         css={activeTab === "board" ? s.click : s.unClick}
                         onClick={() => setActiveTab("board")}
                     >
-                        {
-                            activeTab === "board" ?
-                            <IoClipboard />
-                            :
-                            <IoClipboardOutline />
-                        }
+                        {activeTab === "board" ? <IoClipboard /> : <IoClipboardOutline />}
                         게시판
                     </button>
                     <button
                         css={activeTab === "chat" ? s.click : s.unClick}
                         onClick={() => setActiveTab("chat")}
                     >
-                        {
-                            activeTab === "chat" ?
-                            <IoChatbubbleEllipses />
-                            :
-                            <IoChatbubbleEllipsesOutline />
-                        }
+                        {activeTab === "chat" ? <IoChatbubbleEllipses /> : <IoChatbubbleEllipsesOutline />}
                         채팅
                     </button>
                 </div>
+                
+                {/* 액션 버튼들 */}
                 <div>
-                        {
-                        userId !== moim?.userId ?
-                            userList.find(user => user.userId === userId) ? (
-                                <button css={s.exitMoimButton} onClick={handleExitMoimOnClick}>모임 탈퇴하기</button>
-                            ) : (
-                                <button css={s.joinMoimButton} onClick={handleJoinMoimOnClick}>모임 가입하기</button>
-                            )
-                            :
-                            <>
-                                <button css={s.Transaction} onClick={handleModifyOnClick}><FaPen />수정</button>
-                                <button css={s.Transaction} onClick={handleDeleteMoimOnClick}><FaTrashAlt />삭제</button>
-                            </>
-                        }
+                    {userRole === "ROLE_ADMIN" ? (
+                        <>
+                            <button css={s.Transaction} onClick={handleNavigateToEdit}><FaPen />수정</button>
+                            <button css={s.Transaction} onClick={handleDeleteMoim}><FaTrashAlt />삭제</button>
+                        </>
+                    ) : moimRole === "OWNER" ? (
+                        // 모임 생성자인 경우
+                        <>
+                            <button css={s.Transaction} onClick={handleNavigateToEdit}><FaPen />수정</button>
+                            <button css={s.Transaction} onClick={handleDeleteMoim}><FaTrashAlt />삭제</button>
+                        </>
+                    ) : isUserJoined ? (
+                        // 가입한 사용자인 경우
+                        <button css={s.exitMoimButton} onClick={handleExitMoim}>모임 탈퇴하기</button>
+                    ) : (
+                        // 미가입 사용자인 경우
+                        <button css={s.joinMoimButton} onClick={handleJoinMoim}>모임 가입하기</button>
+                    )}
                 </div>
             </div>
             
+            {/* Home 탭 콘텐츠 */}
             {activeTab === "home" && (
                 <div css={s.mainContent}>
+                    {/* 모임 기본 정보 */}
                     <div css={s.moimInfo}>
-                        <img src={`${baseURL}/image${moim.moimImgPath}`} alt="모임 썸네일" />
+                        <img src={`${moim.moimImgPath}`} alt="모임 썸네일" />
                         <div css={s.moimTextInfo}>
-                        <h1 css={s.moimTitle}>{moim.title}</h1>
-                        <div css={s.moimMeta}>
-                            <span>{getCategory?.categoryEmoji}{getCategory?.categoryName}</span> · <span>{moim.districtName}</span> · <span>{moim.memberCount}/{moim.maxMember}</span>
+                            <h1 css={s.moimTitle}>
+                                {moim.title}
+                                <button onClick={handleReportMoimOnClick}><MdReport /></button>
+                            </h1>
+                            <div css={s.moimMeta}>
+                                <span>{getCategory?.categoryEmoji}{getCategory?.categoryName}</span> · 
+                                <span>{moim.districtName}</span> · 
+                                <span>{moim.memberCount}/{moim.maxMember}</span>
+                            </div>
                         </div>
                     </div>
-                </div>
 
+                    {/* 모임 소개 */}
                     <div css={s.section}>
                         <h2 css={s.sectionTitle}>모임 소개</h2>
                         <div css={s.description}>
@@ -344,56 +449,45 @@ function DescriptionSuggestPage(props) {
                         </div>
                     </div>
 
+                    {/* 모임 멤버 */}
                     <div css={s.section}>
                         <h2 css={s.sectionTitle}>모임 멤버</h2>
                         <div css={s.memberSection}>
-                            {
-                                userList?.map((user) => {
-                                    const roleEmoji = user.moimRole === "OWNER" ? "👑" : "👤";
-                                    const isBlocked = userBlockList?.includes(user.userId);
+                            {userList?.map((user) => {
+                                const roleEmoji = user.moimRole === "OWNER" ? "👑" : "👤";
+                                const isBlocked = userBlockList?.includes(user.userId);
 
-                                    if (isBlocked) {
-                                        return (
-                                            <div key={user.userId} css={s.memberCard} onClick={() => handleUserInformationOnClick(user.userId)}>
-                                                <img
-                                                    src={`${baseURL}/image${user.profileImgPath}`}
-                                                    alt="프로필"
-                                                    css={s.profileImage}
-                                                /> 
-                                                <div css={s.defaultAvatar}>{roleEmoji}</div>
-                                                <div css={s.memberInfo}>
-                                                    <span css={s.memberRole}>{user.nickName}</span>
-                                                    <span css={s.memberName}>{user.introduction}</span>
-                                                </div>
-                                                <div css={s.blockedUserText}>
-                                                    차단한 유저
-                                                </div>
-                                            </div>
-                                        )
-                                    } else {
-                                        return (
-                                            <div key={user.userId} css={s.memberCard} onClick={() => handleUserInformationOnClick(user.userId)}>
-                                                <img
-                                                    src={`${baseURL}/image${user.profileImgPath}`}
-                                                    alt="프로필"
-                                                    css={s.profileImage}
-                                                /> 
-                                                <div css={s.defaultAvatar}>{roleEmoji}</div>
-                                                <div css={s.memberInfo}>
-                                                    <span css={s.memberRole}>{user.nickName}</span>
-                                                    <span css={s.memberName}>{user.introduction}</span>
-                                                </div>
-                                            </div>
-                                        )
-                                    }
-                                })
-                            }
+                                return (
+                                    <div 
+                                        key={user.userId} 
+                                        css={s.memberCard} 
+                                        onClick={() => handleMemberClick(user.userId)}
+                                    >
+                                        <img
+                                            src={`${user.profileImgPath}`}
+                                            alt="프로필"
+                                            css={s.profileImage}
+                                        /> 
+                                        <div css={s.defaultAvatar}>{roleEmoji}</div>
+                                        <div css={s.memberInfo}>
+                                            <span css={s.memberRole}>{user.nickName}</span>
+                                            <span css={s.memberName}>{user.introduction}</span>
+                                        </div>
+                                        {isBlocked && (
+                                            <div css={s.blockedUserText}>차단한 유저</div>
+                                        )}
+                                    </div>
+                                );
+                            })}
                         </div>
                     </div>
                 </div>
             )}
+            
+            {/* 게시판 탭 콘텐츠 */}
             {activeTab === "board" && (
                 <div>
+                    {/* 카테고리 선택 및 작성 버튼 */}
                     <div css={s.forumCategoryContainer}>
                         {categoriesWithAll.map((category) => (
                             <button
@@ -404,43 +498,39 @@ function DescriptionSuggestPage(props) {
                                 {category.forumCategoryName}
                             </button>
                         ))}
-                        {
-                            userId !== undefined ? 
-                                userList.find(user => user.userId === userId) ? (
-                                    <button css={s.createButton} onClick={handleWriteForumOnClick}>게시글 작성</button>
-                                ) : (
-                                    <button css={s.createButton} onClick={handleJoinMoimOnClick}>모임 가입하기</button>
-                                )
-                                :
-                                 <></>
-                        }
+                        {userId !== undefined && (
+                            isUserJoined ? (
+                                <button css={s.createButton} onClick={handleNavigateToCreateForum}>게시글 작성</button>
+                            ) : (
+                                <button css={s.createButton} onClick={handleJoinMoim}>모임 가입하기</button>
+                            )
+                        )}
                     </div>
+                    
+                    {/* 포럼 목록 */}
                     <div css={s.forumGrid}>
-                        {
-                            userId === undefined ? 
+                        {userId === undefined ? (
+                            // 비로그인 사용자
                             <div css={s.loginContainer}>
                                 <h2>로그인이 필요한 페이지입니다</h2>
                                 <div css={s.loginBox}>
-                                <button css={s.googleLogin} onClick={() => { window.location.href = "http://localhost:8080/oauth2/authorization/google"; }}>
-                                    <FcGoogle />
-                                    구글 로그인
-                                </button>
-                                <button css={s.kakaoLogin} onClick={() => { window.location.href = "http://localhost:8080/oauth2/authorization/kakao"; }}>
-                                    <SiKakaotalk />
-                                    카카오 로그인
-                                </button>
+                                    <button css={s.googleLogin} onClick={() => { window.location.href = "http://localhost:8080/oauth2/authorization/google"; }}>
+                                        <FcGoogle />구글 로그인
+                                    </button>
+                                    <button css={s.kakaoLogin} onClick={() => { window.location.href = "http://localhost:8080/oauth2/authorization/kakao"; }}>
+                                        <SiKakaotalk />카카오 로그인
+                                    </button>
                                 </div>
                             </div>
-                            :
-                            filteredForums.length === 0 ? (
-                                <div css={s.register}>
-                                    <h3>게시글을 등록해주세요</h3>
-                                </div>
-                            ) 
-                        :
-                        <div css={s.forumContainer}>
-                            {
-                                filteredForums?.map((forum) => {
+                        ) : filteredForums.length === 0 ? (
+                            // 게시글이 없는 경우
+                            <div css={s.register}>
+                                <h3>게시글을 등록해주세요</h3>
+                            </div>
+                        ) : (
+                            // 게시글 목록
+                            <div css={s.forumContainer}>
+                                {filteredForums?.map((forum) => {
                                     const date = new Date(forum.forumCreatedAt);
                                     const formatted = new Intl.DateTimeFormat('ko-KR', {
                                         year: 'numeric',
@@ -451,15 +541,14 @@ function DescriptionSuggestPage(props) {
                                         hour12: true,
                                         timeZone: 'Asia/Seoul'
                                     }).format(date);
-        
+
                                     return (
-                                        <div css={s.forumCard} onClick={() => handleJoinForumOnClick(forum.forumId)} key={forum.forumId}>
-                                            <Toaster />
+                                        <div css={s.forumCard} onClick={() => handleNavigateToForumDetail(forum.forumId)} key={forum.forumId}>
                                             <div css={s.forumHeader}>
                                                 <img
                                                     css={s.modalProfileImage}
-                                                    src={`${baseURL}/image${forum.user.profileImgPath}`}
-                                                    alt=""
+                                                    src={`${forum.user.profileImgPath}`}
+                                                    alt="프로필"
                                                 />
                                                 <div css={s.userInfo}>
                                                     <h3 css={s.h3Tag}>{forum.user.nickName}</h3>
@@ -521,21 +610,37 @@ function DescriptionSuggestPage(props) {
                     모임 가입하기
                 </button>
             </div>
-
             
+            {/* 채팅 탭 콘텐츠 */}
+             {activeTab === "chat" && 
+                moimId ? ( userList.find(user => user.userId === userId) ?
+                    <ChattingPage 
+                        moimId={Number(moimId)}
+                        userId={principalQuery?.data?.data?.user?.nickName}
+                    /> : toast.error("모임 가입이 필요한 페이지입니다")
+                ) : (
+                    null
+                )}
+           
+            {/* 사용자 프로필 모달 */}
             {isModalOpen && selectedUser && (
                 <div css={s.modalOverlay} onClick={handleModalBackdropClick}>
                     <div css={s.modalContent}>
                         <div css={s.modalHeader}>
                             <h3>멤버 프로필</h3>
-                            <button css={s.closeButton} onClick={handleCloseModal}>
-                                <IoClose />
-                            </button>
+                            <div css={s.modalHeaderButtons}>
+                                <button css={s.reportButton} onClick={handleReportOnClick}>
+                                    <MdReport />
+                                </button>
+                                <button css={s.closeButton} onClick={handleCloseModal}>
+                                    <IoClose />
+                                </button>
+                            </div>
                         </div>
                         <div css={s.modalBody}>
                             <div css={s.userProfile}>
                                 <img
-                                    src={`${baseURL}/image${selectedUser.profileImgPath}`}
+                                    src={`${selectedUser.profileImgPath}`}
                                     alt="프로필"
                                     css={s.modalProfileImage}
                                 />
@@ -559,19 +664,28 @@ function DescriptionSuggestPage(props) {
                                         <p css={s.userIntroduction}>{selectedUser.introduction}</p>
                                     )}
                                     <div css={s.modalButtonContainer}>
-                                        {isBlockedUser ? (
-                                            <button onClick={() => handleUserBlockOnClick(selectedUser.userId, selectedUser.nickName)}>
-                                                차단 해제
-                                            </button>
-                                        ) : (
-                                            <button onClick={() => handleUserBlockOnClick(selectedUser.userId, selectedUser.nickName)}>
-                                                차단하기
+                                        {selectedUser.userId !== userId && (
+                                            <button onClick={() => handleToggleUserBlock(selectedUser.userId, selectedUser.nickName)}>
+                                                {isBlockedUser ? '차단 해제' : '차단하기'}
                                             </button>
                                         )}
-                                        {/* 강퇴 버튼 - 방장이고 자신이 아닌 경우만 표시 */}
+                                        
+                                        {/* 현재 유저의 모임 내 역할을 다시 확인 */}
+                                        {(() => {
+                                            const currentUserInMoim = userList.find(u => u.userId === userId);
+                                            const isCurrentUserOwner = currentUserInMoim?.moimRole === "OWNER";
+                                            
+                                            return isCurrentUserOwner && selectedUser.moimRole === "MEMBER" && selectedUser.userId !== userId && (
+                                                <button css={s.transferOwnershipButton} onClick={() => handleTransferOwner(selectedUser)}>
+                                                    👑 모임장 권한 넘기기
+                                                </button>
+                                            );
+                                        })()}
+                                        
+                                        {/* 방장이고 자신이 아닌 경우만 강퇴 버튼 표시 */}
                                         {userList.find(u => u.userId === userId)?.moimRole === "OWNER" && 
                                          selectedUser.userId !== userId && (
-                                            <button css={s.modalKickButton} onClick={() => handleKickUserOnClick(selectedUser.userId, selectedUser.nickName)}>
+                                            <button css={s.modalKickButton} onClick={() => {}}>
                                                 강퇴하기
                                             </button>
                                         )}
@@ -582,6 +696,53 @@ function DescriptionSuggestPage(props) {
                     </div>
                 </div>
             )}
+
+            {/* 신고 모달 */}
+            {isReportModalOpen && (
+                <div css={s.reportModalOverlay} onClick={(e) => e.target === e.currentTarget && handleCloseReportModal()}>
+                    <div css={s.reportModalContent}>
+                        <div css={s.reportModalHeader}>
+                            <h3>사용자 신고</h3>
+                            <button css={s.closeButton} onClick={handleCloseReportModal}>
+                                <IoClose />
+                            </button>
+                        </div>
+                        <div css={s.reportModalBody}>
+                            <p css={s.reportModalDescription}>신고 사유를 선택해주세요:</p>
+                            <div css={s.reasonList}>
+                                {reportReasons.map((reason, index) => (
+                                    <label key={index} css={s.reasonItem}>
+                                        <input
+                                            type="radio"
+                                            name="reportReason"
+                                            value={reason}
+                                            checked={selectedReason === reason}
+                                            onChange={() => handleReasonChange(reason)}
+                                        />
+                                        <span css={s.reasonText}>{reason}</span>
+                                    </label>
+                                ))}
+                            </div>
+                            {selectedReason === '기타' && (
+                                <textarea
+                                    css={s.customReasonInput}
+                                    placeholder="기타 사유를 입력해주세요..."
+                                    value={customReason}
+                                    onChange={(e) => setCustomReason(e.target.value)}
+                                    maxLength={200}
+                                />
+                            )}
+                            <div css={s.reportModalFooter}>
+                                <button css={s.submitReportButton} onClick={handleSubmitReport}>
+                                    신고하기
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+            
+            <Toaster />
         </div>
     );
 }

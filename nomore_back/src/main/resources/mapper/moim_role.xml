@@ -38,4 +38,40 @@
             and user_id = #{userId}
     </delete>
 
+    <update id="updateMoimRole">
+        UPDATE moim_role_tb
+        SET moim_role = #{moimRole}
+        WHERE user_id = #{userId} AND moim_id = #{moimId}
+    </update>
+
+    <select id="findMembersByMoimIdExceptUser" resultType="com.korit.nomoreback.dto.moim.MoimRoleDto">
+        SELECT
+            mr.moim_role_id as moimRoleId,
+            mr.moim_role as moimRole,
+            mr.moim_id as moimId,
+            mr.user_id as userId,
+            u.nick_name as nickName,
+            u.profile_img_path as profileImgPath
+        FROM moim_role_tb mr
+        JOIN user_tb u ON mr.user_id = u.user_id
+        WHERE mr.moim_id = #{moimId}
+        AND mr.user_id != #{userId}
+        AND mr.moim_role = 'MEMBER'
+    </select>
+    <select id="findAllMembersByMoimId" resultType="com.korit.nomoreback.dto.moim.MoimRoleDto">
+        SELECT
+            mr.moim_role_id as moimRoleId,
+            mr.moim_role as moimRole,
+            mr.moim_id as moimId,
+            mr.user_id as userId,
+            u.nick_name as nickName,
+            u.profile_img_path as profileImgPath
+        FROM moim_role_tb mr
+        JOIN user_tb u ON mr.user_id = u.user_id
+        WHERE mr.moim_id = #{moimId}
+        ORDER BY
+            CASE WHEN mr.moim_role = 'OWNER' THEN 1 ELSE 2 END,
+            u.nick_name
+    </select>
+
 </mapper>

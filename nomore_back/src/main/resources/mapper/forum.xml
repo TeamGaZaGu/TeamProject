@@ -311,5 +311,6 @@
             forum_tb f
         where
             f.moim_id = #{moimId}
+
     </select>
 </mapper>

@@ -21,11 +21,12 @@ function ChattingPage({ moimId }) {
   if (!moimId || isNaN(moimIdNum)) return <div>올바른 채팅방 ID가 필요합니다.</div>;
   if (!userObj) return <div>사용자 정보를 가져오는 중...</div>;
 
+  // 과거 메시지 & 멤버 가져오기
   useEffect(() => {
     async function fetchPastMessages() {
       try {
-        const response = await reqGetMessages(moimIdNum, 0, 50);
-        setMessages(response.data.reverse());
+        const res = await reqGetMessages(moimIdNum, 0, 50);
+        setMessages(res.data.reverse());
       } catch (err) {
         console.error('과거 메시지 불러오기 실패:', err);
       }
@@ -33,8 +34,8 @@ function ChattingPage({ moimId }) {
 
     async function fetchMembers() {
       try {
-        const response = await reqMoimUserList(moimIdNum);
-        setMembers(response.data);
+        const res = await reqMoimUserList(moimIdNum);
+        setMembers(res.data);
       } catch (err) {
         console.error('멤버 목록 가져오기 실패:', err);
       }
@@ -42,50 +43,69 @@ function ChattingPage({ moimId }) {
 
     fetchPastMessages();
     fetchMembers();
+  }, [moimIdNum]);
 
-    const accessToken = localStorage.getItem('AccessToken');
-    if (!accessToken) return console.error('🚫 accessToken 없음.');
-
-    const tokenWithoutBearer = accessToken.replace(/^Bearer\s/, '');
-    const stompClient = new Client({
+  // WebSocket 연결
+  useEffect(() => {
+    const client = new Client({
       brokerURL: undefined,
-      webSocketFactory: () =>
-        new SockJS(
-          `http://192.168.2.17:8080/ws?access_token=${tokenWithoutBearer}&moimId=${moimIdNum}&userId=${userObj.userId}`
-        ),
+      webSocketFactory: () => new SockJS('http://192.168.2.17:8080/ws'),
       debug: (str) => console.log(str),
       reconnectDelay: 5000,
+      connectHeaders: {
+        moimId: moimIdNum.toString(),
+        userId: userObj.userId.toString(),
+      },
     });
 
-    stompClient.connectHeaders = {
-      moimId: moimIdNum.toString(),
-      userId: userObj.userId.toString(),
-    };
-
-    stompClient.onConnect = () => {
+    client.onConnect = () => {
       console.log('✅ WebSocket connected');
 
-      // 채팅 메시지 구독
-      stompClient.subscribe(`/sub/chat/${moimIdNum}`, (msg) => {
+      // 메시지 구독
+      client.subscribe(`/sub/chat/${moimIdNum}`, (msg) => {
         const chatMessage = JSON.parse(msg.body);
         setMessages((prev) => [...prev, chatMessage]);
         messageEndRef.current?.scrollIntoView({ behavior: 'smooth' });
       });
 
       // 온라인 유저 구독
-      stompClient.subscribe(`/sub/chat/${moimIdNum}/online`, (msg) => {
-        const onlineUserData = JSON.parse(msg.body);
-        console.log('온라인 유저 데이터 수신:', onlineUserData);
-        setOnlineUsers(onlineUserData.map(String));
+      client.subscribe(`/sub/chat/${moimIdNum}/online`, (msg) => {
+        const onlineData = JSON.parse(msg.body);
+        setOnlineUsers(onlineData.map((id) => Number(id)));
+        console.log('온라인 유저:', onlineData);
       });
+
+      // 변경: 연결 직후 온라인 신호를 보낼 때 "실제 연결됨"을 확인하여 publish 오류 방지
+      if (stompClientRef.current && stompClientRef.current.connected) {
+        stompClientRef.current.publish({
+          destination: `/pub/chat/${moimIdNum}/online`,
+        });
+      }
     };
 
-    stompClient.activate();
-    stompClientRef.current = stompClient;
+    // 변경: ref에 먼저 담아두고 activate 호출
+    stompClientRef.current = client;
+    client.activate();
 
-    return () => stompClient.deactivate();
-  }, [moimIdNum, userObj]);
+    return () => {
+      // 변경: 정리 순서 고정 - 오프라인 전송 → 잠깐 대기 → deactivate (전송 누락/유령 온라인 방지)
+      if (stompClientRef.current && stompClientRef.current.connected) {
+        try {
+          stompClientRef.current.publish({
+            destination: `/pub/chat/${moimIdNum}/${userObj.userId}/offline`,
+          });
+          setTimeout(() => {
+            stompClientRef.current?.deactivate();
+          }, 100); 
+        } catch (error) {
+          console.log('STOMP cleanup error:', error);
+          stompClientRef.current?.deactivate(); // 변경: 오류가 나도 연결은 반드시 종료
+        }
+      }
+    };
+  }, [moimIdNum, userObj.userId]);
 
+  // 메시지 자동 스크롤
   useEffect(() => {
     messageEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
@@ -103,16 +123,18 @@ function ChattingPage({ moimId }) {
       destination: `/pub/chat/${moimIdNum}`,
       body: JSON.stringify(chatMessage),
     });
+
     setInput('');
   };
 
   return (
     <div css={s.PageContainer}>
+      {/* 유저 리스트 */}
       <div css={s.UserListContainer}>
         {members.map((member) => {
-          let circleColor = 'gray'; // 기본 오프라인
-          if (member.userId === userObj.userId) circleColor = 'red'; // 자기 자신
-          else if (onlineUsers.includes(member.userId.toString())) circleColor = 'green'; // 온라인
+          const isMe = member.userId === userObj.userId;
+          const isOnline = onlineUsers.includes(member.userId);
+          const circleColor = isMe ? 'red' : isOnline ? 'green' : 'gray';
 
           return (
             <div key={member.userId} css={s.UserItem}>
@@ -130,12 +152,13 @@ function ChattingPage({ moimId }) {
                   borderRadius: '50%',
                   background: circleColor,
                 }}
-              ></div>
+              />
             </div>
           );
         })}
       </div>
 
+      {/* 채팅 영역 */}
       <div css={s.ChatContainer}>
         <div css={s.MessageList}>
           {messages.map((msg, idx) => {
@@ -158,10 +181,10 @@ function ChattingPage({ moimId }) {
           <input
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => { if (e.key === 'Enter') sendMessage(); }}
+            onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
             placeholder="메시지를 입력하세요"
           />
-          <button onClick={sendMessage}>전송</button>
+        <button onClick={sendMessage}>전송</button>
         </div>
       </div>
     </div>

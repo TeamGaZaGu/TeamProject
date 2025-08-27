@@ -4,6 +4,8 @@ import com.korit.nomoreback.dto.moim.MoimRoleDto;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 @Mapper
 public interface MoimRoleMapper {
     int insertMoimRole(MoimRoleDto moimRoleDto);
@@ -12,4 +14,8 @@ public interface MoimRoleMapper {
     int deleteByMoimIdAndUserId(Integer moimId, Integer userId);
 
     int exitMoim(@Param("moimId") Integer moimId, @Param("userId") Integer userId);
+
+    int updateMoimRole(@Param("userId") Integer userId, @Param("moimId") Integer moimId, @Param("moimRole") String moimRole);
+    List<MoimRoleDto> findMembersByMoimIdExceptUser(@Param("moimId") Integer moimId, @Param("userId") Integer userId);
+    List<MoimRoleDto> findAllMembersByMoimId(@Param("moimId") Integer moimId);
 }

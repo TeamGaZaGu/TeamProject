@@ -5,7 +5,6 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { reqModifyMoim, reqSelectMoim } from '../../../api/moimApi';
 import useCategoryQuery from '../../../queries/useCategoryQuery';
 import { reqDistrict } from '../../../api/searchApi';
-import { baseURL } from '../../../api/axios';
 
 function ModifySuggestMoim(props) {
     const navigate = useNavigate();
@@ -64,7 +63,7 @@ function ModifySuggestMoim(props) {
                 setSelectedCategory(getCategory.categoryName);
                 setSelectedDistrict(moimData.districtName);
                 setSelectedMaxMembers(moimData.maxMember);
-                setPreviewImg(`${baseURL}/image${moimData.moimImgPath}`);
+                setPreviewImg(`${moimData.moimImgPath}`);
 ;
             } catch (err) {
                 console.error(err);

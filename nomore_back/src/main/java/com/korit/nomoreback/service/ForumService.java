@@ -7,6 +7,8 @@ import com.korit.nomoreback.dto.forum.*;
 import com.korit.nomoreback.dto.moim.MoimCategoryRespDto;
 import com.korit.nomoreback.dto.moim.MoimRoleDto;
 import com.korit.nomoreback.security.model.PrincipalUtil;
+import com.korit.nomoreback.util.AppProperties;
+import com.korit.nomoreback.util.ImageUrlUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,15 +28,24 @@ public class ForumService {
     private final ForumLikeMapper forumLikeMapper;
     private final ForumImgMapper forumImgMapper;
     private final MoimRoleMapper moimRoleMapper;
+    private final ImageUrlUtil imageUrlUtil;
+    private final AppProperties appProperties;
+
+    public Integer getCurrentUser(){
+        return principalUtil.getPrincipalUser().getUser().getUserId();
+    }
 
     @Transactional
     public void registerForum(ForumRegisterDto dto) {
 
-        Forum forum = dto.toEntity();
-        forumMapper.registerForum(forum);
-        System.out.println("새로 생성된 forumId = " + forum.getForumId());
+        Integer userId = getCurrentUser();
 
-        final String UPLOAD_PATH = "/forum";
+        Forum forum = dto.toEntity();
+
+        dto.setUserId(userId);
+
+        forumMapper.registerForum(forum);
+
         List<MultipartFile> imageFiles = dto.getForumImages();
 
         if (imageFiles != null && !imageFiles.isEmpty()) {
@@ -59,9 +70,16 @@ public class ForumService {
     }
 
     public Forum getForumById(Integer forumId) {
-        Integer userId = principalUtil.getPrincipalUser().getUser().getUserId();
-        return forumMapper.findByForumIdAndUserId(forumId, userId);
+        Integer userId = getCurrentUser();
+        Forum forum = forumMapper.findByForumIdAndUserId(forumId, userId);
+        List<ForumImg> forumImgs = forumImgMapper.findImgById(forum.getForumId());
+        forumImgs.forEach(img -> img.buildImageUrl(imageUrlUtil));
+        forum.setForumImgList(forumImgs);
+        forum.getUser().buildImageUrl(imageUrlUtil);
+
+        return forum;
     }
+
     public ForumSearchRespDto getForumsByMoimId(ForumSearchReqDto dto) {
         Integer userId = principalUtil.getPrincipalUser().getUser().getUserId();
         Integer totalElements = forumMapper.getCountOfOptions(dto.toOption(userId));
@@ -79,56 +97,75 @@ public class ForumService {
                 .build();
     }
 
+    public byte[] getBlob(String url, String imageConfigsName) {
+        String fileName = url.replaceAll(appProperties.getImageConfigs().get(imageConfigsName).getPrefix(), "");
+        String path = appProperties.getImageConfigs().get(imageConfigsName).getDirPath() + fileName;
+        return fileService.convertToBlob(path);
+    }
+  
+
     public List<Forum> getForumsByCategoryId(Integer moimId, Integer categoryId) {
-        Integer userId = principalUtil.getPrincipalUser().getUser().getUserId();
+        Integer userId = getCurrentUser();
         return forumMapper.findByCategoryId(moimId, categoryId, userId);
     }
 
-
-    public void modifyForum(ForumModifyDto forumModifyDto,ForumImgModifyDto forumImgModifyDto){
-
-        Integer userId = principalUtil.getPrincipalUser().getUser().getUserId();
-
-        Integer forumId = forumModifyDto.getForumId();
-
+    public void modifyForum(ForumModifyDto dto){
+        Integer userId = getCurrentUser();
+        Integer forumId = dto.getForumId();
         Forum forum = forumMapper.findByForumId(forumId);
-
         Forum originForum = forumMapper.findByForumIdAndUserId(forumId,userId);
 
-        List<ForumImg> modifiedImgList = forumImgModifyDto.getImgList();
+        List<ForumImg> forumImgs = forumImgMapper.findImgById(forumId);
+        if (forumImgs != null && !forumImgs.isEmpty()) {
+            List<Integer> imgIds = forumImgs.stream()
+                    .map(forumImg -> forumImg.getForumImgId())
+                    .toList();
+            forumImgMapper.deleteImg(imgIds);
+        }
+
+        List<MultipartFile> imageFiles = dto.getForumImages();
+        System.out.println("imageFiles" + imageFiles);
+        List<ForumImg> modifiedImgList = new ArrayList<>();
+        if (imageFiles != null) {
+            int seq = 1;
+            for (MultipartFile file : imageFiles) {
+                String storedPath = fileService.uploadFile(file, "forum");
+                ForumImg forumImg = ForumImg.builder()
+                        .forumId(forumId)
+                        .seq(seq++)
+                        .path(storedPath)
+                        .build();
+                modifiedImgList.add(forumImg);
+            }
+        }
 
         if (userId.equals(forum.getUser().getUserId()) ||
                 moimRoleMapper.findRoleByUserAndMoimId(userId,forum.getMoim().getMoimId()).equals("OWNER")){
-            if (modifiedImgList != null) {
-                forumImgMapper.modifyImg(modifiedImgList);
+            if (modifiedImgList != null && !modifiedImgList.isEmpty()) {
+                forumImgMapper.insertMany(modifiedImgList);
             }
-            forumMapper.modifyForum(forumModifyDto.modify(originForum));
+            forumMapper.modifyForum(dto.modify(originForum));
             return;
         }
-
         throw new IllegalArgumentException("권한 없음");
     }
 
     public void deleteForum(Integer forumId,Integer moimId) {
-        Integer userId = principalUtil.getPrincipalUser().getUser().getUserId();
-
+        Integer userId = getCurrentUser();
         Forum forum = forumMapper.findByForumId(forumId);
-
         List<ForumImg> forumImgs = forumImgMapper.findImgById(forumId);
-
         List<Integer> imgIds = forumImgs.stream()
                 .map(ForumImg::getForumImgId)
                 .toList();
 
         if (userId.equals(forum.getUser().getUserId()) ||
-            moimRoleMapper.findRoleByUserAndMoimId(userId,moimId).equals("OWNER")){
+                moimRoleMapper.findRoleByUserAndMoimId(userId,moimId).equals("OWNER")){
             if (!imgIds.isEmpty()) {
                 forumImgMapper.deleteImg(imgIds);
             }
             forumMapper.deleteForum(forumId);
             return;
         }
-
         throw new IllegalArgumentException("권한 없음");
     }
 
@@ -137,11 +174,8 @@ public class ForumService {
     }
 
     public Integer registerComment(ForumCommentRegDto dto) {
-
-        Integer userId = principalUtil.getPrincipalUser().getUser().getUserId();
-
+        Integer userId = getCurrentUser();
         forumCommentMapper.insert(dto.toEntity(userId));
-
         return forumCommentMapper.getCountByForumId(dto.getForumId());
     }
 
@@ -163,14 +197,14 @@ public class ForumService {
 
     public void modifyComment (ForumCommentModifyDto modifyDto,Integer forumId) {
         List<ForumComment> forumCommentList = forumCommentMapper.findAllByForumId(forumId);
-        Integer userId = principalUtil.getPrincipalUser().getUser().getUserId();
+        Integer userId = getCurrentUser();
         forumCommentList
                 .stream().filter(comment -> comment.getUserId().equals(userId))
                 .forEach(forumComment -> forumCommentMapper.modifyComment(modifyDto.toEntity(forumComment)));
     }
 
     public void deleteComment(Integer forumCommentId, Integer forumId, Integer moimId) {
-        Integer userId = principalUtil.getPrincipalUser().getUser().getUserId();
+        Integer userId = getCurrentUser();
         ForumComment comment = forumCommentMapper.findByCommentId(forumCommentId);
         MoimRoleDto moimRoleDto = moimRoleMapper.findRoleByUserAndMoimId(userId,moimId);
 
@@ -185,15 +219,17 @@ public class ForumService {
         forumCommentMapper.deleteComment(forumCommentId);
     }
 
-
     public void like(Integer forumId) {
-        Integer userId = principalUtil.getPrincipalUser().getUser().getUserId();
+        Integer userId = getCurrentUser();
         forumLikeMapper.insertLike(forumId, userId);
     }
 
     public void dislike(Integer forumId) {
-        Integer userId = principalUtil.getPrincipalUser().getUser().getUserId();
+        Integer userId = getCurrentUser();
         forumLikeMapper.deleteLike(forumId, userId);
     }
 
+    public List<Forum> findForumsByUserId(Integer userId) {
+        return forumMapper.findForumsByUserId(userId);
+    }
 }

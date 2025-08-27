@@ -739,3 +739,178 @@ export const modalKickButton = css`
     transform: translateY(1px);
   }
 `;
+
+// 모달 헤더 버튼 컨테이너
+export const modalHeaderButtons = css`
+  display: flex;
+  gap: 8px;
+  align-items: center;
+`;
+
+// 신고 버튼
+export const reportButton = css`
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  color: #ff4757;
+  padding: 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  
+  &:hover {
+    background-color: #ff475720;
+  }
+`;
+
+// 신고 모달 오버레이
+export const reportModalOverlay = css`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 100px;
+  z-index: 1001;
+`;
+
+// 신고 모달 컨텐츠
+export const reportModalContent = css`
+  background: white;
+  border-radius: 12px;
+  width: 400px;
+  max-width: 90vw;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  animation: slideDown 0.3s ease-out;
+  
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+`;
+
+// 신고 모달 헤더
+export const reportModalHeader = css`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid #f0f0f0;
+  
+  h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+  }
+`;
+
+// 신고 모달 바디
+export const reportModalBody = css`
+  padding: 20px 24px 24px;
+`;
+
+// 신고 모달 설명
+export const reportModalDescription = css`
+  margin: 0 0 16px 0;
+  color: #666;
+  font-size: 14px;
+  line-height: 1.4;
+`;
+
+// 신고 사유 목록
+export const reasonList = css`
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+`;
+
+// 신고 사유 아이템
+export const reasonItem = css`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  padding: 8px 0;
+  
+  input[type="radio"] {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+  }
+`;
+
+// 신고 사유 텍스트
+export const reasonText = css`
+  font-size: 14px;
+  color: #333;
+  line-height: 1.4;
+  cursor: pointer;
+`;
+
+// 기타 사유 입력창
+export const customReasonInput = css`
+  width: 100%;
+  min-height: 80px;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 1.4;
+  resize: vertical;
+  margin-bottom: 20px;
+  
+  &:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.1);
+  }
+  
+  &::placeholder {
+    color: #999;
+  }
+`;
+
+// 신고 모달 푸터
+export const reportModalFooter = css`
+  display: flex;
+  justify-content: flex-end;
+`;
+
+// 신고 제출 버튼
+export const submitReportButton = css`
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  
+  &:hover {
+    background-color: #c82333;
+  }
+  
+  &:active {
+    background-color: #bd2130;
+  }
+  
+  &:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
+`;

@@ -3,6 +3,7 @@ package com.korit.nomoreback.service;
 import com.korit.nomoreback.domain.user.User;
 import com.korit.nomoreback.domain.user.UserMapper;
 import com.korit.nomoreback.dto.user.UserProfileUpdateReqDto;
+import com.korit.nomoreback.util.ImageUrlUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -10,15 +11,18 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
 
     private final UserMapper userMapper;
+    private final ImageUrlUtil imageUrlUtil;
 
     public List<User> allUser() {
-        return userMapper.allUser();
+        List<User> userList = userMapper.allUser().stream().map(user -> user.buildImageUrl(imageUrlUtil)).collect(Collectors.toList());
+        return userList;
     }
 
     public void blockUser(Integer userId) {
@@ -60,5 +64,13 @@ public class UserService {
         reqDto.setProfileImgPath(profileImgPath);
         reqDto.setUserId(userId);
         userMapper.updateProfile(reqDto);
+    }
+
+    public void deleteUser(Integer userId) {
+        userMapper.deleteUser(userId);
+    }
+
+    public User findUserById(Integer userId) {
+        return userMapper.findUserById(userId);
     }
 }

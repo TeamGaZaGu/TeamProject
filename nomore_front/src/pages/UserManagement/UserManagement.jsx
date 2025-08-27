@@ -2,13 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { reqAllUser, reqBlockUser, reqUnBlockUser } from '../../api/userApi';
 /** @jsxImportSource @emotion/react */
 import * as s from './styles';
-import { baseURL } from '../../api/axios';
+import { useNavigate } from 'react-router-dom';
 
 function UserManagement(props) {
     const [allUser, setAllUser] = useState([]);
     const [loading, setLoading] = useState(true);
+    const navigate = useNavigate();
 
-    // 컴포넌트 마운트 시 사용자 목록 가져오기
     useEffect(() => {
         fetchUsers();
     }, []);
@@ -84,10 +84,10 @@ function UserManagement(props) {
                         <thead css={s.tableHead}>
                             <tr>
                                 <th css={s.tableHeader}>ID</th>
+                                <th css={s.tableHeader}>프로필이미지</th>
                                 <th css={s.tableHeader}>닉네임</th>
                                 <th css={s.tableHeader}>성명</th>
                                 <th css={s.tableHeader}>이메일</th>
-                                <th css={s.tableHeader}>프로필이미지</th>
                                 <th css={s.tableHeader}>성별</th>
                                 <th css={s.tableHeader}>생년월일</th>
                                 <th css={s.tableHeader}>회원차단</th>
@@ -95,15 +95,12 @@ function UserManagement(props) {
                         </thead>
                         <tbody>
                             {allUser?.filter(user => user.userRole !== 'ROLE_ADMIN').map((user) => (
-                                <tr key={user.userId} css={s.tableRow}>
+                                    <tr key={user.userId} css={s.tableRow}>
                                     <td css={s.tableCell}>{user.userId}</td>
-                                    <td css={s.tableCell}>{user.nickName}</td>
-                                    <td css={s.tableCell}>{user.fullName}</td>
-                                    <td css={s.tableCell}>{user.email}</td>
                                     <td css={s.tableCell}>
                                         {user.profileImgPath ? (
                                             <img
-                                                 src={`${baseURL}/image${user.profileImgPath}`}
+                                                 src={`${user.profileImgPath}`}
                                                  alt="프로필"
                                                  css={s.profileImage}
                                             />
@@ -111,6 +108,15 @@ function UserManagement(props) {
                                             <span css={s.noImage}>이미지 없음</span>
                                         )}
                                     </td>
+                                    <td css={s.tableCell}>{user.nickName}</td>
+                                    <td 
+                                        css={s.tableCell} 
+                                        onClick={() => navigate(`/admin/user/${user.userId}`)}
+                                        style={{ cursor: 'pointer', textDecoration: 'underline' }}
+                                    >
+                                        {user.fullName}
+                                    </td>
+                                    <td css={s.tableCell}>{user.email}</td>
                                     <td css={s.tableCell}>{user.gender}</td>
                                     <td css={s.tableCell}>{user.birthDate}</td>
                                     <td css={s.tableCell}>

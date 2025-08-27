@@ -26,6 +26,4 @@ public interface ForumMapper {
     // 게시글 조회
     Integer getCountOfOptions(ForumsSearchOption option);
     List<Forum> findAllOfOptions(ForumsSearchOption option);
-
-
 }

@@ -109,19 +109,25 @@ function HeaderLayout(props) {
         }));
     }
 
-     const handleSearchInputOnClick = async () => {
-    try {
-        navigate("/searchpage", {
-            state: {
-                categoryId: combinedSearch.categoryId || null,
-                districtId: combinedSearch.districtId || null,
-                searchText: combinedSearch.keyword || null
-            }
-        });
-    } catch (error) {
-        console.error("검색 실패", error);
+    const handleSearchInputOnClick = async () => {
+        try {
+            navigate("/searchpage", {
+                state: {
+                    categoryId: combinedSearch.categoryId || null,
+                    districtId: combinedSearch.districtId || null,
+                    searchText: combinedSearch.keyword || null
+                }
+            });
+        } catch (error) {
+            console.error("검색 실패", error);
+        }
     }
-}
+
+    const handleSearchInputOnKeyDown = (e) => {
+        if (e.keyCode === 13) {
+            handleSearchInputOnClick();
+        }
+    }
     
     return (
         <div css={s.headerContainer}>
@@ -190,6 +196,7 @@ function HeaderLayout(props) {
                     placeholder='원하는 모임을 검색해주세요'
                     value={searchInputValue}
                     onChange={handleSearchInputOnChange}
+                    onKeyDown={handleSearchInputOnKeyDown}
                 />
 
                 {/* 검색 버튼 */}

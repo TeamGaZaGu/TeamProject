@@ -4,6 +4,7 @@ import com.korit.nomoreback.domain.user.User;
 import com.korit.nomoreback.domain.user.UserMapper;
 import com.korit.nomoreback.security.jwt.JwtUtil;
 import com.korit.nomoreback.security.model.PrincipalUser;
+import com.korit.nomoreback.util.ImageUrlUtil;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,6 +22,7 @@ public class JwtFilter implements Filter {
 
     private final JwtUtil jwtUtil;
     private final UserMapper userMapper;
+    private final ImageUrlUtil imageUrlUtil;
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
@@ -57,23 +59,10 @@ public class JwtFilter implements Filter {
         if (foundUser == null) {
             return;
         }
+        foundUser.buildImageUrl(imageUrlUtil);
         PrincipalUser principal = PrincipalUser.builder().user(foundUser).build();
         Authentication authentication = new UsernamePasswordAuthenticationToken(principal, "", principal.   getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authentication);
-    }
-    public Authentication getAuthentication(String token) {
-        String validatedToken = jwtUtil.validateBearerToken(token);
-        if (validatedToken == null) return null;
-
-        Claims claims = jwtUtil.getClaims(validatedToken);
-        if (claims == null) return null;
-
-        Integer userId = (Integer) claims.get("userId");
-        User foundUser = userMapper.findById(userId);
-        if (foundUser == null) return null;
-
-        PrincipalUser principal = PrincipalUser.builder().user(foundUser).build();
-        return new UsernamePasswordAuthenticationToken(principal, "", principal.getAuthorities());
     }
 }
 

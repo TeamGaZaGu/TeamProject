@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -19,8 +20,8 @@ public class FileService {
     private final AppProperties appProperties;
 
     public String uploadFile(MultipartFile file, String imageConfigName) {
+        System.out.println("imageConfigName" + imageConfigName);
         String dirPath = appProperties.getImageConfigs().get(imageConfigName).getDirPath();
-        // 원본 파일 명
         String originalFilename = generateFilename(file.getOriginalFilename());
 
         mkdirs(dirPath);
@@ -40,18 +41,14 @@ public class FileService {
 
     private String generateFilename(String originFilename) {
         StringBuilder newFilename = new StringBuilder();
-        // 겹치지 않는 새 파일명 생성 위한 uuid 문자열 생성
         newFilename.append(UUID.randomUUID().toString().replaceAll("-", ""));
-        // uuid와 원본 파일 명 구분 위한 _ 추가
         newFilename.append("_");
-        // 마지막 원본 파일 명 추가
         newFilename.append(originFilename);
 
         return newFilename.toString();
     }
     private void mkdirs( String path) {
         File f = new File(path);
-        // 해당 File 객체 생성때의 주입한 경로가 존제ㅔ 하는지 확인
         if (!f.exists()) {
             f.mkdirs();
         }
@@ -67,6 +64,16 @@ public class FileService {
             return;
         }
         file.delete();
+    }
+
+    public byte[] convertToBlob(String path) {
+        try {
+            File file = new File(path);
+            return Files.readAllBytes(file.toPath());
+        }catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
 }

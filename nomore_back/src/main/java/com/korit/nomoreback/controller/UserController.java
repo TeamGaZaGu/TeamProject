@@ -1,13 +1,19 @@
 package com.korit.nomoreback.controller;
 
+import com.korit.nomoreback.domain.forum.Forum;
+import com.korit.nomoreback.domain.moim.Moim;
 import com.korit.nomoreback.domain.user.User;
 import com.korit.nomoreback.domain.user.UserMapper;
 import com.korit.nomoreback.dto.response.ResponseDto;
 import com.korit.nomoreback.dto.user.UserProfileUpdateReqDto;
 import com.korit.nomoreback.security.model.PrincipalUser;
+import com.korit.nomoreback.security.model.PrincipalUtil;
+import com.korit.nomoreback.service.ForumService;
+import com.korit.nomoreback.service.MoimService;
 import com.korit.nomoreback.service.UserBlockService;
 import com.korit.nomoreback.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -21,13 +27,14 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
-    private final UserMapper userMapper;
     private final UserBlockService userBlockService;
+    private final PrincipalUtil principalUtil;
+    private final MoimService moimService;
+    private final ForumService forumService;
 
 
     @GetMapping("/admin")
     public ResponseEntity<List<User>> allUser() {
-        System.out.println(userService.allUser());
         return ResponseEntity.ok(userService.allUser());
     }
 
@@ -81,4 +88,43 @@ public class UserController {
         return ResponseEntity.ok(ResponseDto.success(blocked));
     }
 
+    @DeleteMapping("{userId}")
+    public ResponseEntity<ResponseDto<?>> deleteUser(@PathVariable Integer userId) {
+        userService.deleteUser(userId);
+        System.out.println(userId);
+        return ResponseEntity.ok(ResponseDto.success("회원 탈퇴 완료"));
+    }
+
+    @GetMapping("/admin/user/{userId}")
+    public ResponseEntity<?> getUserDetail(@PathVariable Integer userId) {
+        String currentUserRole = principalUtil.getPrincipalUser().getUser().getUserRole();
+        if (!"ROLE_ADMIN".equals(currentUserRole)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("접근 권한이 없습니다");
+        }
+
+        User user = userService.findUserById(userId);
+        return ResponseEntity.ok(user);
+    }
+
+    @GetMapping("/admin/user/{userId}/moims")
+    public ResponseEntity<?> getUserMoims(@PathVariable Integer userId) {
+        String currentUserRole = principalUtil.getPrincipalUser().getUser().getUserRole();
+        if (!"ROLE_ADMIN".equals(currentUserRole)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("접근 권한이 없습니다");
+        }
+
+        List<Moim> userMoims = moimService.findMoimsByUserId(userId);
+        return ResponseEntity.ok(userMoims);
+    }
+
+    @GetMapping("/admin/user/{userId}/posts")
+    public ResponseEntity<?> getUserPosts(@PathVariable Integer userId) {
+        String currentUserRole = principalUtil.getPrincipalUser().getUser().getUserRole();
+        if (!"ROLE_ADMIN".equals(currentUserRole)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("접근 권한이 없습니다");
+        }
+
+        List<Forum> userPosts = forumService.findForumsByUserId(userId);
+        return ResponseEntity.ok(userPosts);
+    }
 }
