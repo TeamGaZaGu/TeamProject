@@ -5,8 +5,9 @@ import { useNavigate } from 'react-router-dom';
 import useCategoryQuery from '../../../queries/useCategoryQuery.jsx';
 import usePrincipalQuery from '../../../queries/usePrincipalQuery.jsx';
 import useMoimQuery from '../../../queries/useMoimQuery.jsx';
+import Oauth2 from '../../../Oauth2/Oauth2.jsx';
 
-function CheckSuggestMoim() {
+function FindMoim() {
     const navigate = useNavigate();
     const principalQuery = usePrincipalQuery();
     const categoryId = principalQuery?.data?.data?.user?.categoryId;
@@ -62,7 +63,7 @@ function CheckSuggestMoim() {
                         <h3>추천 모임이 없습니다.</h3>
                         <p>새로운 모임이 곧 추가될 예정입니다.</p>
                     </div>
-                ) : (
+                    ) : (
                     <div css={s.moimListStyle}>
                         {allMoims.map((moim) => {
                             const category = categories.find(cat => cat.categoryId === moim.categoryId);
@@ -105,14 +106,14 @@ function CheckSuggestMoim() {
                         })}
                     </div>
                 )}
-
-                {/* 로딩 감지 div */}
                 {!isLast && <div ref={loaderRef} style={{ height: "50px" }} />}
             </div>
         );
     }
-
-    return null;
+    return <div css={s.loginContainer}>
+                <h2>로그인이 필요한 페이지입니다</h2>
+                <Oauth2 customStyle={s.customLoginStyle} />
+            </div>;
 }
 
-export default CheckSuggestMoim;
+export default FindMoim;

@@ -1,23 +1,24 @@
 import { css } from "@emotion/react";
 
-export const container = css`
-    min-height: 100vh;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+export const container = css` 
+  min-width: 700px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 `;
 
 export const header = css`
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 16px;
-    background-color: #ffffff;
-    border-bottom: 1px solid #ffffff;
-    position: sticky;
-    top: 0;
-    z-index: 100;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background-color: #ffffff;
+  border-bottom: 1px solid #ffffff;
+  position: sticky;
+  top: 0;
+  z-index: 100;
 `;
 
 export const click = css`
+<<<<<<< HEAD:nomore_front/src/pages/suggestMoim/descriptionSuggestPage/styles.js
     background: none;
     border: none;
     font-size: 24px;
@@ -29,6 +30,19 @@ export const click = css`
         background-color: #f1f3f4;
         border-radius: 50%;
     }
+=======
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: poiner;
+  padding: 8px;
+  color: #333;
+  
+  &:hover {
+      background-color: #f1f3f4;
+      border-radiust: 50%;
+  }
+>>>>>>> 293-회원가입-생년월일-수정:nomore_front/src/pages/moim/detailMoim/styles.js
 `;
 
 export const headerActions = css`
@@ -37,32 +51,38 @@ export const headerActions = css`
 `;
 
 export const unClick = css`
-    background: none;
-    border: none;
-    font-size: 20px;
-    cursor: pointer;
-    padding: 8px;
-    color: #666;
-    border-radius: 50%;
-    
-    &:hover {
-        background-color: #f1f3f4;
-    }
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 8px;
+  color: #666;
+  border-radius: 50%;
+  
+  &:hover {
+      background-color: #f1f3f4;
+  }
 `;
 
 export const Transaction = css`
-    background: none;
-    border: none;
-    font-size: 20px;
-    cursor: pointer;
-    margin-left: 3rem;
-    padding: 8px;
-    color: #666;
-    border-radius: 50%;
-    
-    &:hover {
-        background-color: #f1f3f4;
-    }
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  margin-left: 3rem;
+  padding: 8px;
+  color: #666;
+  border-radius: 50%;
+  
+  &:hover {
+      background-color: #f1f3f4;
+  }
+`;
+
+export const homeLayout = css`
+  display: flex;
+  flex-direction: row;
+  background-color: #ffffff;
 `;
 
 // 사용자 액션 컨테이너 (가입/탈퇴 버튼과 신고 버튼을 함께 배치)
@@ -161,8 +181,7 @@ export const mainContent = css`
   display: flex;
   flex-direction: column;
   width: 100%;
-  background-color: #ffffff;
-  min-height: calc(100vh - 140px);
+  min-height: 799px;
 `;
 
 export const moimInfo = css`
@@ -191,20 +210,20 @@ export const moimTextInfo = css`
 `;
 
 export const moimMeta = css`
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 14px;
-    color: #666;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #666;
 `;
 
 export const section = css`
-    padding: 0 20px 24px;
-    border-top: 8px solid #f8f9fa;
-    
-    &:first-of-type {
-        border-top: none;
-    }
+  padding: 0 20px 24px;
+  border-top: 8px solid #f8f9fa;
+  
+  &:first-of-type {
+      border-top: none;
+  }
 `;
 
 export const sectionTitle = css`
@@ -215,127 +234,149 @@ export const sectionTitle = css`
 `;
 
 export const description = css`
-    p {
-        font-size: 15px;
-        line-height: 1.6;
-        color: #333;
-        margin: 0;
-        white-space: pre-wrap;
-    }
+  p {
+      font-size: 15px;
+      line-height: 1.6;
+      color: #333;
+      margin: 0;
+      white-space: pre-wrap;
+  }
 `;
 
 export const scheduleCard = css`
-    background-color: #ffffff;
-    border: 1px solid #e9ecef;
-    border-radius: 12px;
-    padding: 16px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  background-color: #ffffff;
+  border: 1px solid #e9ecef;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 `;
 
 export const scheduleHeader = css`
-    display: flex;
-    gap: 16px;
-    align-items: flex-start;
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
 `;
 
 export const scheduleDate = css`
-    background-color: #f8f9fa;
-    border-radius: 8px;
-    padding: 12px;
-    text-align: center;
-    min-width: 80px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 12px;
+  text-align: center;
+  min-width: 80px;
 `;
 
 export const dateText = css`
-    font-size: 14px;
-    font-weight: 600;
-    color: #666;
+  font-size: 14px;
+  font-weight: 600;
+  color: #666;
 `;
 
 export const scheduleInfo = css`
-    flex: 1;
+  flex: 1;
 `;
 
 export const scheduleName = css`
-    font-size: 16px;
-    font-weight: 600;
-    margin: 0 0 4px 0;
-    color: #1a1a1a;
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0 0 4px 0;
+  color: #1a1a1a;
 `;
 
 export const scheduleLocation = css`
-    font-size: 14px;
-    color: #666;
-    margin: 0 0 4px 0;
+  font-size: 14px;
+  color: #666;
+  margin: 0 0 4px 0;
 `;
 
 export const scheduleType = css`
-    display: inline-block;
-    background-color: #e3f2fd;
-    color: #1976d2;
-    font-size: 12px;
-    font-weight: 500;
-    padding: 2px 8px;
-    border-radius: 12px;
+  display: inline-block;
+  background-color: #e3f2fd;
+  color: #1976d2;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 12px;
 `;
 
 export const memberSection = css`
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 `;
 
 export const memberCardWrapper = css`
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-    padding: 8px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
 `;
 
 export const memberInfoSection = css`
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    flex: 1;
-    cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  cursor: pointer;
 `;
 
 export const kickButton = css`
-    background-color: #dc3545;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    padding: 6px 12px;
-    font-size: 12px;
-    font-weight: 500;
-    cursor: pointer;
-    margin-left: 12px;
-    white-space: nowrap;
-    transition: background-color 0.2s ease;
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  margin-left: 12px;
+  white-space: nowrap;
+  transition: background-color 0.2s ease;
 
-    &:hover {
-        background-color: #c82333;
-    }
+  &:hover {
+      background-color: #c82333;
+  }
 
-    &:active {
-        transform: translateY(1px);
-    }
+  &:active {
+      transform: translateY(1px);
+  }
 `;
 
 export const blockedUserText = css`
-    font-size: 12px;
-    color: #666;
-    margin-left: auto;
-    padding-right: 8px;
+  font-size: 12px;
+  color: #666;
+  margin-left: auto;
+  padding-right: 8px;
+`;
+
+export const rightSidebar = css`
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-auto-rows: auto;     
+  gap: 10px;
+  width: 40rem;
+  max-width: 40rem;
+
+  & img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+  }
+
+  & p {
+    display: flex;
+    margin: 5rem;
+    justify-content: center;
+    align-items: center;
+    font-size: 2rem;
+  }
 `;
 
 export const memberCard = css`
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 8px 0;
-    cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+  cursor: pointer;
 `;
 
 export const profileImage = css`
@@ -347,30 +388,30 @@ export const profileImage = css`
 `;
 
 export const defaultAvatar = css`
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 1.5rem;
-    font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.5rem;
+  font-weight: bold;
 `;
 
 export const memberInfo = css`
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 `;
 
 export const memberRole = css`
-    font-size: 12px;
-    color: #666;
-    font-weight: 500;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1a1a1a;
 `;
 
 export const memberName = css`
-    font-size: 14px;
-    font-weight: 600;
-    color: #1a1a1a;
+  font-size: 12px;
+  color: #666;
+  font-weight: 500;
 `;
 
 export const forumCategoryContainer = css`
@@ -443,13 +484,50 @@ export const loginContainer = css`
   background-color: #f9f9f9;
 `;
 
-export const loginBox = css`
-  display: inline-block;
-  padding: 30px;
-  border-radius: 15px;
-  background-color: #7a51c2;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-  text-align: center;
+export const customLoginStyle = css`
+  background: linear-gradient(to bottom right, #7e57c2, #673ab7);
+  border: 1px solid #e0e0e0;
+  padding: 2rem;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+
+   & > button {
+    width: 260px;
+    height: 48px;
+    font-size: 15px;
+    border-radius: 10px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+  }
+
+  & > button:nth-of-type(1) {
+    background-color: #ffffff;
+    color: #000000;
+    border: 1px solid #dcdcdc;
+
+    &:hover {
+      background-color: #f1f1f1;
+    }
+  }
+
+  & > button:nth-of-type(2) {
+    background-color: #fee500;
+    color: #000000;
+
+    &:hover {
+      background-color: #ffeb3b;
+    }
+  }
 `;
 
 export const googleLogin = css`

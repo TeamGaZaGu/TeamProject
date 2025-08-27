@@ -1,6 +1,6 @@
 import api from "./axios";
 
-export const reqRegisterForum = async (data, moimId) => await api.post(`/api/moims/${moimId}/register`, data, {
+export const reqRegisterForum = async (data, moimId) => await api.post(`/api/forum/${moimId}/register`, data, {
     headers: {
     'Content-Type': 'multipart/form-data'
   }

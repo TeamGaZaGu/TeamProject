@@ -24,7 +24,8 @@ function Mypage(props) {
     const [myMoims, setMyMoims] = useState([]);
     const [myPosts, setMyPosts] = useState([]); // [추가]
 
-    // 내가 참여한 모임 가져오기
+    console.log(myMoims)
+
     useEffect(() => {
         if (user?.userId) {
             reqMyMoimList(user.userId)
@@ -302,7 +303,7 @@ function Mypage(props) {
                                 <div css={s.moimImageContainer}>
                                     {moim.moimImgPath ? (
                                         <img
-                                            src={`${baseURL}/image${moim.moimImgPath}`.replace('//', '/')}
+                                            src={moim.moimImgPath}
                                             alt={moim.title}
                                             css={s.moimImage}
                                         />

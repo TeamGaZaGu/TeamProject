@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import useCategoryQuery from '../../../queries/useCategoryQuery.jsx';
 import * as s from './styles.js';
 import React, { useEffect, useState } from 'react';
-import { reqSignup } from '../../../api/authApi.js';
+import { reqAuthorizationPublic, reqSignup } from '../../../api/authApi.js';
 import toast, { Toaster } from 'react-hot-toast';
 
 function Signup(props) {
@@ -59,33 +59,48 @@ function Signup(props) {
   });
 
   useEffect(() => {
-    // 필수 필드들이 비어있는지 체크
-  const requiredFields = ['nickName', 'fullName', 'birthDate'];
-  const hasEmptyRequiredField = requiredFields.some(field => 
-    !String(inputValue[field] || "").trim()
-  );
-    // 카테고리가 선택되지 않았는지 체크
-  const isCategoryEmpty = !Number.isInteger(inputValue.categoryId);
-  const isEmptyValue = !Object.entries(inputValue)
-  .filter(([key]) => key !== 'categoryId') // categoryId 제외
-  .some(([_, value]) => !String(value || '').trim());
-  console.log(Object.entries(inputValue))
-  const isError = !!Object.values(error).filter(value => !!value).length;
+    const publicToken = searchParams.get("publicToken");
+    if (!publicToken) {
+      navigate("/");
+    }
+    reqAuthorizationPublic(publicToken).then(response => {
+      if (!response.data) {
+        alert("잘못된 접근입니다.")
+        navigate("/");
+      }
+    }) 
+  }, []);
 
-  console.log("isEmptyValue", isEmptyValue);
-  console.log("isError", isError);
-  console.log("isCategoryEmpty", isCategoryEmpty);
+  useEffect(() => {
+      // 필수 필드들이 비어있는지 체크
+    const requiredFields = ['nickName', 'fullName', 'birthDate'];
+    const hasEmptyRequiredField = requiredFields.some(field => 
+      !String(inputValue[field] || "").trim()
+    );
+      // 카테고리가 선택되지 않았는지 체크
+    const isCategoryEmpty = !Number.isInteger(inputValue.categoryId);
+    const isEmptyValue = !Object.entries(inputValue)
+    .filter(([key]) => key !== 'categoryId') // categoryId 제외
+    .some(([_, value]) => !String(value || '').trim());
+    const isError = !!Object.values(error).filter(value => !!value).length;
 
-  setButtonDisabled(hasEmptyRequiredField || isEmptyValue || isError || isCategoryEmpty);
+    setButtonDisabled(hasEmptyRequiredField || isEmptyValue || isError || isCategoryEmpty);
 
-  const errorEntries = Object.entries(error);
-  errorEntries.forEach(([key, value]) => {
-    setHelpText(prev => ({
-      ...prev,
-      [key]: !value ? "" : SIGNUP_REGEX_ERROR_MESSAGE[key],
-    }));
-  });
-}, [error, inputValue, selectedCategory]);
+    const errorEntries = Object.entries(error);
+    errorEntries.forEach(([key, value]) => {
+      setHelpText(prev => ({
+        ...prev,
+        [key]: !value ? "" : SIGNUP_REGEX_ERROR_MESSAGE[key],
+      }));
+    });
+  }, [error, inputValue, selectedCategory]);
+
+  const formatBirthDate = (value) => {
+    const onlyNums = value.replace(/\D/g, '');
+    if (onlyNums.length <= 4) return onlyNums;
+    if (onlyNums.length <= 6) return `${onlyNums.slice(0, 4)}-${onlyNums.slice(4)}`;
+    return `${onlyNums.slice(0, 4)}-${onlyNums.slice(4, 6)}-${onlyNums.slice(6, 8)}`;
+  };
 
   const handleToggleCategoryOnClik = () => {
     setIsCategoryOpen((prev) => !prev);
@@ -118,6 +133,11 @@ function Signup(props) {
 }
 
   const handleOnChange = (e) => {
+
+    if (e.target.name === 'birthDate') {
+      e.target.value = formatBirthDate(e.target.value);
+    }
+
     setInputValue(prev => ({
       ...prev,
       [e.target.name]: e.target.value

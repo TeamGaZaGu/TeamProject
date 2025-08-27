@@ -25,12 +25,10 @@ function HeaderLayout(props) {
         const newDistrictState = !isDistrictOpen;
         setIsDistrictOpen(newDistrictState);
         
-        // 다른 드롭다운 닫기
         if (isCategoryOpen) {
             setIsCategoryOpen(false);
         }
 
-        // 드롭다운이 열리고 데이터가 없을 때만 API 호출
         if (newDistrictState && districtList.length === 0) {
             try {
                 const response = await reqDistrict();
@@ -131,15 +129,12 @@ function HeaderLayout(props) {
     
     return (
         <div css={s.headerContainer}>
-            {/* 로고 영역 */}
             <div css={s.logoSection}>
                 <h1 css={s.logoTitle} onClick={handleLogoOnClick}>MEEU</h1>
                 <h4 css={s.logoSubtitle} onClick={handleLogoOnClick}>meet+you</h4>
             </div>
 
-            {/* 컨트롤 영역 */}
             <div css={s.controlSection}>
-                {/* 지역 설정 드롭다운 */}
                 <div css={s.dropdownContainer}>
                     <button css={s.dropdownButton} onClick={handleToggleDistrictOnClick}>
                         {selectedDistrict || '지역설정'}

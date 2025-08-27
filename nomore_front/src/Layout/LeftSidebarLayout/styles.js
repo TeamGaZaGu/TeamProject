@@ -2,7 +2,7 @@ import { css } from "@emotion/react";
 
 export const leftSideBar = css`
   padding: 2rem 1.6rem;
-  border-right: 1px solid #eee;
+  border-right: 0.1rem solid #fff;
   box-sizing: border-box;
   width: 24rem;
   height: 100vh;

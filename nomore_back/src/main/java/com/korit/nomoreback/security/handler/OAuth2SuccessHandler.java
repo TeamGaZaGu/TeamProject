@@ -33,8 +33,9 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
             String name = URLEncoder.encode(user.getFullName(), StandardCharsets.UTF_8);
             String provider = URLEncoder.encode(user.getProvider(), StandardCharsets.UTF_8);
             String providerId = URLEncoder.encode(user.getProviderId(), StandardCharsets.UTF_8);
+            String publicToken = jwtUtil.generatePublicToken(1000 * 60 * 5);
             System.out.println("리다이렉트: 회원가입 페이지");
-            String redirectUrl = String.format("http://localhost:5173/auth/signup?email=%s&name=%s&provider=%s&providerId=%s&" ,email,name,provider, providerId);
+            String redirectUrl = String.format("http://localhost:5173/auth/signup?email=%s&name=%s&provider=%s&providerId=%s&publicToken=%s" ,email,name,provider, providerId, publicToken);
             response.sendRedirect(redirectUrl);
         } else {
             System.out.println("리다이렉트: 메인페이지");

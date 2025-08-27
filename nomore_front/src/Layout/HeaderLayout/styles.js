@@ -6,7 +6,7 @@ export const headerContainer = css`
   align-items: center;
   padding: 12px 24px;
   background-color: #ffffff;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid #eeeded;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   gap: 40px;
 `;
@@ -48,11 +48,9 @@ export const controlSection = css`
   flex: 1;
   max-width: 800px;
   margin: 0 auto;
-  /* overflow: hidden; <- 이 줄을 제거하거나 주석 처리 */
-  overflow: visible; /* 또는 명시적으로 visible로 설정 */
+  overflow: visible; 
 `;
 
-// 드롭다운 컨테이너
 export const dropdownContainer = css`
   position: relative;
   display: inline-block;
@@ -69,6 +67,7 @@ export const dropdownButton = css`
   color: #374151;
   cursor: pointer;
   min-width: 120px;
+  width: 140px;
   text-align: left;
   transition: background-color 0.2s ease;
   
@@ -103,8 +102,14 @@ export const dropdownMenu = css`
   border-radius: 0 0 12px 12px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   z-index: 1000;
-  max-height: 200px; /* 최대 높이 설정 */
-  overflow-y: auto; /* 내용이 많을 때 스크롤 */
+  width: 140px;
+  max-height: 200px; 
+  overflow-y: auto; 
+  background-color: #fff;
+
+  &::-webkit-scrollbar {
+    display: none; 
+  }
 `;
 
 // 드롭다운 아이템

@@ -22,10 +22,17 @@ public class JwtUtil {
         KEY = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret));
     }
 
+    public String generatePublicToken(long expiredTime) {
+        return Jwts.builder()
+                .subject("public_token")
+                .expiration(new Date(new Date().getTime() + expiredTime))
+                .signWith(KEY)
+                .compact();
+    }
+
     public String generateAccessToken(User user) {
         return Jwts.builder()
                 .subject("access_token")
-                .issuer("jinhyuk")
                 .expiration(new Date(new Date().getTime() + EXPIRED_TIME))
                 .claim("userId", user.getUserId())
                 .signWith(KEY)

@@ -1,19 +1,19 @@
 import React from 'react';
 import { Route, Routes } from 'react-router-dom';
-import CreateSuggestpage from '../pages/suggestMoim/createSuggestMoim/CreateSuggestpage';
+import CreateMoim from '../pages/moim/createMoim/CreateMoim';
 import NotFound from '../pages/NotFound/NotFound';
-import CheckSuggestMoim from '../pages/suggestMoim/checkSuggestMoim/CheckSuggestMoim';
-import DescriptionSuggestPage from '../pages/suggestMoim/descriptionSuggestPage/descriptionSuggestPage';
-import ModifySuggestMoim from '../pages/suggestMoim/modifySuggestMoim/ModifySuggestMoim';
+import FindMoim from '../pages/moim/findMoim/FindMoim';
+import DetailMoim from '../pages/moim/detailMoim/DetailMoim';
+import ModifyMoim from '../pages/moim/modifyMoim/ModifyMoim';
 
 function SuggestRoute(props) {
 
     return (
         <Routes>       
-            <Route path='/find' element={ <CheckSuggestMoim /> } />
-            <Route path='/create' element={ <CreateSuggestpage /> } />
-            <Route path='/description' element={ <DescriptionSuggestPage /> } />
-            <Route path='/modify' element={ <ModifySuggestMoim /> } />
+            <Route path='/find' element={ <FindMoim /> } />
+            <Route path='/create' element={ <CreateMoim /> } />
+            <Route path='/description' element={ <DetailMoim /> } />
+            <Route path='/modify' element={ <ModifyMoim /> } />
             <Route path='/*' element={ <NotFound /> } />
         </Routes>
     );

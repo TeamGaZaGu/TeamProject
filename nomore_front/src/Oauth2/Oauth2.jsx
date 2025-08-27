@@ -5,7 +5,7 @@ import { FcGoogle } from 'react-icons/fc';
 import { SiKakaotalk } from 'react-icons/si';
 import Oauth2Redirect from './Oauth2Redirect';
 
-function Oauth2(props) {
+function Oauth2({ customStyle }) {
 
 
     const handleGoogleOnClick = () => {
@@ -17,7 +17,7 @@ function Oauth2(props) {
     };
 
     return (
-        <div css={s.loginContainer}>
+        <div css={customStyle || s.loginContainer}>
             <button onClick={handleGoogleOnClick}><FcGoogle />구글 로그인</button>
             <button onClick={handleKakaoOnClick}><SiKakaotalk />카카오 로그인</button>
         </div>

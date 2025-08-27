@@ -34,4 +34,8 @@ public class AuthService {
         jwtUtil.generateAccessToken(signupUser);
         return signupUser;
     }
+
+    public Boolean authorizationPublic(String publicToken) {
+        return jwtUtil.getClaims(publicToken) != null;
+    }
 }
