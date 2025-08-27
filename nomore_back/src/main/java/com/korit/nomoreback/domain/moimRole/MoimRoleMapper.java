@@ -12,4 +12,6 @@ public interface MoimRoleMapper {
     int deleteByMoimIdAndUserId(Integer moimId, Integer userId);
 
     int exitMoim(@Param("moimId") Integer moimId, @Param("userId") Integer userId);
+
+    void deleteUser(Integer userId);
 }

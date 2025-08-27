@@ -47,15 +47,16 @@ public class SecurityConfig {
 
         http.authorizeHttpRequests(auth -> {
             auth.requestMatchers("/").permitAll();
-            auth.requestMatchers("/oauth2/**").permitAll();
+            auth.requestMatchers("/api/oauth2/**").permitAll();
             auth.requestMatchers("/api/auth/**").permitAll();
-            auth.requestMatchers("/image/**").permitAll();
+            auth.requestMatchers("/api/image/**").permitAll();
             auth.requestMatchers("/api/search/**").permitAll();
-            auth.requestMatchers("/category/**").permitAll();
-            auth.requestMatchers("/forum/**").permitAll();
-            auth.requestMatchers("/api/moims/**").permitAll();
+            auth.requestMatchers("/api/category/**").permitAll();
+            auth.requestMatchers("/api/forum/**").permitAll();
+            auth.requestMatchers("/api/moim/**").permitAll();
             auth.requestMatchers("/api/admin/**").hasRole("ADMIN");
-            auth.requestMatchers("/ws/**").permitAll();
+            auth.requestMatchers("/api/ws/**").permitAll();
+            auth.requestMatchers("/image/**").permitAll();
             auth.anyRequest().authenticated();
         });
 

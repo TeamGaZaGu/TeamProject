@@ -69,6 +69,17 @@
         WHERE moim_id = #{moimId}
     </delete>
 
+    <update id="deleteUser">
+        update moim_tb
+        set moim_member_count = moim_member_count - 1
+        where moim_id in (
+            select moim_id
+            from moim_role_tb
+            where user_id = #{userId}
+            )
+    </update>
+
+
     <select id="findByMoimId" resultMap="MoimResultMap">
         SELECT
             mt.moim_id,

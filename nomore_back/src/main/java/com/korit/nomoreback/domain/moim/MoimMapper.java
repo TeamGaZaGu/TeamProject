@@ -29,4 +29,6 @@ public interface MoimMapper {
     void moimMemberDiscount(Integer moimId);
 
     List<Moim> myMoimList(Integer userId);
+
+    void deleteUser(Integer userId);
 }
