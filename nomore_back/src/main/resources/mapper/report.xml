@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.korit.nomoreback.domain.report.ReportMapper">
+    <insert id="reportUser">
+        insert into report_tb (
+            reporter_id,
+            target_type,
+            target_id,
+            reason,
+            status,
+            created_at
+        ) values (
+            #{reporterId},
+            #{targetType},
+            #{targetId},
+            #{reason},
+            #{status},
+            #{createdAt}
+        )
+    </insert>
+
+    <select id="reqAllReport" resultType="com.korit.nomoreback.domain.report.Report">
+        select
+            rt.report_id as reportId,
+            rt.reporter_id as reporterId,
+            ut.nick_name as reporterNickName,
+            rt.target_type as targetType,
+            rt.target_id as targetId,
+            case
+                when rt.target_type = 1 then tu.nick_name
+                else null
+            end as targetNickName,
+            rt.reason,
+            rt.status,
+            rt.created_at as createdAt
+        from
+            report_tb rt
+            left join user_tb ut on(ut.user_id = rt.reporter_id)
+            left join user_tb tu on(tu.user_id = rt.target_id and rt.target_type = 1)
+    </select>
+</mapper>

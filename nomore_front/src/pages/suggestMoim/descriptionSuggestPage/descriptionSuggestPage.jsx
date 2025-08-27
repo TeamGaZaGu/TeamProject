@@ -18,6 +18,9 @@ import ChattingPage from '../../chatting/ChattingPage.jsx';
 import { FcGoogle } from 'react-icons/fc';
 import { SiKakaotalk } from 'react-icons/si';
 import toast, { Toaster } from 'react-hot-toast';
+import { MdReport } from 'react-icons/md';
+import axios from 'axios';
+import { submitReport } from '../../../api/reportApi.js';
 
 function DescriptionSuggestPage(props) {
     const navigate = useNavigate();
@@ -35,6 +38,11 @@ function DescriptionSuggestPage(props) {
     // 모달 상태
     const [selectedUser, setSelectedUser] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    
+    // 신고 모달 상태
+    const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+    const [selectedReason, setSelectedReason] = useState('');
+    const [customReason, setCustomReason] = useState('');
     
     // React Query hooks
     const principalQuery = usePrincipalQuery();
@@ -60,6 +68,16 @@ function DescriptionSuggestPage(props) {
     
     const [forumCategory, setForumCategory] = useState("전체");
     const categoriesWithAll = [{ forumCategoryId: 0, forumCategoryName: '전체' }, ...respForumCategories];
+
+    // 신고 사유 옵션
+    const reportReasons = [
+        '스팸 / 광고성 활동',
+        '욕설 / 비방 / 혐오 발언',
+        '음란물 / 불건전한 내용',
+        '사기 / 도용 / 사칭',
+        '불법 행위 (범죄, 불법거래 등)',
+        '기타'
+    ];
 
     // 선택된 카테고리에 따른 포럼 필터링
     const filteredForums = forumCategory === "전체"
@@ -208,6 +226,67 @@ function DescriptionSuggestPage(props) {
         }
     }
 
+    // --- 상태 추가 ---
+    const [reportTarget, setReportTarget] = useState(null);
+
+    // --- 모임 신고 버튼 핸들러 ---
+    const handleReportMoimOnClick = () => {
+        setReportTarget("moim");
+        setIsReportModalOpen(true);
+    };
+
+    // --- 유저 신고 버튼 수정 ---
+    const handleReportOnClick = () => {
+        setReportTarget("user");
+        setIsReportModalOpen(true);
+    };
+
+    // 신고 모달 닫기
+    const handleCloseReportModal = () => {
+        setIsReportModalOpen(false);
+        setSelectedReason('');
+        setCustomReason('');
+    }
+
+    // 신고 사유 선택
+    const handleReasonChange = (reason) => {
+        setSelectedReason(reason);
+        if (reason !== '기타') {
+            setCustomReason('');
+        }
+    }
+
+    // 신고 제출
+    const handleSubmitReport = async () => {
+        if (!selectedReason) {
+            alert('신고 사유를 선택해주세요.');
+            return;
+        }
+
+        if (selectedReason === '기타' && !customReason.trim()) {
+            alert('기타 사유를 입력해주세요.');
+            return;
+        }
+
+        try {
+            const reportData = {
+                userId: userId,
+                targetType: reportTarget === "user" ? 1 : 2,
+                targetId: reportTarget === "user" ? selectedUser.userId : moim.moimId,
+                reason: selectedReason === '기타' ? customReason : selectedReason
+            };
+
+            await submitReport(reportData);
+            
+            toast.success('신고가 접수되었습니다');
+            handleCloseReportModal();
+            
+        } catch (error) {
+            console.error('신고 제출 실패:', error);
+            toast.error('신고 제출에 실패했습니다.');
+        }
+    }
+
     // 사용자 차단/해제 토글
     const handleToggleUserBlock = async (targetUserId, nickName) => {
         const action = isBlockedUser ? '차단해제' : '차단';
@@ -305,7 +384,10 @@ function DescriptionSuggestPage(props) {
                     <div css={s.moimInfo}>
                         <img src={`${moim.moimImgPath}`} alt="모임 썸네일" />
                         <div css={s.moimTextInfo}>
-                            <h1 css={s.moimTitle}>{moim.title}</h1>
+                            <h1 css={s.moimTitle}>
+                                {moim.title}
+                                <button onClick={handleReportMoimOnClick}><MdReport /></button>
+                            </h1>
                             <div css={s.moimMeta}>
                                 <span>{getCategory?.categoryEmoji}{getCategory?.categoryName}</span> · 
                                 <span>{moim.districtName}</span> · 
@@ -458,14 +540,20 @@ function DescriptionSuggestPage(props) {
                     null
                 )}
            
+            {/* 사용자 프로필 모달 */}
             {isModalOpen && selectedUser && (
                 <div css={s.modalOverlay} onClick={handleModalBackdropClick}>
                     <div css={s.modalContent}>
                         <div css={s.modalHeader}>
                             <h3>멤버 프로필</h3>
-                            <button css={s.closeButton} onClick={handleCloseModal}>
-                                <IoClose />
-                            </button>
+                            <div css={s.modalHeaderButtons}>
+                                <button css={s.reportButton} onClick={handleReportOnClick}>
+                                    <MdReport />
+                                </button>
+                                <button css={s.closeButton} onClick={handleCloseModal}>
+                                    <IoClose />
+                                </button>
+                            </div>
                         </div>
                         <div css={s.modalBody}>
                             <div css={s.userProfile}>
@@ -521,6 +609,51 @@ function DescriptionSuggestPage(props) {
                                         )}
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* 신고 모달 */}
+            {isReportModalOpen && (
+                <div css={s.reportModalOverlay} onClick={(e) => e.target === e.currentTarget && handleCloseReportModal()}>
+                    <div css={s.reportModalContent}>
+                        <div css={s.reportModalHeader}>
+                            <h3>사용자 신고</h3>
+                            <button css={s.closeButton} onClick={handleCloseReportModal}>
+                                <IoClose />
+                            </button>
+                        </div>
+                        <div css={s.reportModalBody}>
+                            <p css={s.reportModalDescription}>신고 사유를 선택해주세요:</p>
+                            <div css={s.reasonList}>
+                                {reportReasons.map((reason, index) => (
+                                    <label key={index} css={s.reasonItem}>
+                                        <input
+                                            type="radio"
+                                            name="reportReason"
+                                            value={reason}
+                                            checked={selectedReason === reason}
+                                            onChange={() => handleReasonChange(reason)}
+                                        />
+                                        <span css={s.reasonText}>{reason}</span>
+                                    </label>
+                                ))}
+                            </div>
+                            {selectedReason === '기타' && (
+                                <textarea
+                                    css={s.customReasonInput}
+                                    placeholder="기타 사유를 입력해주세요..."
+                                    value={customReason}
+                                    onChange={(e) => setCustomReason(e.target.value)}
+                                    maxLength={200}
+                                />
+                            )}
+                            <div css={s.reportModalFooter}>
+                                <button css={s.submitReportButton} onClick={handleSubmitReport}>
+                                    신고하기
+                                </button>
                             </div>
                         </div>
                     </div>
