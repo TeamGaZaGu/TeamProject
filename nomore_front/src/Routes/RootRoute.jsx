@@ -14,6 +14,7 @@ import UserManagement from '../pages/UserManagement/UserManagement';
 import ForumRoute from './ForumRoute';
 import BenUserPage from '../pages/BenUserPage/BenUserPage';
 import ChattingPage from '../pages/chatting/ChattingPage';
+import ReportManagement from '../pages/ReportManagement/ReportManagement';
 
 function RootRoute(props) {
     const principalQuery = usePrincipalQuery();
@@ -43,7 +44,10 @@ function RootRoute(props) {
                 <Route path='/mypage' element={ <Mypage /> } />
                 <Route path='/category/*' element={ <CatogoryPage /> } />
                 {user?.userRole === "ROLE_ADMIN" && (
-                    <Route path='/userManagement' element={<UserManagement />} />
+                    <>
+                        <Route path='/userManagement' element={<UserManagement />} />
+                        <Route path='/reportManagement' element={<ReportManagement />} />
+                    </>
                 )}
                 <Route path='/' element={ <Home />} />
                 <Route path='*' element={ <NotFound /> } />
