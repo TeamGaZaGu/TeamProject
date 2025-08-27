@@ -1,10 +1,8 @@
 package com.korit.nomoreback.service;
 
 import com.korit.nomoreback.domain.forum.*;
-import com.korit.nomoreback.domain.moim.Moim;
 import com.korit.nomoreback.domain.moimRole.MoimRoleMapper;
 import com.korit.nomoreback.dto.forum.*;
-import com.korit.nomoreback.dto.moim.MoimCategoryRespDto;
 import com.korit.nomoreback.dto.moim.MoimRoleDto;
 import com.korit.nomoreback.security.model.PrincipalUtil;
 import com.korit.nomoreback.util.AppProperties;
@@ -40,9 +38,9 @@ public class ForumService {
 
         Integer userId = getCurrentUser();
 
-        Forum forum = dto.toEntity();
-
         dto.setUserId(userId);
+
+        Forum forum = dto.toEntity();
 
         forumMapper.registerForum(forum);
 
@@ -109,7 +107,19 @@ public class ForumService {
         String path = appProperties.getImageConfigs().get(imageConfigsName).getDirPath() + fileName;
         return fileService.convertToBlob(path);
     }
-  
+
+    public List<Forum> getForumsByMoimId(Integer moimId) {
+        Integer userId = getCurrentUser();
+        List<Forum> forums = forumMapper.findByMoimId(moimId, userId);
+
+        for (Forum forum : forums) {
+            List<ForumImg> forumImgs = forumImgMapper.findImgById(forum.getForumId());
+            forumImgs.forEach(img -> img.buildImageUrl(imageUrlUtil));
+            forum.setForumImgList(forumImgs);;
+            forum.getUser().buildImageUrl(imageUrlUtil);
+        }
+        return forums;
+    }
 
     public List<Forum> getForumsByCategoryId(Integer moimId, Integer categoryId) {
         Integer userId = getCurrentUser();

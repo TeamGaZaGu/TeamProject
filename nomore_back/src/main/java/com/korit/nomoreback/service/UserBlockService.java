@@ -59,23 +59,8 @@ public class UserBlockService {
         return userBlockMapper.findByBlockerIdAndBlockedId(currentUserId, targetUserId) != null;
     }
 
-    public boolean isMutuallyBlocked(int userId1, int userId2) {
-        UserBlock block1 = userBlockMapper.findByBlockerIdAndBlockedId(userId1, userId2);
-        UserBlock block2 = userBlockMapper.findByBlockerIdAndBlockedId(userId2, userId1);
-        return block1 != null || block2 != null;
-    }
-
     public List<Integer> getBlockedUserIds(Integer userId) {
         return userBlockMapper.findBlockedUserIdsByBlockerId(userId);
     }
 
-    public List<Integer> getBlockerIds() {
-        int blockedId = getCurrentUserId();
-        return userBlockMapper.findBlockerIdsByBlockedId(blockedId);
-    }
-
-    public List<UserBlock> getBlockedUsers() {
-        int blockerId = getCurrentUserId();
-        return userBlockMapper.findBlockedUsersByBlockerId(blockerId);
-    }
 }
