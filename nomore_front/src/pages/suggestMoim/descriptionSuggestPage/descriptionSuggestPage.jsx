@@ -25,7 +25,7 @@ import { submitReport } from '../../../api/reportApi.js';
 function DescriptionSuggestPage(props) {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
-    const [ searchParam ] = useSearchParams();
+    const [searchParam] = useSearchParams();
     const moimId = parseInt(searchParam.get("moimId"));
 
     // 탭 상태
@@ -43,14 +43,14 @@ function DescriptionSuggestPage(props) {
     const [isReportModalOpen, setIsReportModalOpen] = useState(false);
     const [selectedReason, setSelectedReason] = useState('');
     const [customReason, setCustomReason] = useState('');
-    
+    const [reportTarget, setReportTarget] = useState(null);
+
     // React Query hooks
     const principalQuery = usePrincipalQuery();
     const userId = principalQuery?.data?.data?.user?.userId;
     const userRole = principalQuery?.data?.data?.user?.userRole;
-    const moimRole = userList.find( user => user.userId === userId ) ?.moimRole;
+    const moimRole = userList.find(user => user.userId === userId)?.moimRole;
 
-    
     const categoryQuery = useCategoryQuery();
     const categories = categoryQuery?.data?.data || [];
     const getCategory = categories.find(category => category.categoryId === moim.categoryId);
@@ -58,8 +58,6 @@ function DescriptionSuggestPage(props) {
     const userBlockListQuery = useUserBlockListQuery({userId});
     const userBlockList = userBlockListQuery?.data?.data?.body;
     const isBlockedUser = userBlockList?.includes(selectedUser?.userId);
-
-    const isBlockedUser = userBlockList?.includes(selectedUser?.userId)
 
     const forumQuery = useForumQuery({ size: 10, moimId });
     const allForums = forumQuery?.data?.pages?.map(page => page.data.body.contents).flat() || [];
@@ -84,6 +82,107 @@ function DescriptionSuggestPage(props) {
     const filteredForums = forumCategory === "전체"
         ? allForums
         : allForums.filter(forum => forum.forumCategory.forumCategoryName === forumCategory);
+
+    // 현재 사용자가 모임에 가입되어 있는지 확인
+    const isUserJoined = userList.find(user => user.userId === userId);
+
+    // 모임 정보 조회
+    const fetchMoim = async () => {
+        try {
+            const response = await reqSelectMoim(moimId);
+            setMoim(response.data);
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    // 모임 사용자 목록 조회
+    const fetchMoimUserList = async () => {
+        try {
+            const response = await reqMoimUserList(moimId);
+            setUserList(response?.data);
+        } catch(error) {
+            console.log(error);
+        }
+    }
+
+    // 모임 가입
+    const handleJoinMoimOnClick = async () => {
+        try {
+            const response = await reqMoimBanUserList(moimId);
+            const banList = response?.data;
+            
+            const isBannedUser = banList?.find(ban => ban.userId === userId);
+            
+            if (isBannedUser) {
+                alert("해당 모임에 가입하실 수 없습니다.");
+                return;
+            }
+          
+            await reqJoinMoim(moimId);
+            await fetchMoim();
+            await fetchMoimUserList();
+            
+            queryClient.invalidateQueries(['moim', moimId]);
+            queryClient.invalidateQueries(['moimUserList', moimId]);
+            
+            alert("모임 가입이 완료되었습니다!");
+            
+        } catch (error) {
+            console.error("가입 처리 중 에러:", error);
+            alert("가입 처리 중 문제가 발생했습니다. 다시 시도해주세요.");
+        }
+    }
+
+    // 모임 탈퇴
+    const handleExitMoimOnClick = async () => {
+        const isConfirmed = window.confirm("이 모임에서 탈퇴하시겠습니까?");
+
+        if (!isConfirmed) return;
+        
+        if (userId !== moim?.userId) {
+            try {
+                await reqExitMoim(moimId);
+                await fetchMoim();
+                await fetchMoimUserList();
+                
+                queryClient.invalidateQueries(['moim', moimId]);
+                queryClient.invalidateQueries(['moimUserList', moimId]);
+                
+                navigate("/");
+                
+            } catch (error) {
+                console.error("탈퇴 처리 중 에러:", error);
+                alert("탈퇴 처리 중 문제가 발생했습니다.");
+            }
+        }
+    }
+
+    // 모임 수정 페이지로 이동
+    const handleNavigateToEdit = () => {
+        navigate(`/suggest/modify?moimId=${moimId}`);
+    }
+
+    // 모임 삭제
+    const handleDeleteMoimOnClick = async () => {
+        const isConfirmed = window.confirm("모임을 삭제하시겠습니까?");
+        
+        if (!isConfirmed) return;
+        
+        try {
+            await reqDeleteMoim(moimId);
+            
+            queryClient.invalidateQueries(["moimpage"]);
+            queryClient.invalidateQueries(['moim']);
+            queryClient.invalidateQueries(['forums']);
+            
+            alert("모임 삭제 성공");
+            navigate("/");
+        } catch (error) {
+            console.error("모임 삭제 실패:", error);
+            alert("모임 삭제에 실패했습니다.");
+        }
+    }
 
     // 권한 이양 함수
     const handleTransferOwner = async (targetUser) => {
@@ -120,117 +219,6 @@ function DescriptionSuggestPage(props) {
         }
     };
 
-    const fetchMoim = async () => {
-        try {
-            const response = await reqSelectMoim(moimId);
-            setMoim(response.data);
-        } catch (err) {
-            console.error(err);
-        }
-    };
-
-    // 모임 사용자 목록 조회
-    const fetchMoimUserList = async () => {
-        try {
-            const response = await reqMoimUserList(moimId);
-            setUserList(response?.data);
-        } catch(error) {
-            console.log(error);
-        }
-    }
-
-    useEffect(() => {
-        if (moimId) {
-            fetchMoim();
-            fetchMoimUserList();
-        }
-    }, [moimId]);
-
-    // 모임 가입 후 즉시 반영되도록 수정
-    const handleJoinMoimOnClick = async () => {
-        try {
-            // 밴 리스트 체크
-            const response = await reqMoimBanUserList(moimId);
-            const banList = response?.data;
-            
-            const isBannedUser = banList?.find(ban => ban.userId === userId);
-            
-            if (isBannedUser) {
-                alert("해당 모임에 가입하실 수 없습니다.");
-                return;
-            }
-          
-            const joinResponse = await reqJoinMoim(moimId);
-            await fetchMoim();
-            await fetchMoimUserList();
-            
-            // 관련 쿼리들 무효화
-            queryClient.invalidateQueries(['moim', moimId]);
-            queryClient.invalidateQueries(['moimUserList', moimId]);
-            
-            alert("모임 가입이 완료되었습니다!");
-            
-        } catch (error) {
-            console.error("가입 처리 중 에러:", error);
-            alert("가입 처리 중 문제가 발생했습니다. 다시 시도해주세요.");
-        }
-    }
-
-    const handleExitMoimOnClick = async () => {
-        const isConfirmed = window.confirm("이 모임에서 탈퇴하시겠습니까?")
-
-
-        if (!isConfirmed) return;
-        
-        if (userId !== moim?.userId) {
-            try {
-                await reqExitMoim(moimId);
-                
-                // 탈퇴 후 즉시 데이터 새로고침
-                await fetchMoim();
-                await fetchMoimUserList();
-                
-                // 관련 쿼리들 무효화
-                queryClient.invalidateQueries(['moim', moimId]);
-                queryClient.invalidateQueries(['moimUserList', moimId]);
-                
-                navigate("/");
-                
-            } catch (error) {
-                console.error("탈퇴 처리 중 에러:", error);
-                alert("탈퇴 처리 중 문제가 발생했습니다.");
-            }
-        }
-    }
-
-    // 모임 수정 페이지로 이동
-    const handleNavigateToEdit = () => {
-        navigate(`/suggest/modify?moimId=${moimId}`);
-    }
-
-    const handleDeleteMoimOnClick = async () => {
-        const isConfirmed = window.confirm("모임을 삭제하시겠습니까?");
-        
-        if (!isConfirmed) {
-            return;
-        }
-        
-        try {
-            await reqDeleteMoim(moimId);
-            
-            // 모임 관련 모든 쿼리 무효화
-            queryClient.invalidateQueries(["moimpage"]);
-            queryClient.invalidateQueries(['moim']);
-            queryClient.invalidateQueries(['forums']);
-            
-            alert("모임 삭제 성공");
-            await navigate("/");
-        } catch (error) {
-            console.error("모임 삭제 실패:", error);
-            alert("모임 삭제에 실패했습니다.");
-        }
-    }
-
     // 사용자 프로필 모달 열기
     const handleMemberClick = (targetUserId) => {
         const user = userList.find(u => u.userId === targetUserId);
@@ -253,16 +241,13 @@ function DescriptionSuggestPage(props) {
         }
     }
 
-    // --- 상태 추가 ---
-    const [reportTarget, setReportTarget] = useState(null);
-
-    // --- 모임 신고 버튼 핸들러 ---
+    // 모임 신고 버튼 핸들러
     const handleReportMoimOnClick = () => {
         setReportTarget("moim");
         setIsReportModalOpen(true);
     };
 
-    // --- 유저 신고 버튼 수정 ---
+    // 유저 신고 버튼 핸들러
     const handleReportOnClick = () => {
         setReportTarget("user");
         setIsReportModalOpen(true);
@@ -273,6 +258,7 @@ function DescriptionSuggestPage(props) {
         setIsReportModalOpen(false);
         setSelectedReason('');
         setCustomReason('');
+        setReportTarget(null);
     }
 
     // 신고 사유 선택
@@ -328,12 +314,9 @@ function DescriptionSuggestPage(props) {
                 await reqUserBlock(targetUserId);
             }
             
-            // 차단 목록 쿼리 즉시 무효화
             await queryClient.invalidateQueries(['userBlockList', userId]);
             
             alert(`${nickName}님을 ${action}했습니다.`);
-            
-            // 모달 닫기 (차단 상태 변경 반영)
             handleCloseModal();
 
         } catch(error) {
@@ -356,17 +339,22 @@ function DescriptionSuggestPage(props) {
         }
     }
 
-    // 현재 사용자가 모임에 가입되어 있는지 확인
-    const isUserJoined = userList.find(user => user.userId === userId);
-
+    // 더보기 버튼 핸들러
     const handleLoadMore = () => {
         forumQuery.fetchNextPage();
     }
 
-    // 탭 전환 시 데이터 새로고침 (게시글 작성 후 돌아왔을 때 반영)
+    // 초기 데이터 로드
+    useEffect(() => {
+        if (moimId) {
+            fetchMoim();
+            fetchMoimUserList();
+        }
+    }, [moimId]);
+
+    // 탭 전환 시 데이터 새로고침
     useEffect(() => {
         if (activeTab === "board") {
-            // 게시판 탭으로 전환될 때 포럼 쿼리 새로고침
             queryClient.invalidateQueries(['forums', moimId]);
         }
     }, [activeTab, queryClient, moimId]);
@@ -400,24 +388,28 @@ function DescriptionSuggestPage(props) {
                 </div>
                 
                 {/* 액션 버튼들 */}
-                <div>
+                <div css={s.headerActions}>
                     {userRole === "ROLE_ADMIN" ? (
                         <>
                             <button css={s.Transaction} onClick={handleNavigateToEdit}><FaPen />수정</button>
-                            <button css={s.Transaction} onClick={handleDeleteMoim}><FaTrashAlt />삭제</button>
+                            <button css={s.Transaction} onClick={handleDeleteMoimOnClick}><FaTrashAlt />삭제</button>
                         </>
                     ) : moimRole === "OWNER" ? (
-                        // 모임 생성자인 경우
                         <>
                             <button css={s.Transaction} onClick={handleNavigateToEdit}><FaPen />수정</button>
-                            <button css={s.Transaction} onClick={handleDeleteMoim}><FaTrashAlt />삭제</button>
+                            <button css={s.Transaction} onClick={handleDeleteMoimOnClick}><FaTrashAlt />삭제</button>
                         </>
-                    ) : isUserJoined ? (
-                        // 가입한 사용자인 경우
-                        <button css={s.exitMoimButton} onClick={handleExitMoim}>모임 탈퇴하기</button>
                     ) : (
-                        // 미가입 사용자인 경우
-                        <button css={s.joinMoimButton} onClick={handleJoinMoim}>모임 가입하기</button>
+                        <div css={s.userActionContainer}>
+                            {isUserJoined ? (
+                                <button css={s.exitMoimButtonInline} onClick={handleExitMoimOnClick}>모임 탈퇴하기</button>
+                            ) : (
+                                <button css={s.joinMoimButtonInline} onClick={handleJoinMoimOnClick}>모임 가입하기</button>
+                            )}
+                            <button css={s.reportMoimButton} onClick={handleReportMoimOnClick}>
+                                <MdReport />
+                            </button>
+                        </div>
                     )}
                 </div>
             </div>
@@ -425,13 +417,11 @@ function DescriptionSuggestPage(props) {
             {/* Home 탭 콘텐츠 */}
             {activeTab === "home" && (
                 <div css={s.mainContent}>
-                    {/* 모임 기본 정보 */}
                     <div css={s.moimInfo}>
                         <img src={`${moim.moimImgPath}`} alt="모임 썸네일" />
                         <div css={s.moimTextInfo}>
                             <h1 css={s.moimTitle}>
                                 {moim.title}
-                                <button onClick={handleReportMoimOnClick}><MdReport /></button>
                             </h1>
                             <div css={s.moimMeta}>
                                 <span>{getCategory?.categoryEmoji}{getCategory?.categoryName}</span> · 
@@ -441,7 +431,6 @@ function DescriptionSuggestPage(props) {
                         </div>
                     </div>
 
-                    {/* 모임 소개 */}
                     <div css={s.section}>
                         <h2 css={s.sectionTitle}>모임 소개</h2>
                         <div css={s.description}>
@@ -449,7 +438,6 @@ function DescriptionSuggestPage(props) {
                         </div>
                     </div>
 
-                    {/* 모임 멤버 */}
                     <div css={s.section}>
                         <h2 css={s.sectionTitle}>모임 멤버</h2>
                         <div css={s.memberSection}>
@@ -487,7 +475,6 @@ function DescriptionSuggestPage(props) {
             {/* 게시판 탭 콘텐츠 */}
             {activeTab === "board" && (
                 <div>
-                    {/* 카테고리 선택 및 작성 버튼 */}
                     <div css={s.forumCategoryContainer}>
                         {categoriesWithAll.map((category) => (
                             <button
@@ -502,15 +489,13 @@ function DescriptionSuggestPage(props) {
                             isUserJoined ? (
                                 <button css={s.createButton} onClick={handleNavigateToCreateForum}>게시글 작성</button>
                             ) : (
-                                <button css={s.createButton} onClick={handleJoinMoim}>모임 가입하기</button>
+                                <button css={s.createButton} onClick={handleJoinMoimOnClick}>모임 가입하기</button>
                             )
                         )}
                     </div>
                     
-                    {/* 포럼 목록 */}
                     <div css={s.forumGrid}>
                         {userId === undefined ? (
-                            // 비로그인 사용자
                             <div css={s.loginContainer}>
                                 <h2>로그인이 필요한 페이지입니다</h2>
                                 <div css={s.loginBox}>
@@ -523,12 +508,10 @@ function DescriptionSuggestPage(props) {
                                 </div>
                             </div>
                         ) : filteredForums.length === 0 ? (
-                            // 게시글이 없는 경우
                             <div css={s.register}>
                                 <h3>게시글을 등록해주세요</h3>
                             </div>
                         ) : (
-                            // 게시글 목록
                             <div css={s.forumContainer}>
                                 {filteredForums?.map((forum) => {
                                     const date = new Date(forum.forumCreatedAt);
@@ -567,60 +550,54 @@ function DescriptionSuggestPage(props) {
                                             </div>
                                         </div>
                                     );
-                                })
-                            }
-                            {forumQuery.hasNextPage && (
-                                <div css={s.loadMoreContainerStyle}>
-                                    <button 
-                                        css={s.loadMoreButtonStyle}
-                                        onClick={handleLoadMore}
-                                        disabled={forumQuery.isLoading}
-                                    >
-                                        {forumQuery.isLoading ? (
-                                            <>
-                                                <span css={s.spinnerStyle}>⏳</span>
-                                                불러오는 중...
-                                            </>
-                                        ) : (
-                                            <>
-                                                게시글 더보기
-                                                <span css={s.arrowStyle}>▼</span>
-                                            </>
-                                        )}
-                                    </button>
-                                </div>
-                            )}
-                        </div>
-                        }
+                                })}
+                                {forumQuery.hasNextPage && (
+                                    <div css={s.loadMoreContainerStyle}>
+                                        <button 
+                                            css={s.loadMoreButtonStyle}
+                                            onClick={handleLoadMore}
+                                            disabled={forumQuery.isLoading}
+                                        >
+                                            {forumQuery.isLoading ? (
+                                                <>
+                                                    <span css={s.spinnerStyle}>⏳</span>
+                                                    불러오는 중...
+                                                </>
+                                            ) : (
+                                                <>
+                                                    게시글 더보기
+                                                    <span css={s.arrowStyle}>▼</span>
+                                                </>
+                                            )}
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        )}
                     </div>
                 </div>
             )}
-
-            {activeTab === "chat" && moimId ? (
-                    <ChattingPage 
-                        moimId={Number(moimId)}  // 숫자로 변환
-                        userId={principalQuery?.data?.data?.user?.nickName} // 확실하게 user 전달
-                    />
-                ) : activeTab === "chat" ? (
-                    <div>올바른 채팅방 ID가 필요합니다.</div>
-                ) : null}
-
-            <div css={s.bottomActions}>
-                <button css={s.joinButton} >
-                    모임 가입하기
-                </button>
-            </div>
             
             {/* 채팅 탭 콘텐츠 */}
-             {activeTab === "chat" && 
-                moimId ? ( userList.find(user => user.userId === userId) ?
-                    <ChattingPage 
-                        moimId={Number(moimId)}
-                        userId={principalQuery?.data?.data?.user?.nickName}
-                    /> : toast.error("모임 가입이 필요한 페이지입니다")
+            {activeTab === "chat" && (
+                moimId ? (
+                    userList.find(user => user.userId === userId) ? (
+                        <ChattingPage 
+                            moimId={Number(moimId)}
+                            userId={principalQuery?.data?.data?.user?.nickName}
+                        />
+                    ) : (
+                        <div css={s.loginContainer}>
+                            <h2>모임 가입이 필요한 페이지입니다</h2>
+                            <button css={s.joinMoimButton} onClick={handleJoinMoimOnClick}>
+                                모임 가입하기
+                            </button>
+                        </div>
+                    )
                 ) : (
-                    null
-                )}
+                    <div>올바른 채팅방 ID가 필요합니다.</div>
+                )
+            )}
            
             {/* 사용자 프로필 모달 */}
             {isModalOpen && selectedUser && (
@@ -670,7 +647,6 @@ function DescriptionSuggestPage(props) {
                                             </button>
                                         )}
                                         
-                                        {/* 현재 유저의 모임 내 역할을 다시 확인 */}
                                         {(() => {
                                             const currentUserInMoim = userList.find(u => u.userId === userId);
                                             const isCurrentUserOwner = currentUserInMoim?.moimRole === "OWNER";
@@ -682,7 +658,6 @@ function DescriptionSuggestPage(props) {
                                             );
                                         })()}
                                         
-                                        {/* 방장이고 자신이 아닌 경우만 강퇴 버튼 표시 */}
                                         {userList.find(u => u.userId === userId)?.moimRole === "OWNER" && 
                                          selectedUser.userId !== userId && (
                                             <button css={s.modalKickButton} onClick={() => {}}>
@@ -702,7 +677,7 @@ function DescriptionSuggestPage(props) {
                 <div css={s.reportModalOverlay} onClick={(e) => e.target === e.currentTarget && handleCloseReportModal()}>
                     <div css={s.reportModalContent}>
                         <div css={s.reportModalHeader}>
-                            <h3>사용자 신고</h3>
+                            <h3>{reportTarget === "user" ? "사용자 신고" : "모임 신고"}</h3>
                             <button css={s.closeButton} onClick={handleCloseReportModal}>
                                 <IoClose />
                             </button>
@@ -748,4 +723,3 @@ function DescriptionSuggestPage(props) {
 }
 
 export default DescriptionSuggestPage;
-                                                

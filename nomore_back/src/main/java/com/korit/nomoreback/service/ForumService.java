@@ -211,8 +211,4 @@ public class ForumService {
         Integer userId = getCurrentUser();
         forumLikeMapper.deleteLike(forumId, userId);
     }
-
-    public List<Forum> findForumsByUserId(Integer userId) {
-        return forumMapper.findForumsByUserId(userId);
-    }
 }
