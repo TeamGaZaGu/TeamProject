@@ -38,9 +38,9 @@ public class ForumService {
 
         Integer userId = getCurrentUser();
 
-        Forum forum = dto.toEntity();
-
         dto.setUserId(userId);
+
+        Forum forum = dto.toEntity();
 
         forumMapper.registerForum(forum);
 
