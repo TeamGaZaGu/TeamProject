@@ -22,7 +22,6 @@ public class FileService {
     public String uploadFile(MultipartFile file, String imageConfigName) {
         System.out.println("imageConfigName" + imageConfigName);
         String dirPath = appProperties.getImageConfigs().get(imageConfigName).getDirPath();
-        // 원본 파일 명
         String originalFilename = generateFilename(file.getOriginalFilename());
 
         mkdirs(dirPath);
@@ -42,11 +41,8 @@ public class FileService {
 
     private String generateFilename(String originFilename) {
         StringBuilder newFilename = new StringBuilder();
-        // 겹치지 않는 새 파일명 생성 위한 uuid 문자열 생성
         newFilename.append(UUID.randomUUID().toString().replaceAll("-", ""));
-        // uuid와 원본 파일 명 구분 위한 _ 추가
         newFilename.append("_");
-        // 마지막 원본 파일 명 추가
         newFilename.append(originFilename);
 
         return newFilename.toString();
@@ -73,7 +69,7 @@ public class FileService {
     public byte[] convertToBlob(String path) {
         try {
             File file = new File(path);
-            return Files.readAllBytes(file.toPath()); // readAllBytes -> path의 경로에 있는 실제 파일의 내용을 byte[]로 읽어 반환
+            return Files.readAllBytes(file.toPath());
         }catch (Exception e) {
             e.printStackTrace();
             return null;
