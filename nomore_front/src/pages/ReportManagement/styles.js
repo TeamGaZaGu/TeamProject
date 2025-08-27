@@ -7,6 +7,25 @@ export const container = css`
   margin: 0 auto;
 `;
 
+export const filterContainer = css`
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+`;
+
+export const filterLabel = css`
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+
+  input[type="radio"] {
+    accent-color: #4f46e5; /* 보라색 강조 */
+    cursor: pointer;
+  }
+`;
+
 // 페이지 제목
 export const pageTitle = css`
   font-size: 2rem;
@@ -117,4 +136,3 @@ export const processButton = css`
     background-color: #1d4ed8;
   }
 `;
-

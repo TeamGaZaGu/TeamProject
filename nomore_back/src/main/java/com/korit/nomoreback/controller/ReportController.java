@@ -25,4 +25,10 @@ public class ReportController {
         reportService.reportUser(dto);
         return ResponseEntity.ok(ResponseDto.success("신고되었습니다."));
     }
+
+    @PostMapping("/report/{reportId}")
+    public ResponseEntity<ResponseDto<?>> reportComplete(@PathVariable Integer reportId) {
+        reportService.reportComplete(reportId);
+        return ResponseEntity.ok(ResponseDto.success("조치완료 되었습니다."));
+    }
 }
