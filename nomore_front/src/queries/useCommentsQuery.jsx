@@ -1,11 +1,11 @@
 import { useInfiniteQuery} from '@tanstack/react-query';
 import React from 'react';
-import { reqGetForums } from '../api/forumApi';
+import { reqGetComment, reqGetForums } from '../api/forumApi';
 
-function useForumQuery({size, moimId}) {
+function useCommentsQuery({size, forumId}) {
     return useInfiniteQuery({
-        queryKey: ["forums", size, moimId],
-        queryFn: async ({pageParam = 1}) => await reqGetForums({page: pageParam, size, moimId}),
+        queryKey: ["forums", size, forumId],
+        queryFn: async ({pageParam = 1}) => await reqGetComment({page: pageParam, size, forumId}),
         getNextPageParam: (lastPage, allPages) => {
             console.log(lastPage)
             const currentPage = lastPage.data.body.page;
@@ -15,4 +15,4 @@ function useForumQuery({size, moimId}) {
     })
 }
 
-export default useForumQuery;
+export default useCommentsQuery;

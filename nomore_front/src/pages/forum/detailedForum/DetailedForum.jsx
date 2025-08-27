@@ -10,6 +10,7 @@ import usePrincipalQuery from '../../../queries/usePrincipalQuery.jsx';
 import { SiKakaotalk } from 'react-icons/si';
 import { FcGoogle } from 'react-icons/fc';
 import { X } from 'lucide-react';
+import useCommentsQuery from '../../../queries/useCommentsQuery.jsx';
 import { MdReport } from 'react-icons/md';
 import { IoClose } from 'react-icons/io5';
 import toast, { Toaster } from 'react-hot-toast';
@@ -25,7 +26,37 @@ function DetailedForum(props) {
     const inputRef = useRef(null);
 
     const [ searchParam ] = useSearchParams();
-    const forumId = searchParam.get("forumId");
+    const forumId = parseInt(searchParam.get("forumId"));
+
+    const commentQuery = useCommentsQuery({ size:20 , forumId})
+    const allComments = commentQuery?.data?.pages?.map(page => page.data.body.contents).flat() || [];
+    const isLast = commentQuery?.data?.data?.body.isLast || false;
+    console.log("--------------------")
+    console.log(allComments);
+
+    const loaderRef = useRef(null);
+
+    useEffect(() => {
+        const observer = new IntersectionObserver((entries) => {
+            if (entries[0].isIntersecting) {
+                if(commentQuery.hasNextPage) {
+                    commentQuery.fetchNextPage();
+                }
+            }
+        }, { 
+            rootMargin: "500px",
+        });
+
+        if (loaderRef.current) {
+            observer.observe(loaderRef.current);
+        }
+
+        return () => {
+            if (loaderRef.current) {
+                observer.unobserve(loaderRef.current);
+            }
+        };
+    }, [loaderRef.current]);
 
     const [ comments, setComments ] = useState([]);
     const [ commentValue, setCommentValue ] = useState("");
@@ -241,6 +272,7 @@ function DetailedForum(props) {
       }
     }
 
+    // 댓글 작성 후 즉시 반영되도록 수정
     const handleRegisterCommentOnClick = async (forumId, moimId) => {
         if (commentValue.trim() === "") {
             return setCommentValue("");
@@ -255,10 +287,21 @@ function DetailedForum(props) {
             parentUserId: recomment?.user.userId,
             content
         }
-        await reqRegisterComment(forumId, moimId, comment)
-        setCommentValue("");
-        setRecomment(null);
-        await fetchComment();
+        
+        try {
+            await reqRegisterComment(forumId, moimId, comment);
+            setCommentValue("");
+            setRecomment(null);
+            
+            // 댓글 쿼리 무효화하여 새 댓글 데이터 다시 가져오기
+            await queryClient.invalidateQueries(['comments', forumId]);
+            // 포럼 상세 정보도 새로고침 (댓글 수 업데이트 등)
+            await fetchForum();
+            
+        } catch (error) {
+            console.error("댓글 등록 실패:", error);
+            alert("댓글 등록에 실패했습니다.");
+        }
     }
 
     useEffect(() => {
@@ -274,15 +317,28 @@ function DetailedForum(props) {
     }, [recomment]);
 
     const handleLikeOnClick = async (e) => {
-        await reqLike(forumId)
-        await fetchForum()
+        try {
+            await reqLike(forumId);
+            await fetchForum();
+            // 포럼 목록 쿼리도 무효화 (좋아요 수 반영)
+            queryClient.invalidateQueries(['forums']);
+        } catch (error) {
+            console.error("좋아요 처리 실패:", error);
+        }
     }
 
     const handleDislikeOnClick = async (e) => {
-        await reqDislike(forumId)
-        await fetchForum()
+        try {
+            await reqDislike(forumId);
+            await fetchForum();
+            // 포럼 목록 쿼리도 무효화 (좋아요 수 반영)
+            queryClient.invalidateQueries(['forums']);
+        } catch (error) {
+            console.error("좋아요 취소 처리 실패:", error);
+        }
     }
 
+    // 댓글 삭제 후 즉시 반영되도록 수정
     const handleCommentDeleteOnClick = async (forumId, moimId, forumCommentId) => {
         const confirmDelete = window.confirm("댓글을 삭제하시겠습니까?");
         if (!confirmDelete) return;
@@ -290,7 +346,12 @@ function DetailedForum(props) {
         try {
             await reqDeleteComment(forumId, moimId, forumCommentId);
             alert("댓글이 삭제되었습니다.");
-            await fetchComment()
+            
+            // 댓글 쿼리 무효화하여 삭제된 댓글 반영
+            await queryClient.invalidateQueries(['comments', forumId]);
+            // 포럼 정보도 새로고침 (댓글 수 업데이트)
+            await fetchForum();
+            
         } catch (e) {
             alert("권한이 없습니다.");
         }
@@ -351,7 +412,7 @@ function DetailedForum(props) {
                     <div css={s.comments}>
                       <div css={s.commentList}>
                           {
-                            comments?.map(comment => {
+                            allComments?.map(comment => {
                               if (comment.level === 0) {
                                 return (
                                     <div key={comment.forumCommentId} css={s.commentRow}>

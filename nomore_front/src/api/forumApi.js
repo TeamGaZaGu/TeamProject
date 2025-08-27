@@ -6,7 +6,13 @@ export const reqRegisterForum = async (data, moimId) => await api.post(`/api/moi
   }
 });
 
-export const reqGetForums = async (moimId) => await api.get(`/api/moims/${moimId}/forums`);
+export const reqGetForums = async ({page, size, moimId}) => await api.get("/api/moims/forums", {
+  params: {
+    page,
+    size,
+    moimId,
+  }
+});
 
 export const reqGetForumsWithParams = async (moimId, params) => await api.get(`/api/moims/${moimId}/forums`, { params });
 
@@ -22,7 +28,13 @@ export const reqModifyForum = async (forumId, data) => await api.put(`/api/moims
 
 export const reqDeleteForum = async (forumId, moimId) => await api.delete(`/api/moims/${moimId}/${forumId}/delete`);
 
-export const reqGetComment = async (forumId) => await api.get(`api/moims/${forumId}/comments`);
+export const reqGetComment = async ({page, size, forumId}) => await api.get(`api/moims/comments`, {
+  params: {
+    page,
+    size,
+    forumId,
+  }
+});
 
 export const reqRegisterComment = async (forumId, moimId, data) => await api.post(`api/moims/${moimId}/${forumId}/comment`, data);
 

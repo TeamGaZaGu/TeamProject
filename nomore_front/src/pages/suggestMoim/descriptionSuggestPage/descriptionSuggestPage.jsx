@@ -25,8 +25,8 @@ import { submitReport } from '../../../api/reportApi.js';
 function DescriptionSuggestPage(props) {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
-    const [searchParam] = useSearchParams();
-    const moimId = searchParam.get("moimId");
+    const [ searchParam ] = useSearchParams();
+    const moimId = parseInt(searchParam.get("moimId"));
 
     // 탭 상태
     const [activeTab, setActiveTab] = useState("home");
@@ -59,9 +59,10 @@ function DescriptionSuggestPage(props) {
     const userBlockList = userBlockListQuery?.data?.data?.body;
     const isBlockedUser = userBlockList?.includes(selectedUser?.userId);
 
-    // 포럼 관련 데이터
-    const forumQuery = useForumQuery(moimId);
-    const respForums = forumQuery?.data?.data || []; 
+    const isBlockedUser = userBlockList?.includes(selectedUser?.userId)
+
+    const forumQuery = useForumQuery({ size: 10, moimId });
+    const allForums = forumQuery?.data?.pages?.map(page => page.data.body.contents).flat() || [];
 
     const forumCategoryQuery = useForumCategoryQuery();
     const respForumCategories = forumCategoryQuery?.data?.data || [];
@@ -81,8 +82,8 @@ function DescriptionSuggestPage(props) {
 
     // 선택된 카테고리에 따른 포럼 필터링
     const filteredForums = forumCategory === "전체"
-        ? respForums
-        : respForums.filter(forum => forum.forumCategory.forumCategoryName === forumCategory);
+        ? allForums
+        : allForums.filter(forum => forum.forumCategory.forumCategoryName === forumCategory);
 
     // 권한 이양 함수
     const handleTransferOwner = async (targetUser) => {
@@ -145,8 +146,8 @@ function DescriptionSuggestPage(props) {
         }
     }, [moimId]);
 
-    // 모임 가입
-    const handleJoinMoim = async () => {
+    // 모임 가입 후 즉시 반영되도록 수정
+    const handleJoinMoimOnClick = async () => {
         try {
             // 밴 리스트 체크
             const response = await reqMoimBanUserList(moimId);
@@ -158,10 +159,15 @@ function DescriptionSuggestPage(props) {
                 alert("해당 모임에 가입하실 수 없습니다.");
                 return;
             }
-            
-            await reqJoinMoim(moimId);
+          
+            const joinResponse = await reqJoinMoim(moimId);
             await fetchMoim();
             await fetchMoimUserList();
+            
+            // 관련 쿼리들 무효화
+            queryClient.invalidateQueries(['moim', moimId]);
+            queryClient.invalidateQueries(['moimUserList', moimId]);
+            
             alert("모임 가입이 완료되었습니다!");
             
         } catch (error) {
@@ -170,16 +176,30 @@ function DescriptionSuggestPage(props) {
         }
     }
 
-    // 모임 탈퇴
-    const handleExitMoim = async () => {
-        const isConfirmed = window.confirm("이 모임에서 탈퇴하시겠습니까?");
+    const handleExitMoimOnClick = async () => {
+        const isConfirmed = window.confirm("이 모임에서 탈퇴하시겠습니까?")
+
 
         if (!isConfirmed) return;
         
         if (userId !== moim?.userId) {
-            await reqExitMoim(moimId);
-            await fetchMoim();
-            navigate("/");
+            try {
+                await reqExitMoim(moimId);
+                
+                // 탈퇴 후 즉시 데이터 새로고침
+                await fetchMoim();
+                await fetchMoimUserList();
+                
+                // 관련 쿼리들 무효화
+                queryClient.invalidateQueries(['moim', moimId]);
+                queryClient.invalidateQueries(['moimUserList', moimId]);
+                
+                navigate("/");
+                
+            } catch (error) {
+                console.error("탈퇴 처리 중 에러:", error);
+                alert("탈퇴 처리 중 문제가 발생했습니다.");
+            }
         }
     }
 
@@ -188,16 +208,23 @@ function DescriptionSuggestPage(props) {
         navigate(`/suggest/modify?moimId=${moimId}`);
     }
 
-    // 모임 삭제
-    const handleDeleteMoim = async () => {
-        const isConfirmed = window.confirm("정말로 모임을 삭제하시겠습니까?");
-        if (!isConfirmed) return;
-
+    const handleDeleteMoimOnClick = async () => {
+        const isConfirmed = window.confirm("모임을 삭제하시겠습니까?");
+        
+        if (!isConfirmed) {
+            return;
+        }
+        
         try {
             await reqDeleteMoim(moimId);
+            
+            // 모임 관련 모든 쿼리 무효화
             queryClient.invalidateQueries(["moimpage"]);
-            alert("모임 삭제 완료");
-            navigate("/");
+            queryClient.invalidateQueries(['moim']);
+            queryClient.invalidateQueries(['forums']);
+            
+            alert("모임 삭제 성공");
+            await navigate("/");
         } catch (error) {
             console.error("모임 삭제 실패:", error);
             alert("모임 삭제에 실패했습니다.");
@@ -301,7 +328,13 @@ function DescriptionSuggestPage(props) {
                 await reqUserBlock(targetUserId);
             }
             
+            // 차단 목록 쿼리 즉시 무효화
             await queryClient.invalidateQueries(['userBlockList', userId]);
+            
+            alert(`${nickName}님을 ${action}했습니다.`);
+            
+            // 모달 닫기 (차단 상태 변경 반영)
+            handleCloseModal();
 
         } catch(error) {
             console.log(`사용자 ${action} 실패:`, error);
@@ -325,6 +358,18 @@ function DescriptionSuggestPage(props) {
 
     // 현재 사용자가 모임에 가입되어 있는지 확인
     const isUserJoined = userList.find(user => user.userId === userId);
+
+    const handleLoadMore = () => {
+        forumQuery.fetchNextPage();
+    }
+
+    // 탭 전환 시 데이터 새로고침 (게시글 작성 후 돌아왔을 때 반영)
+    useEffect(() => {
+        if (activeTab === "board") {
+            // 게시판 탭으로 전환될 때 포럼 쿼리 새로고침
+            queryClient.invalidateQueries(['forums', moimId]);
+        }
+    }, [activeTab, queryClient, moimId]);
 
     return (
         <div css={s.container}>
@@ -522,12 +567,49 @@ function DescriptionSuggestPage(props) {
                                             </div>
                                         </div>
                                     );
-                                })}
-                            </div>
-                        )}
+                                })
+                            }
+                            {forumQuery.hasNextPage && (
+                                <div css={s.loadMoreContainerStyle}>
+                                    <button 
+                                        css={s.loadMoreButtonStyle}
+                                        onClick={handleLoadMore}
+                                        disabled={forumQuery.isLoading}
+                                    >
+                                        {forumQuery.isLoading ? (
+                                            <>
+                                                <span css={s.spinnerStyle}>⏳</span>
+                                                불러오는 중...
+                                            </>
+                                        ) : (
+                                            <>
+                                                게시글 더보기
+                                                <span css={s.arrowStyle}>▼</span>
+                                            </>
+                                        )}
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                        }
                     </div>
                 </div>
             )}
+
+            {activeTab === "chat" && moimId ? (
+                    <ChattingPage 
+                        moimId={Number(moimId)}  // 숫자로 변환
+                        userId={principalQuery?.data?.data?.user?.nickName} // 확실하게 user 전달
+                    />
+                ) : activeTab === "chat" ? (
+                    <div>올바른 채팅방 ID가 필요합니다.</div>
+                ) : null}
+
+            <div css={s.bottomActions}>
+                <button css={s.joinButton} >
+                    모임 가입하기
+                </button>
+            </div>
             
             {/* 채팅 탭 콘텐츠 */}
              {activeTab === "chat" && 
@@ -666,3 +748,4 @@ function DescriptionSuggestPage(props) {
 }
 
 export default DescriptionSuggestPage;
+                                                

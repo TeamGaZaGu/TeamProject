@@ -1,5 +1,6 @@
 package com.korit.nomoreback.domain.forum;
 
+import com.korit.nomoreback.domain.moim.Moim;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -12,10 +13,7 @@ public interface ForumMapper {
     Forum findByForumId(@Param("forumId") Integer forumId);
     int modifyForum(Forum forum);
     int deleteForum(@Param("forumId") Integer forumId);
-    List<Forum> findByMoimId(
-            @Param("moimId") Integer moimId,
-            @Param("userId") Integer userId
-    );
+
     List<Forum> findByCategoryId(
             @Param("moimId") Integer moimId,
             @Param("categoryId") Integer categoryId,
@@ -24,7 +22,8 @@ public interface ForumMapper {
     List<ForumImg> findImgsByForumId(@Param("forumId") Integer forumId);
 
     List<ForumCategory> getFourumCategories();
-    List<Forum> findAllByMoimId(@Param("moimId") Integer moimId);
 
-    List<Forum> findForumsByUserId(@Param("userId") Integer userId);
+    // 게시글 조회
+    Integer getCountOfOptions(ForumsSearchOption option);
+    List<Forum> findAllOfOptions(ForumsSearchOption option);
 }

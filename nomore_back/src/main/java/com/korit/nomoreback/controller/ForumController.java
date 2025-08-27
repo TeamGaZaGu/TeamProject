@@ -3,6 +3,7 @@ package com.korit.nomoreback.controller;
 import com.korit.nomoreback.domain.forum.Forum;
 import com.korit.nomoreback.domain.forum.ForumComment;
 import com.korit.nomoreback.dto.forum.*;
+import com.korit.nomoreback.dto.response.ResponseDto;
 import com.korit.nomoreback.security.model.PrincipalUtil;
 import com.korit.nomoreback.service.FileService;
 import com.korit.nomoreback.service.ForumService;
@@ -34,6 +35,11 @@ public class ForumController {
         Forum forum = forumService.getForumById(forumId);
         return ResponseEntity.ok(forum);
     }
+
+
+    @GetMapping("/forums")
+    public ResponseEntity<ResponseDto<?>> getForumList(ForumSearchReqDto dto) {
+        return ResponseEntity.ok(ResponseDto.success(forumService.getForumsByMoimId(dto)));
 
     @GetMapping("/forums/blobs")
     public ResponseEntity<byte[]> getImage(@RequestParam String url, @RequestParam String imageConfigsName) {
@@ -101,10 +107,9 @@ public class ForumController {
         return ResponseEntity.ok(forumService.getFourumCategories());
     }
 
-    @GetMapping("/{forumId}/comments")
-    public ResponseEntity<List<ForumComment>> getComments(@PathVariable Integer forumId) {
-        List<ForumComment> comments = forumService.getCommentsByForumId(forumId);
-        return ResponseEntity.ok(comments);
+    @GetMapping("/comments")
+    public ResponseEntity<ResponseDto<?>> getComments(ForumCommentSearchReqDto dto) {
+        return ResponseEntity.ok(ResponseDto.success(forumService.getCommentsByForumId(dto)));
     }
 
     @DeleteMapping("/{moimId}/{forumId}/comment/delete/{forumCommentId}")
