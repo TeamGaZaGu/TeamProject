@@ -55,7 +55,6 @@ public class MoimController {
 
     @GetMapping("/find")
     public ResponseEntity<ResponseDto<?>> findCategoryMoims(MoimCategoryReqDto dto) {
-        System.out.println(dto);
         return ResponseEntity.ok(ResponseDto.success(moimService.categoryMoim(dto)));
     }
 
@@ -71,7 +70,6 @@ public class MoimController {
 
     @PatchMapping(value = "/{moimId}/modify", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> updateMoim(@PathVariable Integer moimId, @ModelAttribute MoimModifyDto dto) {
-        System.out.println(dto);
         dto.setMoimId(moimId);
         moimService.modifyMoim(dto);
         return ResponseEntity.ok("수정 완");
@@ -95,13 +93,11 @@ public class MoimController {
         searchReqDto.setKeyword(keyword);
 
         List<MoimListRespDto> moimList = moimService.searchMoim(searchReqDto);
-        System.out.println("검색 파라미터: " + searchReqDto);
         return ResponseEntity.ok(moimList);
     }
 
     @GetMapping("/userList")
     public ResponseEntity<List<User>> moimUserList(@RequestParam Integer moimId) {
-        System.out.println(moimService.moimUserList(moimId));
         return ResponseEntity.ok(moimService.moimUserList(moimId));
     }
 
@@ -120,7 +116,6 @@ public class MoimController {
 
     @GetMapping("/{userId}/moims")
     public ResponseEntity<List<Moim>> myMoimList(@PathVariable Integer userId) {
-        System.out.println(moimService.myMoimList(userId));
         return ResponseEntity.ok(moimService.myMoimList(userId));
     }
 }

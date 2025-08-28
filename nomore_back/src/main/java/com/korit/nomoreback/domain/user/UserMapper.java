@@ -22,7 +22,7 @@ public interface UserMapper {
 
     int insert(User entity);
 
-    void updateProfile(UserProfileUpdateReqDto reqDto);
+    int updateProfile(User user);
     String findProfileImgPathByUserId(int userId);
 
     void deleteUser(Integer userId);
