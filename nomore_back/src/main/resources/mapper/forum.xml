@@ -273,8 +273,7 @@
             fc.forum_category_name,
 
             ifnull(flc.like_count, 0) as like_count,
-            ifnull(fcc.comment_count, 0) as comment_count,
-            ifnull(flt.forum_like_id, 0) as is_like
+            ifnull(fcc.comment_count, 0) as comment_count
         from forum_tb f
             join user_tb u on u.user_id = f.user_id
             left join (
@@ -295,10 +294,6 @@
                 from forum_comment_tb
                 group by forum_id
                 ) fcc on fcc.forum_id = f.forum_id
-
-            left join forum_like_tb flt
-                on flt.forum_id = f.forum_id
-                and flt.user_id = #{userId}
         where
             f.moim_id = #{moimId}
         limit #{startIndex}, #{size}

@@ -25,6 +25,7 @@ function MypageButton(props) {
 
         if (isConfirmed) {
             localStorage.removeItem("AccessToken");
+            queryClient.setQueryData(["principal"], null)
             await queryClient.invalidateQueries({
                 queryKey: ["principal"],
             });

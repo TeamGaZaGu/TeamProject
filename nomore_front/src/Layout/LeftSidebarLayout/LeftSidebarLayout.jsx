@@ -27,7 +27,7 @@ function LeftSidebarLayout(props) {
     }
 
     const handleSuggestOnClick = () => {
-        navigate("/suggest/find")
+        navigate("/moim/find")
     }
 
     const handleCategoryOnClick = (categoryId) => {

@@ -1,7 +1,7 @@
 import { css } from "@emotion/react";
 
-export const container = css` 
-  min-width: 700px;
+export const container = css`
+  position: relative;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 `;
 
@@ -17,8 +17,28 @@ export const header = css`
   z-index: 100;
 `;
 
+export const mainLayout = css`
+  display: flex;
+  border: none;
+  width: 100%;
+  gap: 2rem;
+  margin: 0 auto;
+  background-color: #fff;
+  overflow-y: hidden;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 1rem;
+  }
+`;
+
+
+export const contentArea = css`
+  flex: 1;
+  min-width: 0;
+`;
+
 export const click = css`
-<<<<<<< HEAD:nomore_front/src/pages/suggestMoim/descriptionSuggestPage/styles.js
     background: none;
     border: none;
     font-size: 24px;
@@ -30,19 +50,6 @@ export const click = css`
         background-color: #f1f3f4;
         border-radius: 50%;
     }
-=======
-  background: none;
-  border: none;
-  font-size: 24px;
-  cursor: poiner;
-  padding: 8px;
-  color: #333;
-  
-  &:hover {
-      background-color: #f1f3f4;
-      border-radiust: 50%;
-  }
->>>>>>> 293-회원가입-생년월일-수정:nomore_front/src/pages/moim/detailMoim/styles.js
 `;
 
 export const headerActions = css`
@@ -118,6 +125,65 @@ export const reportMoimButton = css`
     }
 `;
 
+
+export const rightSidebar = css`
+  width: 40rem;
+  flex-shrink: 0;
+  background-color: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  padding: 20px;
+  height: fit-content;
+  position: sticky;
+  top: 20px;
+
+  @media (max-width: 768px) {
+    display: none;
+  }
+`;
+
+export const sidebarTitle = css`
+  font-size: 16px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #f0f0f0;
+`;
+
+export const imageGrid = css`
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+`;
+
+export const imageWrapper = css`
+  aspect-ratio: 1;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: #f8f9fa;
+  
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.2s ease;
+    cursor: pointer;
+  }
+  
+  img:hover {
+    transform: scale(1.05);
+  }
+`;
+
+export const noImages = css`
+  grid-column: 1 / -1;
+  text-align: center;
+  color: #666;
+  font-size: 14px;
+  padding: 40px 20px;
+`;
+
 // 모임 신고 버튼 (관리자/방장용 - 헤더 우측에 배치)
 export const reportMoimButtonAdmin = css`
     background: none;
@@ -180,8 +246,10 @@ export const exitMoimButtonInline = css`
 export const mainContent = css`
   display: flex;
   flex-direction: column;
-  width: 100%;
   min-height: 799px;
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 0; // 기존 background 제거
 `;
 
 export const moimInfo = css`
@@ -348,29 +416,6 @@ export const blockedUserText = css`
   padding-right: 8px;
 `;
 
-export const rightSidebar = css`
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-auto-rows: auto;     
-  gap: 10px;
-  width: 40rem;
-  max-width: 40rem;
-
-  & img {
-    width: 100%;
-    height: auto;
-    object-fit: cover;
-  }
-
-  & p {
-    display: flex;
-    margin: 5rem;
-    justify-content: center;
-    align-items: center;
-    font-size: 2rem;
-  }
-`;
-
 export const memberCard = css`
   display: flex;
   align-items: center;
@@ -414,14 +459,30 @@ export const memberName = css`
   font-weight: 500;
 `;
 
-export const forumCategoryContainer = css`
+export const categoryAndForumsWrapper = css`
   display: flex;
+  flex-direction: column;
+  background-color: #fff;
+`;
+
+export const topBar = css`
+  display: flex;
+  align-items: center;
+  margin-right: 2rem;
+  gap: 12px;
+  padding-bottom: 12px;
+  flex-shrink: 0;
+  overflow-x: auto;
+`;
+
+export const forums = css`
+  display: flex;
+  flex-direction: row;
   align-items: center;
   gap: 8px;
   margin-bottom: 1rem;
   padding: 12px 20px;
   background-color: #ffffff;
-  border-bottom: 1px solid #e5e7eb;
   overflow-x: auto;
 `;
 

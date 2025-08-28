@@ -181,7 +181,7 @@ function ModifyMoim(props) {
     try {
         await reqModifyMoim(formData, moimId);
         alert("모임 수정 성공!");
-        navigate(`/suggest/description?moimId=${moimId}`);
+        navigate(`/moim/description?moimId=${moimId}`);
     } catch (error) {
         console.error("모임 수정 실패:", error);
         alert("모임 수정 실패");

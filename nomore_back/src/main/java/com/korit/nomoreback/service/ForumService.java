@@ -3,6 +3,7 @@ package com.korit.nomoreback.service;
 import com.korit.nomoreback.domain.forum.*;
 import com.korit.nomoreback.domain.moim.Moim;
 import com.korit.nomoreback.domain.moimRole.MoimRoleMapper;
+import com.korit.nomoreback.domain.user.User;
 import com.korit.nomoreback.dto.forum.*;
 import com.korit.nomoreback.dto.moim.MoimCategoryRespDto;
 import com.korit.nomoreback.dto.moim.MoimRoleDto;
@@ -16,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -37,13 +39,9 @@ public class ForumService {
 
     @Transactional
     public void registerForum(ForumRegisterDto dto) {
-
         Integer userId = getCurrentUser();
-
-        Forum forum = dto.toEntity();
-
         dto.setUserId(userId);
-
+        Forum forum = dto.toEntity();
         forumMapper.registerForum(forum);
 
         List<MultipartFile> imageFiles = dto.getForumImages();
@@ -63,8 +61,6 @@ public class ForumService {
 
                 forumImgs.add(forumImg);
             }
-            System.out.println("이미지 저장 리스트: " + forumImgs);
-
             forumImgMapper.insertMany(forumImgs);
         }
     }
@@ -81,10 +77,9 @@ public class ForumService {
     }
 
     public ForumSearchRespDto getForumsByMoimId(ForumSearchReqDto dto) {
-        Integer userId = principalUtil.getPrincipalUser().getUser().getUserId();
-        Integer totalElements = forumMapper.getCountOfOptions(dto.toOption(userId));
+        Integer totalElements = forumMapper.getCountOfOptions(dto.toOption());
         Integer totalPages = (int) Math.ceil(totalElements.doubleValue() / dto.getSize().doubleValue());
-        List<Forum> foundForums = forumMapper.findAllOfOptions(dto.toOption(userId));
+        List<Forum> foundForums = forumMapper.findAllOfOptions(dto.toOption());
         boolean isLast = foundForums.size() < dto.getSize();
 
         for (Forum forum : foundForums) {
@@ -189,18 +184,18 @@ public class ForumService {
     public ForumCommentSearchRespDto getCommentsByForumId(ForumCommentSearchReqDto dto) {
         Integer totalElements = forumCommentMapper.getCountOfOptions(dto.toOption());
         Integer totalPages = (int) Math.ceil(totalElements.doubleValue() / dto.getSize().doubleValue());
-        List<ForumComment> foundForums = forumCommentMapper.findAllOfOptions(dto.toOption());
-        boolean isLast = foundForums.size() < dto.getSize();
-//
-//        for (ForumComment forumComment : foundForums) {
-//            List<ForumImg> forumImgs = forumImgMapper.findImgById(forumComment.getForumId());
-//            forumImgs.forEach(img -> img.buildImageUrl(imageUrlUtil));
-//            forumComment.getUser().getProfileImgPath();;
-//            forumComment.getUser().buildImageUrl(imageUrlUtil);
-//        }
+        System.out.println("totalPages " + totalPages);
+        List<ForumComment> getComments =
+                forumCommentMapper.findAllOfOptions(dto.toOption())
+                        .stream().map(comment -> {
+                            comment.getUser().buildImageUrl(imageUrlUtil);
+                            return comment;
+                        }).collect(Collectors.toList());
+
+        boolean isLast = getComments.size() < dto.getSize();
 
         return ForumCommentSearchRespDto.builder()
-                .contents(foundForums)
+                .contents(getComments)
                 .totalElements(totalElements)
                 .totalPages(totalPages)
                 .page(dto.getPage())

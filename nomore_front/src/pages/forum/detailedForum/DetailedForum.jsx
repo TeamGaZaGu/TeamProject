@@ -31,9 +31,8 @@ function DetailedForum(props) {
 
     const commentQuery = useCommentsQuery({ size:20 , forumId})
     const allComments = commentQuery?.data?.pages?.map(page => page.data.body.contents).flat() || [];
+    console.log("allComments", allComments)
     const isLast = commentQuery?.data?.data?.body.isLast || false;
-    console.log("--------------------")
-    console.log(allComments);
 
     const loaderRef = useRef(null);
 
@@ -58,8 +57,7 @@ function DetailedForum(props) {
             }
         };
     }, [loaderRef.current]);
-
-    const [ comments, setComments ] = useState([]);
+    
     const [ commentValue, setCommentValue ] = useState("");
     const [ recomment, setRecomment ] = useState(null);    
     const [ forum, setForum ] = useState([]);
@@ -215,22 +213,7 @@ function DetailedForum(props) {
             fetchForum();
         }
     }, [forumId]);
-
-    const fetchComment = async () => {
-      try {
-        const response = await reqGetComment(forumId);
-        setComments(response?.data)
-      } catch (error) {
-          console.log("댓글 불러오기 실패:", error);
-      }
-    };
-
-    useEffect(() => {
-      if (forumId) {
-            fetchComment();
-        }
-    }, [forumId])
-        
+    
     const handleDeleteForumOnClick = async (forumId, moimId) => {
         const confirmDelete = window.confirm("게시글을 삭제하시겠습니까?");
         if (!confirmDelete) return;
@@ -238,7 +221,7 @@ function DetailedForum(props) {
         try {
             await reqDeleteForum(forumId, moimId);
             queryClient.invalidateQueries(['forums']); 
-            navigate(`/suggest/description?moimId=${moimId}`);
+            navigate(`/moim/description?moimId=${moimId}`);
         } catch (error) {
             console.error("삭제 실패:", error);
             alert("게시글 삭제 중 오류 발생");
@@ -253,7 +236,7 @@ function DetailedForum(props) {
         setRecomment(null);
       }
     }
-
+    
     const handleRegisterCommentOnClick = async (forumId, moimId) => {
         if (commentValue.trim() === "") {
             return setCommentValue("");
@@ -384,7 +367,7 @@ function DetailedForum(props) {
                             ? <p onClick={(e) => handleDislikeOnClick(e)}><BiSolidLike style={{ color: '#1e1ef3ff' }} />{forum?.likeCount}</p>
                             : <p onClick={(e) => handleLikeOnClick(e)}><BiLike />{forum?.likeCount}</p>
                         }
-                        <p onClick={() => inputRef.current?.focus()}><FaRegComment />{comments.length}</p>
+                        <p onClick={() => inputRef.current?.focus()}><FaRegComment />{allComments.length}</p>
                     </div>
                     <div css={s.comments}>
                       <div css={s.commentList}>

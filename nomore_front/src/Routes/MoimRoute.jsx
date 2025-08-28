@@ -6,7 +6,7 @@ import FindMoim from '../pages/moim/findMoim/FindMoim';
 import DetailMoim from '../pages/moim/detailMoim/DetailMoim';
 import ModifyMoim from '../pages/moim/modifyMoim/ModifyMoim';
 
-function SuggestRoute(props) {
+function MoimRoute(props) {
 
     return (
         <Routes>       
@@ -19,4 +19,4 @@ function SuggestRoute(props) {
     );
 }
 
-export default SuggestRoute;
+export default MoimRoute;
