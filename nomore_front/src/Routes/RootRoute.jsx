@@ -1,6 +1,6 @@
 import Home from '../pages/home/Home';
 import MainLayout from '../Layout/MainLayout/MainLayout';
-import { Route, Routes, useNavigate, useSearchParams } from 'react-router-dom';
+import { Route, Routes, Navigate } from 'react-router-dom';
 import NotFound from '../pages/NotFound/NotFound';
 import Mypage from '../pages/Mypage/Mypage';
 import Signup from '../pages/Auth/signup/Signup';
@@ -25,10 +25,15 @@ function RootRoute(props) {
         return <Loading />
     }
 
+    // 사용자가 차단된 경우
     if (user?.userSiteBlock === 1) {
         return (
             <MainLayout>
-                <BenUserPage />
+                <Routes>
+                    <Route path='/temporaryBlocking' element={<BenUserPage />} />
+                    {/* 다른 모든 경로를 차단 페이지로 리다이렉트 */}
+                    <Route path='*' element={<Navigate to="/temporaryBlocking" replace />} />
+                </Routes>
             </MainLayout>
         );
     }

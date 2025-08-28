@@ -136,3 +136,96 @@ export const processButton = css`
     background-color: #1d4ed8;
   }
 `;
+
+export const modalOverlay = css`
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+`;
+
+export const modalContent = css`
+    background-color: white;
+    border-radius: 8px;
+    padding: 0;
+    width: 90%;
+    max-width: 600px;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+`;
+
+export const modalHeader = css`
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid #e5e7eb;
+    
+    h3 {
+        margin: 0;
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #1f2937;
+    }
+`;
+
+export const closeButton = css`
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #6b7280;
+    padding: 0.5rem;
+    border-radius: 4px;
+    
+    &:hover {
+        background-color: #f3f4f6;
+        color: #374151;
+    }
+`;
+
+export const modalBody = css`
+    padding: 2rem;
+`;
+
+export const reasonText = css`
+    font-size: 1.4rem;
+    line-height: 1.6;
+    color: #374151;
+    white-space: pre-wrap;
+    word-break: break-word;
+    background-color: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    padding: 1rem;
+    min-height: 100px;
+`;
+
+export const modalFooter = css`
+    display: flex;
+    justify-content: flex-end;
+    padding: 1rem 2rem 1.5rem 2rem;
+    border-top: 1px solid #e5e7eb;
+`;
+
+export const confirmButton = css`
+    background-color: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 0.75rem 1.5rem;
+    font-size: 1.4rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    
+    &:hover {
+        background-color: #2563eb;
+    }
+`;
