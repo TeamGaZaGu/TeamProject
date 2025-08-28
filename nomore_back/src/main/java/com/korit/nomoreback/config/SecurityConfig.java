@@ -56,6 +56,7 @@ public class SecurityConfig {
             auth.requestMatchers("/api/admin/**").hasRole("ADMIN");
             auth.requestMatchers("/ws/**").permitAll();
             auth.requestMatchers("/api/user/**").permitAll();
+            auth.requestMatchers("/api/chat/").permitAll();
             auth.anyRequest().authenticated();
         });
 

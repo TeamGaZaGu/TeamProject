@@ -8,8 +8,9 @@ import java.util.List;
 
 @Mapper
 public interface ChatMapper {
-    void insertChat(ChatMessageDto chat);
+    void insertChat(Chat chat);
     List<Chat> getMessages(@Param("moimId") Integer moimId,
                            @Param("limit") Integer limit,
                            @Param("offset") Integer offset);
+//    void deleteChat();
 }

@@ -26,6 +26,10 @@ app:
       prefix: "${app.server-host}/image/forum"
       dir-path: "${user.dir}/upload/forum"
       default-img: "default.jpg"
+    chat:
+      prefix: "${app.server-host}/image/chat"
+      dir-path: "${user.dir}/upload/chat"
+      default-img: "default.jpg"
 ---
 
 spring:
