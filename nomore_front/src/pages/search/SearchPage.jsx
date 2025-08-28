@@ -44,7 +44,7 @@ function SearchPage(props) {
     }, [loaderRef.current]);
 
     const handleMoimOnClick = (moimId) => {
-        navigate(`/suggest/description?moimId=${moimId}`);
+        navigate(`/moim/description?moimId=${moimId}`);
     };
 
     console.log(allMoims);

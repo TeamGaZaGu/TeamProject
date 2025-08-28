@@ -61,6 +61,7 @@ function DetailMoim(props) {
 
     const forumQuery = useForumQuery({ size: 10, moimId });
     const allForums = forumQuery?.data?.pages?.map(page => page.data.body.contents).flat() || [];
+    const allImages = allForums.flatMap(forum => forum.forumImgList || []);
 
     const forumCategoryQuery = useForumCategoryQuery();
     const respForumCategories = forumCategoryQuery?.data?.data || [];
@@ -160,7 +161,7 @@ function DetailMoim(props) {
 
     // 모임 수정 페이지로 이동
     const handleNavigateToEdit = () => {
-        navigate(`/suggest/modify?moimId=${moimId}`);
+        navigate(`/moim/modify?moimId=${moimId}`);
     }
 
     // 모임 삭제
@@ -401,204 +402,245 @@ function DetailMoim(props) {
                         </>
                     ) : (
                         <div css={s.userActionContainer}>
-                            {isUserJoined ? (
-                                <button css={s.exitMoimButtonInline} onClick={handleExitMoimOnClick}>모임 탈퇴하기</button>
+                            {userId !== undefined ? (
+                                <>
+                                    {isUserJoined ? (
+                                        <button css={s.exitMoimButtonInline} onClick={handleExitMoimOnClick}>
+                                            모임 탈퇴하기
+                                        </button>
+                                    ) : (
+                                        <button css={s.joinMoimButtonInline} onClick={handleJoinMoimOnClick}>
+                                            모임 가입하기
+                                        </button>
+                                    )}
+                                    <button css={s.reportMoimButton} onClick={handleReportMoimOnClick}>
+                                        <MdReport />
+                                    </button>
+                                </>
                             ) : (
-                                <button css={s.joinMoimButtonInline} onClick={handleJoinMoimOnClick}>모임 가입하기</button>
+                                <></>
                             )}
-                            <button css={s.reportMoimButton} onClick={handleReportMoimOnClick}>
-                                <MdReport />
-                            </button>
                         </div>
                     )}
                 </div>
             </div>
-            
-            {/* Home 탭 콘텐츠 */}
-            {activeTab === "home" && (
-                <div css={s.mainContent}>
-                    <div css={s.moimInfo}>
-                        <img src={`${moim.moimImgPath}`} alt="모임 썸네일" />
-                        <div css={s.moimTextInfo}>
-                            <h1 css={s.moimTitle}>
-                                {moim.title}
-                            </h1>
-                            <div css={s.moimMeta}>
-                                <span>{getCategory?.categoryEmoji}{getCategory?.categoryName}</span> · 
-                                <span>{moim.districtName}</span> · 
-                                <span>{moim.memberCount}/{moim.maxMember}</span>
+            <div css={s.mainLayout}>
+
+                <div css={s.contentArea}> 
+                    {/* Home 탭 콘텐츠 */}
+                    {activeTab === "home" && (
+                        <div css={s.mainContent}>
+                            <div css={s.moimInfo}>
+                                <img src={`${moim.moimImgPath}`} alt="모임 썸네일" />
+                                <div css={s.moimTextInfo}>
+                                    <h1 css={s.moimTitle}>
+                                        {moim.title}
+                                    </h1>
+                                    <div css={s.moimMeta}>
+                                        <span>{getCategory?.categoryEmoji}{getCategory?.categoryName}</span> · 
+                                        <span>{moim.districtName}</span> · 
+                                        <span>{moim.memberCount}/{moim.maxMember}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div css={s.section}>
+                                <h2 css={s.sectionTitle}>모임 소개</h2>
+                                <div css={s.description}>
+                                    <p>{moim.discription}</p>
+                                </div>
+                            </div>
+
+                            <div css={s.section}>
+                                <h2 css={s.sectionTitle}>모임 멤버</h2>
+                                <div css={s.memberSection}>
+                                    {userList?.map((user) => {
+                                        const roleEmoji = user.moimRole === "OWNER" ? "👑" : "👤";
+                                        const isBlocked = userBlockList?.includes(user.userId);
+
+                                        return (
+                                            <div 
+                                                key={user.userId} 
+                                                css={s.memberCard} 
+                                                onClick={() => handleMemberClick(user.userId)}
+                                            >
+                                                <img
+                                                    src={`${user.profileImgPath}`}
+                                                    alt="프로필"
+                                                    css={s.profileImage}
+                                                /> 
+                                                <div css={s.defaultAvatar}>{roleEmoji}</div>
+                                                <div css={s.memberInfo}>
+                                                    <span css={s.memberRole}>{user.nickName}</span>
+                                                    <span css={s.memberName}>{user.introduction}</span>
+                                                </div>
+                                                {isBlocked && (
+                                                    <div css={s.blockedUserText}>차단한 유저</div>
+                                                )}
+                                            </div>
+                                        );
+                                    })}
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    )}
+                    
+                    {/* 게시판 탭 콘텐츠 */}
+                    {activeTab === "board" && (
+                    <div css={s.mainContent}>
+                        <div css={s.categoryAndForumsWrapper}>
 
-                    <div css={s.section}>
-                        <h2 css={s.sectionTitle}>모임 소개</h2>
-                        <div css={s.description}>
-                            <p>{moim.discription}</p>
-                        </div>
-                    </div>
-
-                    <div css={s.section}>
-                        <h2 css={s.sectionTitle}>모임 멤버</h2>
-                        <div css={s.memberSection}>
-                            {userList?.map((user) => {
-                                const roleEmoji = user.moimRole === "OWNER" ? "👑" : "👤";
-                                const isBlocked = userBlockList?.includes(user.userId);
-
-                                return (
-                                    <div 
-                                        key={user.userId} 
-                                        css={s.memberCard} 
-                                        onClick={() => handleMemberClick(user.userId)}
-                                    >
-                                        <img
-                                            src={`${user.profileImgPath}`}
-                                            alt="프로필"
-                                            css={s.profileImage}
-                                        /> 
-                                        <div css={s.defaultAvatar}>{roleEmoji}</div>
-                                        <div css={s.memberInfo}>
-                                            <span css={s.memberRole}>{user.nickName}</span>
-                                            <span css={s.memberName}>{user.introduction}</span>
-                                        </div>
-                                        {isBlocked && (
-                                            <div css={s.blockedUserText}>차단한 유저</div>
-                                        )}
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    </div>
-                </div>
-            )}
-            
-            {/* 게시판 탭 콘텐츠 */}
-            {activeTab === "board" && (
-                <div>
-                    <div css={s.forumCategoryContainer}>
-                        {categoriesWithAll.map((category) => (
-                            <button
+                        {/* 상단 카테고리 버튼 + 작성/가입 버튼 */}
+                        <div css={s.topBar}>
+                            <div css={s.forums}>
+                            {categoriesWithAll.map((category) => (
+                                <button
                                 key={category.forumCategoryId}
                                 onClick={() => setForumCategory(category.forumCategoryName)}
                                 css={s.categoryButton(forumCategory === category.forumCategoryName)}
-                            >
+                                >
                                 {category.forumCategoryName}
-                            </button>
-                        ))}
-                        {userId !== undefined && (
+                                </button>
+                            ))}
+                            </div>
+
+                            {userId !== undefined && (
                             isUserJoined ? (
                                 <button css={s.createButton} onClick={handleNavigateToCreateForum}>게시글 작성</button>
                             ) : (
                                 <button css={s.createButton} onClick={handleJoinMoimOnClick}>모임 가입하기</button>
                             )
-                        )}
-                    </div>
-                    
-                    <div css={s.forumGrid}>
-                        {userId === undefined ? (
+                            )}
+                        </div>
+
+                        {/* 게시글 영역 */}
+                        <div css={s.forumGrid}>
+                            {userId === undefined ? (
                             <div css={s.loginContainer}>
                                 <h2>로그인이 필요한 페이지입니다</h2>
                                 <div css={s.loginBox}>
-                                    <button css={s.googleLogin} onClick={() => { window.location.href = "http://localhost:8080/oauth2/authorization/google"; }}>
-                                        <FcGoogle />구글 로그인
-                                    </button>
-                                    <button css={s.kakaoLogin} onClick={() => { window.location.href = "http://localhost:8080/oauth2/authorization/kakao"; }}>
-                                        <SiKakaotalk />카카오 로그인
-                                    </button>
+                                <button
+                                    css={s.googleLogin}
+                                    onClick={() => { window.location.href = "http://localhost:8080/oauth2/authorization/google"; }}
+                                >
+                                    <FcGoogle />구글 로그인
+                                </button>
+                                <button
+                                    css={s.kakaoLogin}
+                                    onClick={() => { window.location.href = "http://localhost:8080/oauth2/authorization/kakao"; }}
+                                >
+                                    <SiKakaotalk />카카오 로그인
+                                </button>
                                 </div>
                             </div>
-                        ) : filteredForums.length === 0 ? (
+                            ) : filteredForums.length === 0 ? (
                             <div css={s.register}>
                                 <h3>게시글을 등록해주세요</h3>
                             </div>
-                        ) : (
+                            ) : (
                             <div css={s.forumContainer}>
                                 {filteredForums?.map((forum) => {
-                                    const date = new Date(forum.forumCreatedAt);
-                                    const formatted = new Intl.DateTimeFormat('ko-KR', {
-                                        year: 'numeric',
-                                        month: 'numeric',
-                                        day: 'numeric',
-                                        hour: 'numeric',
-                                        minute: 'numeric',
-                                        hour12: true,
-                                        timeZone: 'Asia/Seoul'
-                                    }).format(date);
+                                const date = new Date(forum.forumCreatedAt);
+                                const formatted = new Intl.DateTimeFormat('ko-KR', {
+                                    year: 'numeric',
+                                    month: 'numeric',
+                                    day: 'numeric',
+                                    hour: 'numeric',
+                                    minute: 'numeric',
+                                    hour12: true,
+                                    timeZone: 'Asia/Seoul'
+                                }).format(date);
 
-                                    return (
-                                        <div css={s.forumCard} onClick={() => handleNavigateToForumDetail(forum.forumId)} key={forum.forumId}>
-                                            <div css={s.forumHeader}>
-                                                <img
-                                                    css={s.modalProfileImage}
-                                                    src={`${forum.user.profileImgPath}`}
-                                                    alt="프로필"
-                                                />
-                                                <div css={s.userInfo}>
-                                                    <h3 css={s.h3Tag}>{forum.user.nickName}</h3>
-                                                    <p css={s.postMeta}>
-                                                        {forum.forumCategory.forumCategoryName} · {formatted}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                            <div css={s.forumBody}>
-                                                <h2 css={s.forumTitle}>{forum.forumTitle}</h2>
-                                                <p css={s.forumContent}>{forum.forumContent}</p>
-                                            </div>
-                                            <div css={s.forumFooter}>
-                                                <p><BiLike /> {forum.likeCount}</p>
-                                                <p><FaRegComment /> {forum.commentCount}</p>
-                                            </div>
+                                return (
+                                    <div css={s.forumCard} onClick={() => handleNavigateToForumDetail(forum.forumId)} key={forum.forumId}>
+                                    <div css={s.forumHeader}>
+                                        <img
+                                        css={s.modalProfileImage}
+                                        src={`${forum.user.profileImgPath}`}
+                                        alt="프로필"
+                                        />
+                                        <div css={s.userInfo}>
+                                        <h3 css={s.h3Tag}>{forum.user.nickName}</h3>
+                                        <p css={s.postMeta}>
+                                            {forum.forumCategory.forumCategoryName} · {formatted}
+                                        </p>
                                         </div>
-                                    );
+                                    </div>
+                                    <div css={s.forumBody}>
+                                        <h2 css={s.forumTitle}>{forum.forumTitle}</h2>
+                                        <p css={s.forumContent}>{forum.forumContent}</p>
+                                    </div>
+                                    <div css={s.forumFooter}>
+                                        <p><BiLike /> {forum.likeCount}</p>
+                                        <p><FaRegComment /> {forum.commentCount}</p>
+                                    </div>
+                                    </div>
+                                );
                                 })}
                                 {forumQuery.hasNextPage && (
-                                    <div css={s.loadMoreContainerStyle}>
-                                        <button 
-                                            css={s.loadMoreButtonStyle}
-                                            onClick={handleLoadMore}
-                                            disabled={forumQuery.isLoading}
-                                        >
-                                            {forumQuery.isLoading ? (
-                                                <>
-                                                    <span css={s.spinnerStyle}>⏳</span>
-                                                    불러오는 중...
-                                                </>
-                                            ) : (
-                                                <>
-                                                    게시글 더보기
-                                                    <span css={s.arrowStyle}>▼</span>
-                                                </>
-                                            )}
-                                        </button>
-                                    </div>
+                                <div css={s.loadMoreContainerStyle}>
+                                    <button
+                                    css={s.loadMoreButtonStyle}
+                                    onClick={handleLoadMore}
+                                    disabled={forumQuery.isLoading}
+                                    >
+                                    {forumQuery.isLoading ? (
+                                        <>
+                                        <span css={s.spinnerStyle}>⏳</span>
+                                        불러오는 중...
+                                        </>
+                                    ) : (
+                                        <>
+                                        게시글 더보기
+                                        <span css={s.arrowStyle}>▼</span>
+                                        </>
+                                    )}
+                                    </button>
+                                </div>
                                 )}
                             </div>
+                            )}
+                        </div>
+
+                        </div>
+                    </div>
+                    )}
+                    {/* 채팅 탭 콘텐츠 */}
+                    {activeTab === "chat" && (
+                        moimId ? (
+                            userList.find(user => user.userId === userId) ? (
+                                <ChattingPage 
+                                    moimId={Number(moimId)}
+                                    userId={principalQuery?.data?.data?.user?.nickName}
+                                />
+                            ) : (
+                                <div css={s.loginContainer}>
+                                    <h2>모임 가입이 필요한 페이지입니다</h2>
+                                    <button css={s.joinMoimButton} onClick={handleJoinMoimOnClick}>
+                                        모임 가입하기
+                                    </button>
+                                </div>
+                            )
+                        ) : (
+                            <div>올바른 채팅방 ID가 필요합니다.</div>
+                        )
+                    )}
+                </div>
+                <div css={s.rightSidebar}>
+                    <div css={s.sidebarTitle}>모임 사진</div>
+                    <div css={s.imageGrid}>
+                        {allImages.length > 0 ? (
+                            allImages.slice(0, 12).map((img) => (
+                                <div css={s.imageWrapper} key={img.forumImgId}>
+                                    <img src={img.path} alt="forum image" />
+                                </div>
+                            ))
+                        ) : (
+                            <div css={s.noImages}>등록된 이미지가 없습니다</div>
                         )}
                     </div>
                 </div>
-            )}
-            
-            {/* 채팅 탭 콘텐츠 */}
-            {activeTab === "chat" && (
-                moimId ? (
-                    userList.find(user => user.userId === userId) ? (
-                        <ChattingPage 
-                            moimId={Number(moimId)}
-                            userId={principalQuery?.data?.data?.user?.nickName}
-                        />
-                    ) : (
-                        <div css={s.loginContainer}>
-                            <h2>모임 가입이 필요한 페이지입니다</h2>
-                            <button css={s.joinMoimButton} onClick={handleJoinMoimOnClick}>
-                                모임 가입하기
-                            </button>
-                        </div>
-                    )
-                ) : (
-                    <div>올바른 채팅방 ID가 필요합니다.</div>
-                )
-            )}
-           
+            </div>
             {/* 사용자 프로필 모달 */}
             {isModalOpen && selectedUser && (
                 <div css={s.modalOverlay} onClick={handleModalBackdropClick}>

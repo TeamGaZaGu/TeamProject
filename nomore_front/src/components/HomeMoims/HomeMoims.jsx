@@ -12,7 +12,7 @@ function HomeMoims({ category }) {
     const allMoims = moimQuery?.data?.pages?.map(page => page.data.body.contents).flat() || [];
 
     const handleMoimOnClick = (moimId) => {
-        navigate(`/suggest/description?moimId=${moimId}`);
+        navigate(`/moim/description?moimId=${moimId}`);
     };
 
     const handleImageError = (e, moim) => {

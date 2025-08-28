@@ -43,7 +43,7 @@ function CategoryPage() {
     }, [loaderRef.current]);
 
     const handleMoimOnClick = (moimId) => {
-        navigate(`/suggest/description?moimId=${moimId}`);
+        navigate(`/moim/description?moimId=${moimId}`);
     };
 
     if (categoryQuery.isLoading) {

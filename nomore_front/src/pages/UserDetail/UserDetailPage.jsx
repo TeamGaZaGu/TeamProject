@@ -19,7 +19,7 @@ function UserDetailPage() {
     const currentUserRole = principalQuery?.data?.data?.user?.userRole;
 
     const handleMoimClick = (moimId) => {
-        navigate(`/suggest/description?moimId=${moimId}`);
+        navigate(`/moim/description?moimId=${moimId}`);
     };
 
     const handlePostClick = (forumId, moimId) => {

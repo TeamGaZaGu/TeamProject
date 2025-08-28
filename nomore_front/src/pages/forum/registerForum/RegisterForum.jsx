@@ -79,13 +79,10 @@ function RegisterForum(props) {
         images.forEach((image, index) => {
             formData.append("forumImages", image.file);
         });
-        for (const pair of formData.entries()) {
-            console.log(pair[0], pair[1]);
-        }
 
         try {
             await reqRegisterForum(formData, moimId);
-            navigate(`/suggest/description?moimId=${moimId}`);
+            navigate(`/moim/description?moimId=${moimId}`);
             await queryClient.invalidateQueries({ queryKey: ['forums', moimId] });
         } catch (error) {
             console.error("게시글 등록 실패:", error);

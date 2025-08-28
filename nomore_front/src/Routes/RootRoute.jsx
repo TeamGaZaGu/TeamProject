@@ -8,7 +8,7 @@ import Oauth2Redirect from '../Oauth2/Oauth2Redirect';
 import Loading from '../Loading/Loading';
 import usePrincipalQuery from '../queries/usePrincipalQuery';
 import SearchPage from '../pages/search/SearchPage';
-import SuggestRoute from './SuggestRoute';
+import MoimRoute from './MoimRoute';
 import CatogoryPage from '../pages/CategoryPage/CatogoryPage';
 import UserManagement from '../pages/UserManagement/UserManagement';
 import ForumRoute from './ForumRoute';
@@ -36,7 +36,7 @@ function RootRoute(props) {
     return (
         <MainLayout>
             <Routes>
-                <Route path='/suggest/*' element={<SuggestRoute />} />
+                <Route path='/moim/*' element={<MoimRoute />} />
                 <Route path='/forum/*' element={<ForumRoute />} />
                 <Route path='/searchpage' element={<SearchPage />} />
                 <Route path='/oauth2/login' element={<Oauth2Redirect />} />

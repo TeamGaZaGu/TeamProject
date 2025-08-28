@@ -11,12 +11,11 @@ public class ForumSearchReqDto {
     private Integer size;
     private Integer moimId;
 
-    public ForumsSearchOption toOption(Integer userId) {
+    public ForumsSearchOption toOption() {
         return ForumsSearchOption.builder()
                 .startIndex((page - 1) * size)
                 .size(size)
                 .moimId(moimId)
-                .userId(userId)
                 .build();
     }
 }

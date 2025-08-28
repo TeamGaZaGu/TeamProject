@@ -1,21 +1,17 @@
 package com.korit.nomoreback.controller;
 
 import com.korit.nomoreback.domain.forum.Forum;
-import com.korit.nomoreback.domain.forum.ForumComment;
 import com.korit.nomoreback.dto.forum.*;
 import com.korit.nomoreback.dto.response.ResponseDto;
-import com.korit.nomoreback.security.model.PrincipalUtil;
-import com.korit.nomoreback.service.FileService;
 import com.korit.nomoreback.service.ForumService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.File;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/moims")
+@RequestMapping("/api/forum")
 @RequiredArgsConstructor
 public class ForumController {
 

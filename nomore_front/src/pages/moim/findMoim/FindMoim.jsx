@@ -36,11 +36,11 @@ function FindMoim() {
     }, [loaderRef.current]);
 
     const handleMoimOnClick = (moimId) => {
-        navigate(`/suggest/description?moimId=${moimId}`);
+        navigate(`/moim/description?moimId=${moimId}`);
     };
 
     const handleCreateMoimOnClick = () => {
-        navigate("/suggest/create");
+        navigate("/moim/create");
     };
 
     if (categoryQuery.isLoading) {
