@@ -38,6 +38,7 @@ function ModifyForum(props) {
     }, [forum]);
 
 
+    console.log(getImageBlobPromises)
     useEffect(() => {
         const fetchForum = async () => {
             try {

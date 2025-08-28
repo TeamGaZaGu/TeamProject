@@ -5,10 +5,10 @@ import { css } from '@emotion/react';
 export const PageContainer = css`
   display: flex;
   flex: 1;
-  height: 85vh;
+  height: 80vh;
   width: 100%;          /* ✅ 꽉 채우기 */
   max-width: 1200px;    /* ✅ 필요 시 제한 */
-  margin-top: 55px ;
+  margin-top: 15px ;
   margin-left: auto;
   margin-right: auto;
   border: 1px solid #9bbbd4;

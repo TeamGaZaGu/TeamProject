@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.korit.nomoreback.domain.chat.ChatImgMapper">
+
+    <insert id="insertMany" useGeneratedKeys="true" keyProperty="chatImgId">
+        insert into chat_img_tb (chat_id, seq, path)
+        values
+            <foreach item="chatImg" collection="chatImg" separator=",">
+                (#{chatImg.chatId},#{chatImg.seq},#{chatImg.path})
+            </foreach>
+    </insert>
+
+    <select id="findByChatId" resultType="com.korit.nomoreback.domain.chat.ChatImg">
+        select
+            chat_img_id,
+            chat_id,
+            seq,
+            path
+        from
+            chat_img_tb
+        where
+            chat_id = #{chatId}
+    </select>
+
+</mapper>
