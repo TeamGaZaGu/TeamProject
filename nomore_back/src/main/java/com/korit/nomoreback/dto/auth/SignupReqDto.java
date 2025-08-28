@@ -26,7 +26,7 @@ public class SignupReqDto {
                 .fullName(fullName)
                 .birthDate(birthDate)
                 .email(email)
-                .profileImgPath("/profile/default.jpg")
+                .profileImgPath("default.jpg")
                 .introduction(introduction)
                 .gender(gender)
                 .categoryId(categoryId)

@@ -37,7 +37,7 @@ public class ForumService {
         return principalUtil.getPrincipalUser().getUser().getUserId();
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void registerForum(ForumRegisterDto dto) {
         Integer userId = getCurrentUser();
         dto.setUserId(userId);
@@ -111,6 +111,7 @@ public class ForumService {
         return forumMapper.findByCategoryId(moimId, categoryId, userId);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public void modifyForum(ForumModifyDto dto){
         Integer userId = getCurrentUser();
         Integer forumId = dto.getForumId();

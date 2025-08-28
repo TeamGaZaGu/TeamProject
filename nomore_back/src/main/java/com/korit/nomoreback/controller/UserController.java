@@ -51,16 +51,11 @@ public class UserController {
     }
 
     @PutMapping("/profile")
-    public ResponseEntity<?> updateProfile(
-            @AuthenticationPrincipal PrincipalUser principal,
-            @ModelAttribute UserProfileUpdateReqDto userProfileUpdateReqDto,
-            @RequestParam(value = "profileImg", required = false) MultipartFile profileImg
-    ) {
-        userService.updateProfile(principal.getUser().getUserId(), userProfileUpdateReqDto, profileImg);
-        System.out.println(userProfileUpdateReqDto);
+    public ResponseEntity<?> updateProfile(@ModelAttribute UserProfileUpdateReqDto dto) {
+        System.out.println(dto);
+        userService.updateProfile(dto);
         return ResponseEntity.ok().build();
     }
-
 
     @PostMapping("/userBlock")
     public ResponseEntity<ResponseDto<?>> blockUser(

@@ -71,8 +71,6 @@ function ModifyForum(props) {
         }
     }, [forumId]);
 
-    const [images, setImages] = useState([]);
-
     const handleInputChange = (e) => {
         setForumValue(prev => ({
             ...prev,
@@ -87,17 +85,13 @@ function ModifyForum(props) {
         }));
     }
 
-    const handleImgDeleteOnClick = (index) => {
-        setImages(prev => prev.filter((file, i) => i !== index));
-    }
-
     const handlePlusOnClick =  () => {
         const fileInput = document.createElement("input");
         fileInput.setAttribute("type", "file");
         fileInput.setAttribute("multiple", "true");
         fileInput.click();
         fileInput.onchange = async (e) => {
-            if (images.length + e.target.files.length > 10) {
+            if (forumValue.forumImages.length + e.target.files.length > 10) {
                     alert("이미지는 최대 10개까지만 등록할 수 있습니다.")
                 return;
             }
@@ -137,9 +131,6 @@ function ModifyForum(props) {
             console.log("image.file", image.file)
             formData.append("forumImages", image.file);
         });
-        for (const pair of formData.entries()) {
-            console.log(pair[0], pair[1]);
-        }
 
         try {
             await reqModifyForum(forumId, formData)
@@ -209,7 +200,7 @@ function ModifyForum(props) {
 
             <div css={s.imgbox}>
                 <div css={s.imgCounter}>
-                    이미지 ({images.length}/10)
+                    이미지 ({forumValue.forumImages.length}/10)
                 </div>
                 <div css={s.imgContainer}>
                     {
@@ -233,24 +224,9 @@ function ModifyForum(props) {
                             </div>
                         ))
                     }
-                    {
-                        images.map((img, index) => (
-                            <div key={index}>
-                                <div css={s.previewImg}>
-                                    <img src={img.dataUrl} alt="" />
-                                    <button
-                                        type="button"
-                                        onClick={() => handleImgDeleteOnClick(index)}
-                                        >
-                                        <X size={12} />
-                                    </button>
-                                </div>
-                            </div>
-                        ))
-                    }
                 </div>
                 {
-                    images.length >= 10 && (
+                    forumValue.forumImages.length >= 10 && (
                         <div css={s.errorMessage}>
                             이미지는 최대 10개까지만 등록할 수 있습니다.
                         </div>
