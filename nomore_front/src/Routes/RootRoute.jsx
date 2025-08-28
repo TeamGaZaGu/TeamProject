@@ -21,12 +21,18 @@ function RootRoute(props) {
     const principalQuery = usePrincipalQuery();
     const user = principalQuery?.data?.data?.user;
 
+    // 로딩 중일 때
     if (!principalQuery.isFetched) {
         return <Loading />
     }
 
-    // 사용자가 차단된 경우
-    if (user?.userSiteBlock === 1) {
+    // 디버깅을 위한 콘솔 로그
+    console.log('User data:', user);
+    console.log('userSiteBlock:', user?.userSiteBlock);
+    console.log('userSiteBlock type:', typeof user?.userSiteBlock);
+
+    // 사용자가 차단된 경우 (1 또는 "1" 모두 처리)
+    if (user && (user.userSiteBlock === 1 || user.userSiteBlock === "1")) {
         return (
             <MainLayout>
                 <Routes>

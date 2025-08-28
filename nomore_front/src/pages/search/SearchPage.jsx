@@ -70,7 +70,7 @@ function SearchPage(props) {
                             
                             let categoryName = moim.categoryName;
                             if (!categoryName && moim.categoryId) {
-                                const category = categoryList.find(cat => cat.categoryId === moim.categoryId);
+                                const category = categoryList?.find(cat => cat.categoryId === moim.categoryId);
                                 categoryName = category ? `${category.categoryEmoji} ${category.categoryName}` : "카테고리 정보 없음";
                             }
                             

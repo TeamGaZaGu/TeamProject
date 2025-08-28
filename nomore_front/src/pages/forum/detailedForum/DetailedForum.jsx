@@ -64,28 +64,26 @@ function DetailedForum(props) {
     const [ recomment, setRecomment ] = useState(null);    
     const [ forum, setForum ] = useState([]);
     
-    // 사용자 프로필 모달 상태
     const [selectedUser, setSelectedUser] = useState(null);
     const [isUserModalOpen, setIsUserModalOpen] = useState(false);
     
-    // 신고 모달 상태
     const [isReportModalOpen, setIsReportModalOpen] = useState(false);
     const [selectedReason, setSelectedReason] = useState('');
     const [customReason, setCustomReason] = useState('');
-    const [reportTargetType, setReportTargetType] = useState(3); // 3: 게시글, 4: 댓글, 1: 사용자
+    const [reportTargetType, setReportTargetType] = useState(3);
     const [reportTargetId, setReportTargetId] = useState(null);
     
-    // React Query hooks
     const categoryQuery = useCategoryQuery();
     const categories = categoryQuery?.data?.data || [];
     
     const userId = principalQuery?.data?.data?.user?.userId;
+    // 관리자 권한 확인을 위한 userRole 추가
+    const userRole = principalQuery?.data?.data?.user?.userRole;
     
     const userBlockListQuery = useUserBlockListQuery({userId});
     const userBlockList = userBlockListQuery?.data?.data?.body;
     const isBlockedUser = userBlockList?.includes(selectedUser?.userId);
     
-    // 신고 사유 옵션
     const reportReasons = [
         '스팸 / 광고성 활동',
         '욕설 / 비방 / 혐오 발언',
@@ -109,47 +107,34 @@ function DetailedForum(props) {
         }).format(date);
     }
 
-    // 사용자 프로필 모달 열기
     const handleOpenUserModal = (user) => {
         setSelectedUser(user);
         setIsUserModalOpen(true);
     }
 
-    // 사용자 프로필 모달 닫기
     const handleCloseUserModal = () => {
         setIsUserModalOpen(false);
         setSelectedUser(null);
     }
 
-    // 모달 배경 클릭 시 닫기
     const handleModalBackdropClick = (e) => {
         if (e.target === e.currentTarget) {
             handleCloseUserModal();
         }
     }
 
-    // 게시글 신고 모달 열기
     const handleReportPostOnClick = () => {
-        setReportTargetType(3); // 게시글
+        setReportTargetType(3);
         setReportTargetId(parseInt(forumId));
         setIsReportModalOpen(true);
     }
 
-    // 댓글 신고 모달 열기
-    const handleReportCommentOnClick = (commentId) => {
-        setReportTargetType(4); // 댓글
-        setReportTargetId(commentId);
-        setIsReportModalOpen(true);
-    }
-
-    // 사용자 신고 모달 열기
     const handleReportUserOnClick = () => {
-        setReportTargetType(1); // 사용자
+        setReportTargetType(1);
         setReportTargetId(selectedUser.userId);
         setIsReportModalOpen(true);
     }
 
-    // 신고 모달 닫기
     const handleCloseReportModal = () => {
         setIsReportModalOpen(false);
         setSelectedReason('');
@@ -158,7 +143,6 @@ function DetailedForum(props) {
         setReportTargetId(null);
     }
 
-    // 신고 사유 선택
     const handleReasonChange = (reason) => {
         setSelectedReason(reason);
         if (reason !== '기타') {
@@ -166,7 +150,6 @@ function DetailedForum(props) {
         }
     }
 
-    // 신고 제출
     const handleSubmitReport = async () => {
         if (!selectedReason) {
             alert('신고 사유를 선택해주세요.');
@@ -197,7 +180,6 @@ function DetailedForum(props) {
         }
     }
 
-    // 사용자 차단/해제 토글
     const handleToggleUserBlock = async (targetUserId, nickName) => {
         const action = isBlockedUser ? '차단해제' : '차단';
         const isConfirmed = window.confirm(`"${nickName}" 님을 ${action}하시겠습니까?`);
@@ -272,7 +254,6 @@ function DetailedForum(props) {
       }
     }
 
-    // 댓글 작성 후 즉시 반영되도록 수정
     const handleRegisterCommentOnClick = async (forumId, moimId) => {
         if (commentValue.trim() === "") {
             return setCommentValue("");
@@ -293,9 +274,7 @@ function DetailedForum(props) {
             setCommentValue("");
             setRecomment(null);
             
-            // 댓글 쿼리 무효화하여 새 댓글 데이터 다시 가져오기
             await queryClient.invalidateQueries(['comments', forumId]);
-            // 포럼 상세 정보도 새로고침 (댓글 수 업데이트 등)
             await fetchForum();
             
         } catch (error) {
@@ -320,7 +299,6 @@ function DetailedForum(props) {
         try {
             await reqLike(forumId);
             await fetchForum();
-            // 포럼 목록 쿼리도 무효화 (좋아요 수 반영)
             queryClient.invalidateQueries(['forums']);
         } catch (error) {
             console.error("좋아요 처리 실패:", error);
@@ -331,14 +309,12 @@ function DetailedForum(props) {
         try {
             await reqDislike(forumId);
             await fetchForum();
-            // 포럼 목록 쿼리도 무효화 (좋아요 수 반영)
             queryClient.invalidateQueries(['forums']);
         } catch (error) {
             console.error("좋아요 취소 처리 실패:", error);
         }
     }
 
-    // 댓글 삭제 후 즉시 반영되도록 수정
     const handleCommentDeleteOnClick = async (forumId, moimId, forumCommentId) => {
         const confirmDelete = window.confirm("댓글을 삭제하시겠습니까?");
         if (!confirmDelete) return;
@@ -347,14 +323,17 @@ function DetailedForum(props) {
             await reqDeleteComment(forumId, moimId, forumCommentId);
             alert("댓글이 삭제되었습니다.");
             
-            // 댓글 쿼리 무효화하여 삭제된 댓글 반영
             await queryClient.invalidateQueries(['comments', forumId]);
-            // 포럼 정보도 새로고침 (댓글 수 업데이트)
             await fetchForum();
             
         } catch (e) {
             alert("권한이 없습니다.");
         }
+    };
+
+    // 댓글 삭제 권한 확인 함수
+    const canDeleteComment = (commentUserId) => {
+        return userId === commentUserId || userRole === 'ADMIN';
     };
 
     if(principalQuery.isFetched && principalQuery.isSuccess) {
@@ -381,13 +360,11 @@ function DetailedForum(props) {
                         </div>
                         <div css={s.buttonWrapper}>
                             {userId === forum?.user?.userId ? (
-                                // 본인이 쓴 글인 경우 - 수정/삭제 버튼
                                 <>
                                     <button css={s.editButton} onClick={() => navigate(`/forum/modify?forumId=${forumId}`)}>수정</button>
                                     <button css={s.deleteButton} onClick={() => handleDeleteForumOnClick(forumId, forum?.moim?.moimId)}>삭제</button>
                                 </>
                             ) : (
-                                // 다른 사람이 쓴 글인 경우 - 신고 버튼
                                 <button css={s.reportButton} onClick={handleReportPostOnClick}>
                                     <MdReport /> 신고하기
                                 </button>
@@ -435,18 +412,16 @@ function DetailedForum(props) {
                                                 <p css={s.commentText}>{comment?.forumComment}</p>
                                                 <div css={s.commentActions}>
                                                     <p css={s.recomment} onClick={() => setRecomment(comment)}>답글 달기</p>
-                                                    {userId !== comment?.user?.userId && (
-                                                        <p css={s.reportComment} onClick={() => handleReportCommentOnClick(comment.forumCommentId)}>
-                                                            신고
-                                                        </p>
-                                                    )}
                                                 </div>
                                             </div>
                                         </div>
         
-                                        <div css={s.transactionButton}>
-                                            <button type="button" onClick={() => handleCommentDeleteOnClick(forumId, forum.moim.moimId, comment.forumCommentId)}><X size={12} /></button>
-                                        </div>
+                                        {/* 댓글 삭제 권한 체크 - 본인이거나 관리자만 */}
+                                        {canDeleteComment(comment?.user?.userId) && (
+                                            <div css={s.transactionButton}>
+                                                <button type="button" onClick={() => handleCommentDeleteOnClick(forumId, forum.moim.moimId, comment.forumCommentId)}><X size={12} /></button>
+                                            </div>
+                                        )}
                                     </div>
                                 )
                               }
@@ -481,17 +456,15 @@ function DetailedForum(props) {
                                                     >
                                                         답글 달기
                                                     </p>
-                                                    {userId !== comment?.user?.userId && (
-                                                        <p css={s.reportComment} onClick={() => handleReportCommentOnClick(comment.forumCommentId)}>
-                                                            신고
-                                                        </p>
-                                                    )}
                                                 </div>
                                             </div>
                                         </div>
-                                        <div css={s.transactionButton}>
-                                            <button type="button" onClick={() => handleCommentDeleteOnClick(forumId, forum.moim.moimId, comment.forumCommentId)}><X size={12} /></button>
-                                        </div>
+                                        {/* 대댓글 삭제 권한 체크 - 본인이거나 관리자만 */}
+                                        {canDeleteComment(comment?.user?.userId) && (
+                                            <div css={s.transactionButton}>
+                                                <button type="button" onClick={() => handleCommentDeleteOnClick(forumId, forum.moim.moimId, comment.forumCommentId)}><X size={12} /></button>
+                                            </div>
+                                        )}
                                     </div>
                               )
                             })
@@ -511,7 +484,6 @@ function DetailedForum(props) {
                     </div>
                 </div>
 
-                {/* 사용자 프로필 모달 */}
                 {isUserModalOpen && selectedUser && (
                     <div css={s.modalOverlay} onClick={handleModalBackdropClick}>
                         <div css={s.modalContent}>
@@ -557,7 +529,6 @@ function DetailedForum(props) {
                     </div>
                 )}
 
-                {/* 신고 모달 */}
                 {isReportModalOpen && (
                     <div css={s.reportModalOverlay} onClick={(e) => e.target === e.currentTarget && handleCloseReportModal()}>
                         <div css={s.reportModalContent}>
