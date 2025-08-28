@@ -99,6 +99,7 @@ public class ForumController {
 
     @GetMapping("/comments")
     public ResponseEntity<ResponseDto<?>> getComments(ForumCommentSearchReqDto dto) {
+        System.out.println(dto);
         return ResponseEntity.ok(ResponseDto.success(forumService.getCommentsByForumId(dto)));
     }
 

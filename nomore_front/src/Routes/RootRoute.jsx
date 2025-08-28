@@ -1,6 +1,6 @@
 import Home from '../pages/home/Home';
 import MainLayout from '../Layout/MainLayout/MainLayout';
-import { Route, Routes, useNavigate, useSearchParams } from 'react-router-dom';
+import { Route, Routes, Navigate } from 'react-router-dom';
 import NotFound from '../pages/NotFound/NotFound';
 import Mypage from '../pages/Mypage/Mypage';
 import Signup from '../pages/Auth/signup/Signup';
@@ -21,14 +21,25 @@ function RootRoute(props) {
     const principalQuery = usePrincipalQuery();
     const user = principalQuery?.data?.data?.user;
 
+    // 로딩 중일 때
     if (!principalQuery.isFetched) {
         return <Loading />
     }
 
-    if (user?.userSiteBlock === 1) {
+    // 디버깅을 위한 콘솔 로그
+    console.log('User data:', user);
+    console.log('userSiteBlock:', user?.userSiteBlock);
+    console.log('userSiteBlock type:', typeof user?.userSiteBlock);
+
+    // 사용자가 차단된 경우 (1 또는 "1" 모두 처리)
+    if (user && (user.userSiteBlock === 1 || user.userSiteBlock === "1")) {
         return (
             <MainLayout>
-                <BenUserPage />
+                <Routes>
+                    <Route path='/temporaryBlocking' element={<BenUserPage />} />
+                    {/* 다른 모든 경로를 차단 페이지로 리다이렉트 */}
+                    <Route path='*' element={<Navigate to="/temporaryBlocking" replace />} />
+                </Routes>
             </MainLayout>
         );
     }
