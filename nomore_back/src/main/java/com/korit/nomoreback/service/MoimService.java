@@ -168,4 +168,8 @@ public class MoimService {
                 .map(moim -> moim.buildImageUrl(imageUrlUtil))
                 .collect(Collectors.toList());
     }
+
+    public boolean hasOwnerMoims(Integer userId) {
+        return moimRoleMapper.hasOwnerMoims(userId);
+    }
 }

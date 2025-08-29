@@ -1,6 +1,7 @@
 import { css } from "@emotion/react";
 
 export const mypageBox = css`
+  width: 17rem;
   height: auto;
   padding: 1.5rem;
   border-radius: 1rem;
@@ -24,5 +25,5 @@ export const mypageBox = css`
     gap: 0.5rem;
     cursor: pointer;
     font-weight: 600;
-}
+  }
 `;

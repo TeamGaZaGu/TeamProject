@@ -1,15 +1,18 @@
 /** @jsxImportSource @emotion/react */
 import * as s from './styles';
-import useMoimQuery from '../../queries/useMoimQuery';
 import { useNavigate } from 'react-router-dom';
+import useMoimQuery from '../../queries/useMoimQuery';
 import useCategoryQuery from '../../queries/useCategoryQuery';
 
-function HomeMoims({ category }) {
+function HomeMoims({ category, customMoims }) {
     const navigate = useNavigate();
     const moimQuery = useMoimQuery({ size: 8, categoryId: category.categoryId });
     const categoryQuery = useCategoryQuery();
+
     const categoryList = categoryQuery?.data?.data;
-    const allMoims = moimQuery?.data?.pages?.map(page => page.data.body.contents).flat() || [];
+    const allMoims = moimQuery?.data?.pages
+        ?.map(page => page.data.body.contents)
+        .flat() || [];
 
     const handleMoimOnClick = (moimId) => {
         navigate(`/moim/detail?moimId=${moimId}`);
@@ -50,13 +53,14 @@ function HomeMoims({ category }) {
             <div css={s.categoryHeaderStyle}>
                 <span>{category.categoryEmoji}</span>
                 <span>{category.categoryName}</span>
+                {/* customMoims인 경우 개수 표시 */}
+                {customMoims && <span css={s.countStyle}>({customMoims.length})</span>}
             </div>
             
             <ul css={s.gridContainerStyle}>
                 {allMoims.map((moim) => {
                     const isAvailable = moim.memberCount < moim.maxMember;
                     const hasImage = moim.moimImgPath && moim.moimImgPath !== '';
-                    const imageUrl = moim.moimImgPath;
 
                     return (
                         <li 
@@ -67,7 +71,7 @@ function HomeMoims({ category }) {
                             {hasImage ? (
                                 <div css={s.imageStyle}>
                                     <img
-                                        src={imageUrl}
+                                        src={moim.moimImgPath}
                                         alt={moim.title}
                                         onError={(e) => handleImageError(e, moim)}
                                         loading="lazy"
@@ -83,7 +87,13 @@ function HomeMoims({ category }) {
                                 <h3 css={s.titleStyle}>{moim.title}</h3>
 
                                 <p css={s.descriptionStyle}>
-                                    {moim.discription || '모임에 대한 자세한 설명이 곧 업데이트됩니다.'}
+                                    {moim.discription 
+                                        ? (moim.discription.length > 40 
+                                            ? `${moim.discription.substring(0, 40)}...` 
+                                            : moim.discription
+                                        )
+                                        : '모임에 대한 자세한 설명이 곧 업데이트됩니다.'
+                                    }
                                 </p>
 
                                 <div css={s.tagsStyle}>
@@ -91,10 +101,15 @@ function HomeMoims({ category }) {
                                         📍 {moim.districtName}
                                     </span>
                                     <span css={s.categoryTagStyle}>
-                                        {category.categoryId === 1 ? (
+                                        {/* customMoims인 경우 저장된 카테고리 정보 사용 */}
+                                        {customMoims ? (
+                                            `${moim.categoryEmoji} ${moim.categoryName}`
+                                        ) : category.categoryId === 1 ? (
                                             (() => {
-                                                const moimCategory = categoryList.find(cat => cat.categoryId === moim.categoryId);
-                                                return moimCategory ? `${moimCategory.categoryEmoji} ${moimCategory.categoryName}` : '카테고리 없음';
+                                                const moimCategory = categoryList?.find(cat => cat.categoryId === moim.categoryId);
+                                                return moimCategory 
+                                                    ? `${moimCategory.categoryEmoji} ${moimCategory.categoryName}` 
+                                                    : '카테고리 없음';
                                             })()
                                         ) : (
                                             `${category.categoryEmoji} ${category.categoryName}`
@@ -123,7 +138,8 @@ function HomeMoims({ category }) {
                 })}
             </ul>
 
-            {moimQuery.hasNextPage && (
+            {/* customMoims가 아닐 때만 더보기 버튼 표시 */}
+            {!customMoims && moimQuery.hasNextPage && (
                 <div css={s.loadMoreContainerStyle}>
                     <button 
                         css={s.loadMoreButtonStyle}
@@ -137,7 +153,7 @@ function HomeMoims({ category }) {
                             </>
                         ) : (
                             <>
-                                모임 더보기
+                                {category.categoryName} 더보기
                                 <span css={s.arrowStyle}>▼</span>
                             </>
                         )}

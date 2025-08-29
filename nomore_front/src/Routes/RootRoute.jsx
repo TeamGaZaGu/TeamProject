@@ -16,6 +16,7 @@ import BenUserPage from '../pages/BenUserPage/BenUserPage';
 import ChattingPage from '../pages/chatting/ChattingPage';
 import ReportManagement from '../pages/ReportManagement/ReportManagement';
 import UserDetailPage from '../pages/UserDetail/UserDetailPage';
+import RecentViewedPage from '../pages/RecentViewedPage/RecentViewedPage';
 
 function RootRoute(props) {
     const principalQuery = usePrincipalQuery();
@@ -55,6 +56,7 @@ function RootRoute(props) {
                 <Route path='/chatting/:moimId' element={<ChattingPage />} />
                 <Route path='/mypage' element={<Mypage />} />
                 <Route path='/category/*' element={<CatogoryPage />} />
+                <Route path='/recent-viewed' element={<RecentViewedPage />} />
                 {user?.userRole === "ROLE_ADMIN" && (
                     <>
                         <Route path='/userManagement' element={<UserManagement />} />

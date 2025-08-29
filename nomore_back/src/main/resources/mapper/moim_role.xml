@@ -74,4 +74,11 @@
             u.nick_name
     </select>
 
+    <select id="hasOwnerMoims" resultType="java.lang.Boolean">
+        select count(*) > 0
+        from moim_role_tb
+        where user_id = ${userId}
+        and moim_role = 'OWNER'
+    </select>
+
 </mapper>

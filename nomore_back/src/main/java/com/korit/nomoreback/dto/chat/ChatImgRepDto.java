@@ -16,6 +16,10 @@ public class ChatImgRepDto {
     private Integer seq;
     private String path;
 
-    public ChatImgRepDto(Integer chatId, Integer seq, String path) {
+
+    public ChatImgRepDto(Integer chatImgId, Integer seq, String path) {
+        this.chatImgId = chatImgId;
+        this.seq = seq;
+        this.path = path;
     }
 }

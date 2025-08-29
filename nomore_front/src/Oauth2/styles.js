@@ -1,6 +1,7 @@
 import { css } from "@emotion/react";
 
 export const loginContainer = css`
+  width: 17rem;
   height: auto;
   padding: 1.5rem;
   border-radius: 1rem;

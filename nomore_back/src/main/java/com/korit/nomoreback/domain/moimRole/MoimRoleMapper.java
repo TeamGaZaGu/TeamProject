@@ -18,4 +18,6 @@ public interface MoimRoleMapper {
     int updateMoimRole(@Param("userId") Integer userId, @Param("moimId") Integer moimId, @Param("moimRole") String moimRole);
     List<MoimRoleDto> findMembersByMoimIdExceptUser(@Param("moimId") Integer moimId, @Param("userId") Integer userId);
     List<MoimRoleDto> findAllMembersByMoimId(@Param("moimId") Integer moimId);
+
+    boolean hasOwnerMoims(Integer userId);
 }
