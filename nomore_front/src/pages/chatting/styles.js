@@ -51,6 +51,7 @@ export const RoleTag = css`
 export const ChatContainer = css`
   flex: 1;
   display: flex;
+
   flex-direction: column;
   overflow: hidden;
 `;
