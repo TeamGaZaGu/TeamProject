@@ -4,12 +4,14 @@ import useMoimQuery from '../../queries/useMoimQuery';
 import { useNavigate } from 'react-router-dom';
 import useCategoryQuery from '../../queries/useCategoryQuery';
 
-function HomeMoims({ category }) {
+function HomeMoims({ category, customMoims }) {
     const navigate = useNavigate();
     const moimQuery = useMoimQuery({ size: 8, categoryId: category.categoryId });
     const categoryQuery = useCategoryQuery();
     const categoryList = categoryQuery?.data?.data;
-    const allMoims = moimQuery?.data?.pages?.map(page => page.data.body.contents).flat() || [];
+    
+    // customMoims가 있으면 그것을 사용, 없으면 기존 방식
+    const allMoims = customMoims || moimQuery?.data?.pages?.map(page => page.data.body.contents).flat() || [];
 
     const handleMoimOnClick = (moimId) => {
         navigate(`/moim/description?moimId=${moimId}`);
@@ -50,6 +52,8 @@ function HomeMoims({ category }) {
             <div css={s.categoryHeaderStyle}>
                 <span>{category.categoryEmoji}</span>
                 <span>{category.categoryName}</span>
+                {/* customMoims인 경우 개수 표시 */}
+                {customMoims && <span css={s.countStyle}>({customMoims.length})</span>}
             </div>
             
             <ul css={s.gridContainerStyle}>
@@ -91,7 +95,10 @@ function HomeMoims({ category }) {
                                         📍 {moim.districtName}
                                     </span>
                                     <span css={s.categoryTagStyle}>
-                                        {category.categoryId === 1 ? (
+                                        {/* customMoims인 경우 저장된 카테고리 정보 사용 */}
+                                        {customMoims ? (
+                                            `${moim.categoryEmoji} ${moim.categoryName}`
+                                        ) : category.categoryId === 1 ? (
                                             (() => {
                                                 const moimCategory = categoryList.find(cat => cat.categoryId === moim.categoryId);
                                                 return moimCategory ? `${moimCategory.categoryEmoji} ${moimCategory.categoryName}` : '카테고리 없음';
@@ -123,7 +130,8 @@ function HomeMoims({ category }) {
                 })}
             </ul>
 
-            {moimQuery.hasNextPage && (
+            {/* customMoims가 아닐 때만 더보기 버튼 표시 */}
+            {!customMoims && moimQuery.hasNextPage && (
                 <div css={s.loadMoreContainerStyle}>
                     <button 
                         css={s.loadMoreButtonStyle}
