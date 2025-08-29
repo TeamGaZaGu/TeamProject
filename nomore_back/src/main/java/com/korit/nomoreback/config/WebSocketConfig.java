@@ -43,7 +43,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                     public void afterHandshake(ServerHttpRequest request, ServerHttpResponse response,
                                                WebSocketHandler wsHandler, Exception exception) {}
                 })
-                .withSockJS();// ✅ 등록
+                .withSockJS();
 
     }
 

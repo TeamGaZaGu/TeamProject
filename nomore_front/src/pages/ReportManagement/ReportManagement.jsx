@@ -57,7 +57,7 @@ function ReportManagement() {
             return;
         } else if (report.targetType === 2) {
             // 모임
-            navigate(`/moim/description?moimId=${report.targetId}`);
+            navigate(`/moim/detail?moimId=${report.targetId}`);
         } else if (report.targetType === 3) {
             // 게시글 → forumId, moimId 필요
             if (report.moimId && report.targetId) {

@@ -221,7 +221,7 @@ function DetailedForum(props) {
         try {
             await reqDeleteForum(forumId, moimId);
             queryClient.invalidateQueries(['forums']); 
-            navigate(`/moim/description?moimId=${moimId}`);
+            navigate(`/moim/detail?moimId=${moimId}`);
         } catch (error) {
             console.error("삭제 실패:", error);
             alert("게시글 삭제 중 오류 발생");

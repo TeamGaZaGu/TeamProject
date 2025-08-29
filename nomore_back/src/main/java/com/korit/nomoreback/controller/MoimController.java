@@ -15,7 +15,6 @@ import com.korit.nomoreback.service.MoimService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -54,22 +53,13 @@ public class MoimController {
 
 
     @GetMapping("/find")
-    public ResponseEntity<ResponseDto<?>> findCategoryMoims(MoimCategoryReqDto dto) {
-        return ResponseEntity.ok(ResponseDto.success(moimService.categoryMoim(dto)));
+    public ResponseEntity<ResponseDto<?>> findMoims(MoimCategoryReqDto dto) {
+        return ResponseEntity.ok(ResponseDto.success(moimService.findMoims(dto)));
     }
-
-    @GetMapping("/find/categoryIdInUserId")
-    public List<Moim> findMoimByCategoryIdInUserId() {
-        return moimService.findMoimByCategoryIdInUserId();
-    }
-
-//        @GetMapping("/find/{categoryId}")
-//        public List<Moim> findMoimByCategoryId(@PathVariable Integer categoryId) {
-//            return moimService.findMoimByCategoryId(categoryId);
-//        }
 
     @PatchMapping(value = "/{moimId}/modify", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> updateMoim(@PathVariable Integer moimId, @ModelAttribute MoimModifyDto dto) {
+        System.out.println(dto);
         dto.setMoimId(moimId);
         moimService.modifyMoim(dto);
         return ResponseEntity.ok("수정 완");
@@ -77,7 +67,7 @@ public class MoimController {
 
     @DeleteMapping("/{moimId}/delete")
     public ResponseEntity<?> remove(@PathVariable Integer moimId) {
-        moimService.deleteMoimById(moimId);
+        moimService.deleteMoim(moimId);
         return ResponseEntity.ok("삭제 완");
     }
 

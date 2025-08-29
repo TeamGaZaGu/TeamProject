@@ -24,15 +24,11 @@ public class MoimService {
     private final FileService fileService;
     private final ImageUrlUtil imageUrlUtil;
 
-    public Integer getCurrentUser() {
-        return principalUtil.getPrincipalUser().getUser().getUserId();
+    public User getCurrentUser() {
+        return principalUtil.getPrincipalUser().getUser();
     }
 
-    public String getCurrentUserRole() {
-        return principalUtil.getPrincipalUser().getUser().getUserRole();
-    }
-
-    public MoimCategoryRespDto categoryMoim(MoimCategoryReqDto dto) {
+    public MoimCategoryRespDto findMoims(MoimCategoryReqDto dto) {
         Integer totalElements = moimMapper.getCountOfOptions(dto.toOption());
         Integer totalPages = (int) Math.ceil(totalElements.doubleValue() / dto.getSize().doubleValue());
         List<Moim> foundMoims =
@@ -48,14 +44,13 @@ public class MoimService {
                 .isLast(isLast)
                 .build();
     }
+
     public void createMoim(MoimCreateDto dto) {
-
         Moim moimEntity = dto.toEntity();
-
         String moimImgPath = fileService.uploadFile(dto.getMoimImg(), "moim");
         moimEntity.setMoimImgPath(moimImgPath);
 
-        Integer userId = getCurrentUser();
+        Integer userId = getCurrentUser().getUserId();
 
         moimEntity.setUserId(userId);
 
@@ -71,9 +66,9 @@ public class MoimService {
 
     public void joinMoim(Integer moimId) {
 
-        Integer userId = getCurrentUser();
+        Integer userId = getCurrentUser().getUserId();
 
-        Moim moim = moimMapper.findByMoimId(moimId);
+        Moim moim = moimMapper.findMoimId(moimId);
         if (moim == null){
             throw new IllegalArgumentException("존재하지 않는 모임");
         }
@@ -98,12 +93,11 @@ public class MoimService {
 
     public void exitMoim(Integer moimId) {
 
-        Integer userId = getCurrentUser();
+        Integer userId = getCurrentUser().getUserId();
 
-        MoimRoleDto isOwner = moimRoleMapper.findRoleByUserAndMoimId(userId,moimId);
+        MoimRoleDto isOwner = moimRoleMapper.findMoimRole(userId,moimId);
 
         if ("OWNER".equals(isOwner.getMoimRole())){
-            System.out.println("모임 관리자는 탈퇴 불가능");
             return;
         }
 
@@ -112,57 +106,33 @@ public class MoimService {
     }
 
     public Moim findMoim (Integer moimId) {
-        Moim findMoim = moimMapper.findByMoimId(moimId).buildImageUrl(imageUrlUtil);
+        Moim findMoim = moimMapper.findMoimId(moimId).buildImageUrl(imageUrlUtil);
         return findMoim;
     }
 
     public void modifyMoim(MoimModifyDto modifyDto) {
-        Integer userId = getCurrentUser();
-        MoimRoleDto roleDto = moimRoleMapper.findRoleByUserAndMoimId(userId, modifyDto.getMoimId());
-        String userRole = getCurrentUserRole();
+        Integer userId = getCurrentUser().getUserId();
+        MoimRoleDto roleDto = moimRoleMapper.findMoimRole(userId, modifyDto.getMoimId());
+        String userRole = getCurrentUser().getUserRole();
+        String role = roleDto.getMoimRole();
+        Moim moim = modifyDto.toEntity();
 
-        if ("ROLE_ADMIN".equals(userRole)) {
-            Moim originMoim = moimMapper.findByMoimId(modifyDto.getMoimId());
-
+        if (!"ROLE_ADMIN".equals(userRole) || !"OWNER".equals(role)) {
+            Moim originMoim = moimMapper.findMoimId(modifyDto.getMoimId());
             MultipartFile newImgFile = modifyDto.getMoimImgPath();
             if (newImgFile != null && !newImgFile.isEmpty()) {
-                if (originMoim.getMoimImgPath() != null) {
-                    fileService.deleteFile(originMoim.getMoimImgPath());
-                }
+                fileService.deleteFile(originMoim.getMoimImgPath());
                 String savedFileName = fileService.uploadFile(newImgFile, "moim");
-                originMoim.setMoimImgPath(savedFileName); // 저장된 파일명만 넣기
+                moim.setMoimImgPath(savedFileName);
             }
-
-            Moim moim = modifyDto.modify(originMoim);
-            moimMapper.updateMoim(moim);
-        } else if (!"ROLE_ADMIN".equals(userRole)) {
-            if (roleDto == null) {
-                return;
-            }
-            String role = roleDto.getMoimRole();
-            if (!"OWNER".equals(role)){
-                throw new IllegalArgumentException("권한 없는 사용자");
-            }
-
-            Moim originMoim = moimMapper.findByMoimId(modifyDto.getMoimId());
-
-            MultipartFile newImgFile = modifyDto.getMoimImgPath();
-            if (newImgFile != null && !newImgFile.isEmpty()) {
-                if (originMoim.getMoimImgPath() != null) {
-                    fileService.deleteFile(originMoim.getMoimImgPath());
-                }
-                String savedFileName = fileService.uploadFile(newImgFile, "moim");
-                originMoim.setMoimImgPath(savedFileName); // 저장된 파일명만 넣기
-            }
-            Moim moim = modifyDto.modify(originMoim);
             moimMapper.updateMoim(moim);
         }
     }
 
-    public void deleteMoimById(Integer moimId) {
-        Integer userId = getCurrentUser();
-        String userRole = getCurrentUserRole();
-        MoimRoleDto roleDto = moimRoleMapper.findRoleByUserAndMoimId(userId, moimId);
+    public void deleteMoim(Integer moimId) {
+        Integer userId = getCurrentUser().getUserId();
+        String userRole = getCurrentUser().getUserRole();
+        MoimRoleDto roleDto = moimRoleMapper.findMoimRole(userId, moimId);
 
         if ("ROLE_ADMIN".equals(userRole)) {
             moimMapper.deleteMoimById(moimId);
@@ -176,16 +146,6 @@ public class MoimService {
             }
             moimMapper.deleteMoimById(moimId);
         }
-    }
-
-    public List<Moim> findMoimByCategoryIdInUserId() {
-        Integer userId = getCurrentUser();
-
-        if (userId == null) {
-            throw new IllegalArgumentException("로그인 필요");
-        }
-
-        return moimMapper.findMoimByUserId(userId);
     }
 
     public List<MoimListRespDto> searchMoim(MoimSearchReqDto searchReqDto) {

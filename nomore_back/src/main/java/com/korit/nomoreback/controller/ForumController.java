@@ -3,6 +3,7 @@ package com.korit.nomoreback.controller;
 import com.korit.nomoreback.domain.forum.Forum;
 import com.korit.nomoreback.dto.forum.*;
 import com.korit.nomoreback.dto.response.ResponseDto;
+import com.korit.nomoreback.service.BlobService;
 import com.korit.nomoreback.service.ForumService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;
@@ -16,6 +17,7 @@ import java.util.List;
 public class ForumController {
 
     private final ForumService forumService;
+    private final BlobService blobService;
 
     @PostMapping(value = "/{moimId}/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> registerForum(@PathVariable Integer moimId ,
@@ -40,7 +42,7 @@ public class ForumController {
 
     @GetMapping("/forums/blobs")
     public ResponseEntity<byte[]> getImage(@RequestParam String url, @RequestParam String imageConfigsName) {
-        byte[] data = forumService.getBlob(url, imageConfigsName);
+        byte[] data = blobService.getBlob(url, imageConfigsName);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.IMAGE_JPEG);

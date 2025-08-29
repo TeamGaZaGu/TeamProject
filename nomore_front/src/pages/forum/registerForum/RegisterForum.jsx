@@ -82,7 +82,7 @@ function RegisterForum(props) {
 
         try {
             await reqRegisterForum(formData, moimId);
-            navigate(`/moim/description?moimId=${moimId}`);
+            navigate(`/moim/detail?moimId=${moimId}`);
             await queryClient.invalidateQueries({ queryKey: ['forums', moimId] });
         } catch (error) {
             console.error("게시글 등록 실패:", error);

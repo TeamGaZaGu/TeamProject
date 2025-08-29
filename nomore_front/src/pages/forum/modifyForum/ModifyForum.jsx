@@ -37,8 +37,6 @@ function ModifyForum(props) {
         }
     }, [forum]);
 
-
-    console.log(getImageBlobPromises)
     useEffect(() => {
         const fetchForum = async () => {
             try {
@@ -51,6 +49,7 @@ function ModifyForum(props) {
                         });
                     })
                 });
+                console.log("res",response.data.forumImgList)
                 const results = (await Promise.all(getImageBlobPromises));
                 const forumData = {
                     ...response.data,
@@ -112,7 +111,7 @@ function ModifyForum(props) {
         }
     }
 
-    console.log(forumValue)
+    console.log("forumValue",forumValue)
 
     const handleModifyOnClick = async () => {
 
@@ -141,7 +140,7 @@ function ModifyForum(props) {
             alert("게시글 등록에 실패했습니다.");
         }
     }
-    
+
     return (
         <div css={s.layout}>
             <h1>게시글 수정</h1>

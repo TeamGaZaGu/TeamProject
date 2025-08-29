@@ -11,9 +11,9 @@ public interface UserMapper {
 
     List<User> allUser();
 
-    void blockUser(Integer userId, Integer userSiteBlock);
+    void blockUser(Integer userId);
 
-    void unBlockUser(Integer userId, Integer userSiteBlock);
+    void unBlockUser(Integer userId);
 
     User findByProviderId(String providerId);
     User findByNicName(String nickName);
@@ -26,8 +26,4 @@ public interface UserMapper {
     String findProfileImgPathByUserId(int userId);
 
     void deleteUser(Integer userId);
-
-    User findUserById(@Param("userId") Integer userId);
-
-    User findByUserId(@Param("userId") Integer userId);
 }

@@ -30,47 +30,29 @@ public class UserService {
     }
 
     public void blockUser(Integer userId) {
-        Integer userSiteBlock = 1;
-        userMapper.blockUser(userId, userSiteBlock);
+        userMapper.blockUser(userId);
     }
 
     public void unBlockUser(Integer userId) {
-        Integer userSiteBlock = 0;
-        userMapper.unBlockUser(userId, userSiteBlock);
+        userMapper.unBlockUser(userId);
     }
 
     @Transactional(rollbackFor = Exception.class)
     public void updateProfile(UserProfileUpdateReqDto dto) {
-        System.out.println("dto.getProfileImgPath() " + dto.getProfileImgPath());
+
         User user = principalUtil.getPrincipalUser().getUser();
-        String userImg = user.getProfileImgPath();
-        fileService.deleteFile(userImg);
         User userEntity = dto.toUser();
         if (dto.getProfileImgPath() != null) {
+            String userImg = user.getProfileImgPath();
+            fileService.deleteFile(userImg);
             String profileImgPath = fileService.uploadFile(dto.getProfileImgPath(), "profile");
-            System.out.println("profileImgPath" + profileImgPath);
             userEntity.setProfileImgPath(profileImgPath);
-        } else {
-            userEntity.setProfileImgPath("default.jpg");
         }
         userEntity.setUserId(user.getUserId());
         userMapper.updateProfile(userEntity);
-        System.out.println(userEntity);
     }
 
     public void deleteUser(Integer userId) {
         userMapper.deleteUser(userId);
-    }
-
-    public User findUserById(Integer userId) {
-        return userMapper.findUserById(userId);
-    }
-
-    public User getUserDetail(Integer userId) {
-        User user = userMapper.findByUserId(userId);
-        if (user == null) {
-            throw new RuntimeException("사용자를 찾을 수 없습니다.");
-        }
-        return user;
     }
 }
