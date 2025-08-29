@@ -454,32 +454,40 @@ function DetailMoim(props) {
                             <div css={s.section}>
                                 <h2 css={s.sectionTitle}>모임 멤버</h2>
                                 <div css={s.memberSection}>
-                                    {userList?.map((user) => {
-                                        const roleEmoji = user.moimRole === "OWNER" ? "👑" : "👤";
-                                        const isBlocked = userBlockList?.includes(user.userId);
+                                    {userList
+                                        ?.sort((a, b) => {
+                                            // 방장을 맨 앞으로 정렬
+                                            if (a.moimRole === "OWNER" && b.moimRole !== "OWNER") return -1;
+                                            if (a.moimRole !== "OWNER" && b.moimRole === "OWNER") return 1;
+                                            // 방장이 아닌 경우 기본 순서 유지 (userId 기준 정렬 등 원하는 기준으로 변경 가능)
+                                            return a.userId - b.userId;
+                                        })
+                                        ?.map((user) => {
+                                            const roleEmoji = user.moimRole === "OWNER" ? "👑" : "👤";
+                                            const isBlocked = userBlockList?.includes(user.userId);
 
-                                        return (
-                                            <div 
-                                                key={user.userId} 
-                                                css={s.memberCard} 
-                                                onClick={() => handleMemberClick(user.userId)}
-                                            >
-                                                <img
-                                                    src={`${user.profileImgPath}`}
-                                                    alt="프로필"
-                                                    css={s.profileImage}
-                                                /> 
-                                                <div css={s.defaultAvatar}>{roleEmoji}</div>
-                                                <div css={s.memberInfo}>
-                                                    <span css={s.memberRole}>{user.nickName}</span>
-                                                    <span css={s.memberName}>{user.introduction}</span>
+                                            return (
+                                                <div 
+                                                    key={user.userId} 
+                                                    css={s.memberCard} 
+                                                    onClick={() => handleMemberClick(user.userId)}
+                                                >
+                                                    <img
+                                                        src={`${user.profileImgPath}`}
+                                                        alt="프로필"
+                                                        css={s.profileImage}
+                                                    /> 
+                                                    <div css={s.defaultAvatar}>{roleEmoji}</div>
+                                                    <div css={s.memberInfo}>
+                                                        <span css={s.memberRole}>{user.nickName}</span>
+                                                        <span css={s.memberName}>{user.introduction}</span>
+                                                    </div>
+                                                    {isBlocked && (
+                                                        <div css={s.blockedUserText}>차단한 유저</div>
+                                                    )}
                                                 </div>
-                                                {isBlocked && (
-                                                    <div css={s.blockedUserText}>차단한 유저</div>
-                                                )}
-                                            </div>
-                                        );
-                                    })}
+                                            );
+                                        })}
                                 </div>
                             </div>
                         </div>

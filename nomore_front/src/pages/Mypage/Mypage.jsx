@@ -313,7 +313,15 @@ function Mypage(props) {
                                 </div>
                                 <div css={s.moimContent}>
                                     <h3>{moim.title}</h3>
-                                    <p>{moim.discription}</p>
+                                    <p>
+                                        {moim.discription 
+                                            ? (moim.discription.length > 50 
+                                                ? `${moim.discription.substring(0, 50)}...` 
+                                                : moim.discription
+                                            )
+                                            : '모임에 대한 자세한 설명이 곧 업데이트됩니다.'
+                                        }
+                                    </p>
                                     <span>👥 {moim.memberCount}/{moim.maxMember}명</span>
                                 </div>
                             </div>
