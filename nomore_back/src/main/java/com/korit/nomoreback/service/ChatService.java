@@ -9,6 +9,7 @@ import com.korit.nomoreback.domain.user.UserMapper;
 import com.korit.nomoreback.dto.chat.ChatImgRepDto;
 import com.korit.nomoreback.dto.chat.ChatMessageDto;
 import com.korit.nomoreback.dto.chat.ChatResponseDto;
+import com.korit.nomoreback.util.ImageUrlUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +27,7 @@ public class ChatService {
     private final UserMapper userMapper;
     private final ChatImgMapper chatImgMapper;
     private final FileService fileService;
+    private final ImageUrlUtil imageUrlUtil;
 
     @Transactional
     public ChatResponseDto registerChat(Integer userId, ChatMessageDto chatMessageDto) {
@@ -70,7 +72,11 @@ public class ChatService {
                 .userNickName(chat.getUserNickName())
                 .chattedAt(chat.getChattedAt())
                 .images(chatImgList.stream()
-                        .map(img -> new ChatImgRepDto(img.getChatImgId(), img.getSeq(), img.getPath()))
+                        .map(img -> new ChatImgRepDto(
+                                img.getChatImgId(),
+                                img.getSeq(),
+                                imageUrlUtil.buildImageUrl(img.getPath(), "chat") // ✅ URL 변환
+                        ))
                         .toList())
                 .build();
     }

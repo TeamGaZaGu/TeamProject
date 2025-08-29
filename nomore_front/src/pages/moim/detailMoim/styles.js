@@ -14,7 +14,7 @@ export const header = css`
   border-bottom: 1px solid #ffffff;
   position: sticky;
   top: 0;
-  z-index: 100;
+  z-index: 0;
 `;
 
 export const mainLayout = css`
