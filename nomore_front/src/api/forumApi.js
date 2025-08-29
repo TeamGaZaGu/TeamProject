@@ -19,6 +19,7 @@ export const reqGetForumsWithParams = async (moimId, params) => await api.get(`/
 export const reqGetForumCategories = async () => await api.get("/api/forum/forumCategories");
 
 export const reqDetailForum = async (forumId) => await api.get(`/api/forum/${forumId}`);
+
 export const reqDetailForumBlob = async ({url, imageConfigsName}) => await api.get(`/api/forum/forums/blobs`, {
     params: {url, imageConfigsName},
     responseType: 'blob',

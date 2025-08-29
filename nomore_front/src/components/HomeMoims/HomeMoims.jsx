@@ -15,7 +15,7 @@ function HomeMoims({ category, customMoims }) {
         .flat() || [];
 
     const handleMoimOnClick = (moimId) => {
-        navigate(`/moim/description?moimId=${moimId}`);
+        navigate(`/moim/detail?moimId=${moimId}`);
     };
 
     const handleImageError = (e, moim) => {

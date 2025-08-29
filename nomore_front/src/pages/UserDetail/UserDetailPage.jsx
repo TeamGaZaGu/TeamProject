@@ -1,25 +1,26 @@
 /** @jsxImportSource @emotion/react */
 import React, { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { reqUserDetail, reqUserMoims, reqUserPosts } from '../../api/userApi';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { reqUserMoims, reqUserPosts } from '../../api/userApi';
 import usePrincipalQuery from '../../queries/usePrincipalQuery';
-import { baseURL } from '../../api/axios';
 import * as s from './styles';
 
 function UserDetailPage() {
     const navigate = useNavigate();
+    const location = useLocation();
+    const user = location.state.user
     const { userId } = useParams();
-    const [user, setUser] = useState(null);
     const [userMoims, setUserMoims] = useState([]);
     const [userPosts, setUserPosts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState('info');
 
     const principalQuery = usePrincipalQuery();
-    const currentUserRole = principalQuery?.data?.data?.user?.userRole;
+    const admin = principalQuery.data.data.user;
+    const currentUserRole = admin?.userRole;
 
     const handleMoimClick = (moimId) => {
-        navigate(`/moim/description?moimId=${moimId}`);
+        navigate(`/moim/detail?moimId=${moimId}`);
     };
 
     const handlePostClick = (forumId, moimId) => {
@@ -43,11 +44,6 @@ function UserDetailPage() {
             try {
                 setLoading(true);
 
-                // 유저 기본 정보
-                const userResponse = await reqUserDetail(userId);
-                setUser(userResponse.data);
-
-                // 유저가 가입한 모임들 (에러 발생 시 빈 배열로 설정)
                 try {
                     const moimsResponse = await reqUserMoims(userId);
                     setUserMoims(moimsResponse.data || []);
@@ -110,7 +106,7 @@ function UserDetailPage() {
                     <div css={s.profileImageContainer}>
                         {user.profileImgPath ? (
                             <img
-                                src={`${baseURL}/image${user.profileImgPath}`}
+                                src={`${user.profileImgPath}`}
                                 alt="프로필"
                                 css={s.profileImage}
                                 onError={(e) => {

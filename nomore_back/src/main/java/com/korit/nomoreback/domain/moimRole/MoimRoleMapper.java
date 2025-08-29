@@ -10,7 +10,7 @@ import java.util.List;
 public interface MoimRoleMapper {
     int insertMoimRole(MoimRoleDto moimRoleDto);
     boolean isMoimIdAndUserId(@Param("moimId")Integer moimId, @Param("userId") Integer userId);
-    MoimRoleDto findRoleByUserAndMoimId(@Param("userId") Integer userId, @Param("moimId") Integer moimId);
+    MoimRoleDto findMoimRole(@Param("userId") Integer userId, @Param("moimId") Integer moimId);
     int deleteByMoimIdAndUserId(Integer moimId, Integer userId);
 
     int exitMoim(@Param("moimId") Integer moimId, @Param("userId") Integer userId);

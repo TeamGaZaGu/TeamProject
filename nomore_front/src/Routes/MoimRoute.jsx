@@ -12,7 +12,7 @@ function MoimRoute(props) {
         <Routes>       
             <Route path='/find' element={ <FindMoim /> } />
             <Route path='/create' element={ <CreateMoim /> } />
-            <Route path='/description' element={ <DetailMoim /> } />
+            <Route path='/detail' element={ <DetailMoim /> } />
             <Route path='/modify' element={ <ModifyMoim /> } />
             <Route path='/*' element={ <NotFound /> } />
         </Routes>

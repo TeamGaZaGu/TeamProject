@@ -1,14 +1,10 @@
 package com.korit.nomoreback.service;
 
 import com.korit.nomoreback.domain.forum.*;
-import com.korit.nomoreback.domain.moim.Moim;
 import com.korit.nomoreback.domain.moimRole.MoimRoleMapper;
-import com.korit.nomoreback.domain.user.User;
 import com.korit.nomoreback.dto.forum.*;
-import com.korit.nomoreback.dto.moim.MoimCategoryRespDto;
 import com.korit.nomoreback.dto.moim.MoimRoleDto;
 import com.korit.nomoreback.security.model.PrincipalUtil;
-import com.korit.nomoreback.util.AppProperties;
 import com.korit.nomoreback.util.ImageUrlUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -31,7 +27,6 @@ public class ForumService {
     private final ForumImgMapper forumImgMapper;
     private final MoimRoleMapper moimRoleMapper;
     private final ImageUrlUtil imageUrlUtil;
-    private final AppProperties appProperties;
 
     public Integer getCurrentUser(){
         return principalUtil.getPrincipalUser().getUser().getUserId();
@@ -99,11 +94,7 @@ public class ForumService {
                 .build();
     }
 
-    public byte[] getBlob(String url, String imageConfigsName) {
-        String fileName = url.replaceAll(appProperties.getImageConfigs().get(imageConfigsName).getPrefix(), "");
-        String path = appProperties.getImageConfigs().get(imageConfigsName).getDirPath() + fileName;
-        return fileService.convertToBlob(path);
-    }
+
 
 
     public List<Forum> getForumsByCategoryId(Integer moimId, Integer categoryId) {
@@ -127,7 +118,6 @@ public class ForumService {
         }
 
         List<MultipartFile> imageFiles = dto.getForumImages();
-        System.out.println("imageFiles" + imageFiles);
         List<ForumImg> modifiedImgList = new ArrayList<>();
         if (imageFiles != null) {
             int seq = 1;
@@ -143,7 +133,7 @@ public class ForumService {
         }
 
         if (userId.equals(forum.getUser().getUserId()) ||
-                moimRoleMapper.findRoleByUserAndMoimId(userId,forum.getMoim().getMoimId()).equals("OWNER")){
+                moimRoleMapper.findMoimRole(userId,forum.getMoim().getMoimId()).equals("OWNER")){
             if (modifiedImgList != null && !modifiedImgList.isEmpty()) {
                 forumImgMapper.insertMany(modifiedImgList);
             }
@@ -162,7 +152,7 @@ public class ForumService {
                 .toList();
 
         if (userId.equals(forum.getUser().getUserId()) ||
-                moimRoleMapper.findRoleByUserAndMoimId(userId,moimId).equals("OWNER")){
+                moimRoleMapper.findMoimRole(userId,moimId).equals("OWNER")){
             if (!imgIds.isEmpty()) {
                 forumImgMapper.deleteImg(imgIds);
             }
@@ -216,7 +206,7 @@ public class ForumService {
     public void deleteComment(Integer forumCommentId, Integer forumId, Integer moimId) {
         Integer userId = getCurrentUser();
         ForumComment comment = forumCommentMapper.findByCommentId(forumCommentId);
-        MoimRoleDto moimRoleDto = moimRoleMapper.findRoleByUserAndMoimId(userId,moimId);
+        MoimRoleDto moimRoleDto = moimRoleMapper.findMoimRole(userId,moimId);
 
         if (comment == null || !comment.getForumId().equals(forumId)) {
             throw new IllegalArgumentException("댓글이 존재하지 않거나 게시판이 다릅니다.");

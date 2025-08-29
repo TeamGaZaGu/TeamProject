@@ -39,7 +39,6 @@ function ModifyForum(props) {
                 });
 
                 const results = await Promise.all(getImageBlobPromises);
-
                 const forumData = {
                     ...response.data,
                     forumImgList: response.data.forumImgList.map((img, index) => ({
