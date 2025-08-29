@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import useCategoryQuery from '../../queries/useCategoryQuery';
 import api, { baseURL } from "../../api/axios";
 import usePrincipalQuery from '../../queries/usePrincipalQuery';
-import { reqMyMoimList } from '../../api/moimApi';
+import { reqCheckUserIsOwner, reqMyMoimList } from '../../api/moimApi';
 import { useNavigate } from 'react-router-dom';
 import { deleteUser } from '../../api/userApi';
 import { reqGetForumsWithParams } from '../../api/forumApi';
@@ -165,11 +165,18 @@ function Mypage(props) {
     };
 
     const handleDeleteUserOnClick = async () => {
-
-        const confirmDelete = window.confirm("정말 회원 탈퇴를 진행하시겠습니까?");
-        if (!confirmDelete) return;
-
         try {
+            const response = await reqCheckUserIsOwner();
+            const hasOwnerMoims = response.data.hasOwnerMoims;
+            
+            if (hasOwnerMoims) {
+                alert("방장으로 있는 모임이 있습니다. 모든 모임의 방장 권한을 넘긴 후 탈퇴해주세요.");
+                return;
+            }
+
+            const confirmDelete = window.confirm("정말 회원 탈퇴를 진행하시겠습니까?");
+            if (!confirmDelete) return;
+
             await deleteUser(user.userId);
             localStorage.removeItem("AccessToken");
 
@@ -179,11 +186,11 @@ function Mypage(props) {
         } catch (error) {
             console.error(error);
             alert("회원 탈퇴 중 오류가 발생했습니다.");
-        }
+        } 
     };
 
     const handleMoimOnClick = (moimId) => {
-        navigate(`/moim/description?moimId=${moimId}`);
+        navigate(`/suggest/description?moimId=${moimId}`);
     };
 
     const handleMyForumOnClick = (mf) => {

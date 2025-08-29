@@ -18,7 +18,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -117,5 +119,22 @@ public class MoimController {
     @GetMapping("/{userId}/moims")
     public ResponseEntity<List<Moim>> myMoimList(@PathVariable Integer userId) {
         return ResponseEntity.ok(moimService.myMoimList(userId));
+    }
+
+    @GetMapping("/checkowner")
+    public ResponseEntity<Map<String, Boolean>> checkUserHasOwnerMoims() {
+        try {
+            Integer userId = principalUtil.getPrincipalUser().getUser().getUserId();
+            boolean hasOwnerMoims = moimService.hasOwnerMoims(userId);
+
+            Map<String, Boolean> response = new HashMap<>();
+            response.put("hasOwnerMoims", hasOwnerMoims);
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Map<String, Boolean> errorResponse = new HashMap<>();
+            errorResponse.put("hasOwnerMoims", false);
+            return ResponseEntity.ok(errorResponse);
+        }
     }
 }
