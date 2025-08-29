@@ -12,6 +12,7 @@ import { HiUsers } from 'react-icons/hi';
 import { FaUserSlash } from 'react-icons/fa';
 import { MdReport } from 'react-icons/md';
 import useCategoryQuery from '../../queries/useCategoryQuery';
+import { BsClockHistory } from 'react-icons/bs';
 
 function LeftSidebarLayout() {
     const navigate = useNavigate();
@@ -47,20 +48,27 @@ function LeftSidebarLayout() {
         navigate(`/reportManagement`, { state: response?.data?.body });
     };
 
+    const handleRecentViewedOnClick = () => {
+        navigate("/recent-viewed")
+    }
+
     return (
         <div css={s.leftSideBar}>
             <div css={s.loginContainer}>
                 {principalQuery.isFetched && principalQuery.isSuccess ? <MypageButton /> : <Oauth2 />}
             </div>
             <div css={s.sideMenu}>
-                <button onClick={handleHomeOnClick}><IoHomeSharp /> 홈</button>
-                <button onClick={handleSuggestOnClick}><HiUsers /> 추천모임</button>
-                {userRole === "ROLE_ADMIN" && (
-                    <>
-                        <button onClick={handleUserManagementOnClick}><FaUserSlash /> 유저관리</button>
-                        <button onClick={handleReportManagementOnClick}><MdReport /> 신고관리</button>
-                    </>
-                )}
+                <button onClick={handleHometOnClick}><IoHomeSharp />홈</button>
+                <button onClick={handleSuggestOnClick}><HiUsers />추천모임</button>
+                <button onClick={handleRecentViewedOnClick}><BsClockHistory />최근 본 모임</button>
+                {
+                    userRole === "ROLE_ADMIN" && (
+                        <>
+                            <button onClick={handleUserManagementOnClick}><FaUserSlash />유저관리</button>
+                            <button onClick={handleReportManagementOnClick}><MdReport />신고관리</button>
+                        </>
+                    )
+                }
             </div>
             <div css={s.category}>
                 <h3>카테고리</h3>

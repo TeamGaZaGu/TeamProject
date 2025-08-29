@@ -13,6 +13,7 @@ import com.korit.nomoreback.event.ChatOnlineUsersState;
 import com.korit.nomoreback.service.ChatService;
 import com.korit.nomoreback.service.FileService;
 import com.korit.nomoreback.service.MoimService;
+import com.korit.nomoreback.util.ImageUrlUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.*;
@@ -35,6 +36,7 @@ public class ChattingController {
     private final ChatMapper chatMapper;
     private final ChatImgMapper chatImgMapper;
     private final FileService fileService;
+    private final ImageUrlUtil imageUrlUtil;
 
     // WebSocket 채팅 메시지 수신
     @MessageMapping("/chat/{moimId}")
@@ -74,11 +76,19 @@ public class ChattingController {
                                                        @RequestParam(defaultValue = "0") Integer offset) {
         List<Chat> chatList = chatMapper.getMessages(moimId, limit, offset);
         List<ChatResponseDto> result = new ArrayList<>();
+
         for (Chat chat : chatList) {
             List<ChatImg> imgs = chatImgMapper.findByChatId(chat.getChatId());
+
+            // ✅ 여기서 path를 URL로 변환
             List<ChatImgRepDto> imgDtos = imgs.stream()
-                    .map(img -> new ChatImgRepDto(img.getChatImgId(), img.getSeq(), img.getPath()))
+                    .map(img -> new ChatImgRepDto(
+                            img.getChatImgId(),
+                            img.getSeq(),
+                            imageUrlUtil.buildImageUrl(img.getPath(), "chat") // ✅ "chat"은 imageConfigName
+                    ))
                     .toList();
+
             result.add(ChatResponseDto.builder()
                     .chatId(chat.getChatId())
                     .chattingContent(chat.getChattingContent())
@@ -87,6 +97,8 @@ public class ChattingController {
                     .images(imgDtos)
                     .build());
         }
+
+        System.out.println(result);
         return result;
     }
 
@@ -106,6 +118,7 @@ public class ChattingController {
             return map;
         }).toList();
 
+        System.out.println(uploaded);
         return ResponseEntity.ok(uploaded);
     }
 
