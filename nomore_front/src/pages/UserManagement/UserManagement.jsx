@@ -97,7 +97,6 @@ function UserManagement(props) {
                                 <th css={s.tableHeader}>닉네임</th>
                                 <th css={s.tableHeader}>성명</th>
                                 <th css={s.tableHeader}>이메일</th>
-                                <th css={s.tableHeader}>프로필이미지</th>
                                 <th css={s.tableHeader}>성별</th>
                                 <th css={s.tableHeader}>생년월일</th>
                                 <th css={s.tableHeader}>회원상태</th>
@@ -112,32 +111,6 @@ function UserManagement(props) {
                                     <td css={s.tableCell}>{user.nickName}</td>
                                     <td css={s.tableCell}>{user.fullName}</td>
                                     <td css={s.tableCell}>{user.email}</td>
-                                    <td css={s.tableCell}>
-                                        {user.profileImgPath ? (
-                                            <img
-                                                src={`${baseURL}/image${user.profileImgPath}`}
-                                                alt="프로필"
-                                                style={{
-                                                    width: '40px',
-                                                    height: '40px',
-                                                    borderRadius: '50%',
-                                                    objectFit: 'cover'
-                                                }}
-                                            />
-                                        ) : (
-                                            <div style={{
-                                                width: '40px',
-                                                height: '40px',
-                                                borderRadius: '50%',
-                                                backgroundColor: '#f0f0f0',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                justifyContent: 'center'
-                                            }}>
-                                                👤
-                                            </div>
-                                        )}
-                                    </td>
                                     <td css={s.tableCell}>{user.gender || '-'}</td>
                                     <td css={s.tableCell}>
                                         {user.birthDate ? new Date(user.birthDate).toLocaleDateString() : '-'}

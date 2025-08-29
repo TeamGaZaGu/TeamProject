@@ -21,16 +21,21 @@ function LeftSidebarLayout(props) {
     const categoryQuery = useCategoryQuery();
     const categories = categoryQuery.data?.data || [];
     const userRole = principalQuery?.data?.data?.user?.userRole;
+
+    const [selectedCategory, setSelectedCategory] = useState(null);
     
     const handleHometOnClick = () => {
-        navigate("/")
+        setSelectedCategory(null);
+        navigate("/");
     }
 
     const handleSuggestOnClick = () => {
-        navigate("/moim/find")
+        setSelectedCategory(null);
+        navigate("/moim/find");
     }
 
     const handleCategoryOnClick = (categoryId) => {
+        setSelectedCategory(categoryId);
         navigate(`/category?categoryId=${categoryId}`);
     }
 
@@ -73,6 +78,8 @@ function LeftSidebarLayout(props) {
                             type="radio"
                             name="category"
                             value={category.categoryName}
+                            checked={selectedCategory === category.categoryId}                                                                                                                                                                                                                                                                                                                                              
+                            readOnly
                         />
                         <span>{category.categoryEmoji} {category.categoryName}</span>
                     </label>

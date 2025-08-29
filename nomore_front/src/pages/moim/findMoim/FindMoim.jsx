@@ -93,7 +93,13 @@ function FindMoim() {
                                             </div>
                                         </div>
                                         <p css={s.moimDescriptionStyle}>
-                                            {moim.discription || '모임에 대한 자세한 설명이 곧 업데이트됩니다.'}
+                                            {moim.discription 
+                                                ? (moim.discription.length > 50 
+                                                    ? `${moim.discription.substring(0, 50)}...` 
+                                                    : moim.discription
+                                                )
+                                                : '모임에 대한 자세한 설명이 곧 업데이트됩니다.'
+                                            }
                                         </p>
                                         <div css={s.moimTagsStyle}>
                                             <span css={s.locationTagStyle}>{moim.districtName}</span>
