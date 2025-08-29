@@ -2,24 +2,40 @@ import React, { useState, useEffect } from 'react';
 import { IoIosSearch } from "react-icons/io";
 /** @jsxImportSource @emotion/react */
 import * as s from './styles';
-import { reqCategory, reqDistrict } from '../../api/searchApi';
+import { reqDistrict } from '../../api/searchApi';
 import useCategoryQuery from '../../queries/useCategoryQuery';
 import { useNavigate } from 'react-router-dom';
-import useMoimQuery from '../../queries/useMoimQuery';
-import { reqfindAllMoim } from '../../api/moimApi';
-
+import MEEULogo from '../../MEEU.png';
 
 function HeaderLayout(props) {
     const navigate = useNavigate();
 
-    const handleLogoOnClick = () => {
-        navigate("/");
+    const combinedSearchEmpty = {
+        districtId: "",
+        categoryId: "",
+        keyword: "",
     }
+    const [combinedSearch, setCombinedSearch] = useState(combinedSearchEmpty);
+    const [searchInputValue, setSearchInputValue] = useState("");
 
-    /** 지역 함수 */
     const [districtList, setDistrictList] = useState([]);
     const [selectedDistrict, setSelectedDistrict] = useState('');
     const [isDistrictOpen, setIsDistrictOpen] = useState(false);
+
+    const categoryQuery = useCategoryQuery();
+    const [categoryList, setCategoryList] = useState([]);
+    const [selectedCategory, setSelectedCategory] = useState('');
+    const [isCategoryOpen, setIsCategoryOpen] = useState(false);
+
+    const handleLogoOnClick = () => {
+        setCombinedSearch(combinedSearchEmpty);
+        setSearchInputValue("");
+        setSelectedDistrict('');
+        setSelectedCategory('');
+        setIsDistrictOpen(false);
+        setIsCategoryOpen(false);
+        navigate("/");
+    }
 
     const handleToggleDistrictOnClick = async () => {
         const newDistrictState = !isDistrictOpen;
@@ -53,13 +69,6 @@ function HeaderLayout(props) {
         setIsDistrictOpen(false);
     }
 
-    /** 카테고리 함수 */
-    const categoryQuery = useCategoryQuery();
-    const [categoryList, setCategoryList] = useState([]);
-    const [selectedCategory, setSelectedCategory] = useState('');
-    const [isCategoryOpen, setIsCategoryOpen] = useState(false);
-
-    // 카테고리 데이터를 useEffect로 처리
     useEffect(() => {
         if (categoryQuery?.data?.data) {
             setCategoryList(categoryQuery.data.data);
@@ -70,13 +79,12 @@ function HeaderLayout(props) {
         const newCategoryState = !isCategoryOpen;
         setIsCategoryOpen(newCategoryState);
         
-        // 다른 드롭다운 닫기
         if (isDistrictOpen) {
             setIsDistrictOpen(false);
         }
     }
 
-     const handleCategoryOnChange = (e) => {
+    const handleCategoryOnChange = (e) => {
         setSelectedCategory(e.target.value);
         const findCategory = categoryList.find(prev => prev.categoryName === e.target.value);
         
@@ -90,15 +98,6 @@ function HeaderLayout(props) {
         setIsCategoryOpen(false);
     }
 
-    const [searchInputValue, setSearchInputValue] = useState("");
-    const combinedSearchEmpty = {
-        districtId: "",
-        categoryId: "",
-        keyword: "",
-    }
-
-    const [combinedSearch, setCombinedSearch] = useState(combinedSearchEmpty);
-    
     const handleSearchInputOnChange = (e) => {
         setSearchInputValue(e.target.value);
         setCombinedSearch(prev => ({
@@ -129,9 +128,11 @@ function HeaderLayout(props) {
     
     return (
         <div css={s.headerContainer}>
-            <div css={s.logoSection}>
-                <h1 css={s.logoTitle} onClick={handleLogoOnClick}>MEEU</h1>
-                <h4 css={s.logoSubtitle} onClick={handleLogoOnClick}>meet+you</h4>
+            <div css={s.logoSection} onClick={handleLogoOnClick}>
+                <img src={MEEULogo} alt="MEEU Logo" css={s.logoImage} />
+                <div css={s.logoTextContainer}>
+                    <h1 css={s.logoTitle}>MEEU</h1>
+                </div>
             </div>
 
             <div css={s.controlSection}>
@@ -159,7 +160,6 @@ function HeaderLayout(props) {
                     )}
                 </div>
 
-                {/* 카테고리 설정 드롭다운 */}
                 <div css={s.dropdownContainer}>
                     <button css={s.dropdownButton} onClick={handleToggleCategoryOnClick}>
                         {selectedCategory || '카테고리설정'}
@@ -184,7 +184,6 @@ function HeaderLayout(props) {
                     )}
                 </div>
 
-                {/* 검색창 */}
                 <input
                     css={s.searchInput}
                     type="text"
@@ -194,7 +193,6 @@ function HeaderLayout(props) {
                     onKeyDown={handleSearchInputOnKeyDown}
                 />
 
-                {/* 검색 버튼 */}
                 <button css={s.searchButton} onClick={handleSearchInputOnClick}>
                     <IoIosSearch />
                 </button>

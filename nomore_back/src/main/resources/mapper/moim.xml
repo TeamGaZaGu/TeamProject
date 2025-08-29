@@ -209,7 +209,7 @@
                 and mt.district_id = #{districtId}
             </if>
             <if test="searchText != null and searchText != ''">
-                and (moim_title = concat('%', #{searchText}, '%') or moim_discription = concat('%', #{searchText}, '%'))
+                and (moim_title like concat('%', #{searchText}, '%') or moim_discription like concat('%', #{searchText}, '%'))
             </if>
         limit #{startIndex}, #{size}
     </select>

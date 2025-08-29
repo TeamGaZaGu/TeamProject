@@ -1,9 +1,7 @@
 /** @jsxImportSource @emotion/react */
 import * as s from './styles';
-import React from 'react';
 import { FcGoogle } from 'react-icons/fc';
 import { SiKakaotalk } from 'react-icons/si';
-import Oauth2Redirect from './Oauth2Redirect';
 
 function Oauth2({ customStyle }) {
 
