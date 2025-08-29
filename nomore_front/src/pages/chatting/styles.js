@@ -55,10 +55,9 @@ export const RoleTag = css`
 export const ChatContainer = css`
   flex: 1;
   display: flex;
-  flex-direction: column;
-  overflow: hidden;      /* ✅ 여기서도 외부 스크롤 차단 */
+  flex-direction: column;/* ✅ 여기서도 외부 스크롤 차단 */
+  overflow: hidden;
 `;
-
 
 
 export const MessageList = css`
@@ -69,6 +68,7 @@ export const MessageList = css`
   flex-direction: column;
   gap: 8px;
 `;
+
 export const MyMessageWrapper = css`
   display: flex;
   justify-content: flex-end;
@@ -125,6 +125,7 @@ export const InputContainer = css`
   border-top: 1px solid #ddd;
   gap: 8px;
   background-color: #ffffff;
+
   input {
     flex: 1;
     padding: 8px 12px;
