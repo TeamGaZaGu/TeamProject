@@ -81,3 +81,10 @@ export const emptyStateStyle = css`
     margin: 0;
   }
 `;
+
+export const countStyle = css`
+    color: #666;
+    font-size: 14px;
+    margin-left: 8px;
+    font-weight: 400;
+`;

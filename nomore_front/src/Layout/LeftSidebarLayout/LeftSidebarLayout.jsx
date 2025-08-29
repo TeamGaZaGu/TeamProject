@@ -14,6 +14,7 @@ import { FaUserSlash } from 'react-icons/fa';
 import { reqAllUser } from '../../api/userApi';
 import { reqReport } from '../../api/reportApi';
 import { MdReport } from 'react-icons/md';
+import { BsClockHistory } from 'react-icons/bs';
 
 function LeftSidebarLayout(props) {
     const navigate = useNavigate();
@@ -50,6 +51,10 @@ function LeftSidebarLayout(props) {
         navigate(`/reportManagement`, {state: response?.data?.body});
     }
 
+    const handleRecentViewedOnClick = () => {
+        navigate("/recent-viewed")
+    }
+
     return (
         <div css={s.leftSideBar}>
             <div css={s.loginContainer}>
@@ -60,6 +65,7 @@ function LeftSidebarLayout(props) {
             <div css={s.sideMenu}>
                 <button onClick={handleHometOnClick}><IoHomeSharp />홈</button>
                 <button onClick={handleSuggestOnClick}><HiUsers />추천모임</button>
+                <button onClick={handleRecentViewedOnClick}><BsClockHistory />최근 본 모임</button>
                 {
                     userRole === "ROLE_ADMIN" && (
                         <>

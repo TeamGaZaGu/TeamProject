@@ -19,8 +19,8 @@ import { FcGoogle } from 'react-icons/fc';
 import { SiKakaotalk } from 'react-icons/si';
 import toast, { Toaster } from 'react-hot-toast';
 import { MdReport } from 'react-icons/md';
-import axios from 'axios';
 import { submitReport } from '../../../api/reportApi.js';
+import { saveRecentlyViewed } from '../../../utils/recentViewedUtils';
 
 function DetailMoim(props) {
     const navigate = useNavigate();
@@ -359,6 +359,25 @@ function DetailMoim(props) {
             queryClient.invalidateQueries(['forums', moimId]);
         }
     }, [activeTab, queryClient, moimId]);
+
+    useEffect(() => {
+        if (moim && getCategory && moim.moimId) {
+            const moimData = {
+                moimId: moim.moimId,
+                title: moim.title,
+                moimImgPath: moim.moimImgPath,
+                discription: moim.discription,
+                categoryId: moim.categoryId,
+                categoryName: getCategory.categoryName,
+                categoryEmoji: getCategory.categoryEmoji,
+                districtName: moim.districtName,
+                memberCount: moim.memberCount,
+                maxMember: moim.maxMember
+            };
+            
+            saveRecentlyViewed(moimData);
+        }
+    }, [moim, getCategory]);
 
     return (
         <div css={s.container}>
