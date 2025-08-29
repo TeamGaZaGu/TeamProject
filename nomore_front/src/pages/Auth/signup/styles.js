@@ -4,16 +4,10 @@ export const layout = css`
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: 5rem;
-  padding: 2rem;
+  background-color: #ffffff;
   width: 100%;
-  max-width: 600px;
-  min-width: 300px; 
-  margin-left: auto;
-  margin-right: auto;
-  background-color: #fafafa;
-  border-radius: 1rem;
-  height: 100vh;
+  min-height: 100%;
+  padding: 6rem 3rem 3rem; /* 상단/좌우 여백 더 크게 */
   box-sizing: border-box;
 `;
 
@@ -21,22 +15,24 @@ export const inputContainer = css`
   display: flex;
   flex-direction: column;
   width: 100%;
-  max-width: 40rem;
-  gap: 1.5rem;
-  max-height: 60vh;
-  padding-bottom: 2rem;
+  max-width: 48rem; /* 기존보다 더 넓게 */
+  gap: 2rem; /* 입력칸 간격 더 넓게 */
+  max-height: 70vh;
+  padding-bottom: 3rem;
+  flex-shrink: 0;
 `;
 
 export const inputStyle = css`
-  padding: 1rem;
-  border-radius: 0.8rem;
+  padding: 1.2rem 1.4rem; /* 입력칸 높이/좌우 넓힘 */
+  border-radius: 1rem;
   border: 1px solid #dbdbdb;
-  font-size: 1rem;
+  font-size: 1.1rem;
   width: 100%;
   box-sizing: border-box;
 
   &::placeholder {
     color: #aaa;
+    font-size: 1rem;
   }
 
   &:focus {
@@ -48,57 +44,60 @@ export const inputStyle = css`
 export const dropdownContainer = css`
   position: relative;
   display: inline-block;
+  width: 100%;
 `;
 
 export const dropdownButton = css`
   position: relative;
-  padding: 12px 16px;
+  padding: 1.2rem 1.4rem;
   background-color: #ffffff;
-  border: none;
-  border-right: 1px solid #d1d5db;
+  border: 1px solid #d1d5db;
+  border-radius: 1rem;
   width: 100%;
-  font-size: 14px;
+  font-size: 1.1rem;
   color: #374151;
   cursor: pointer;
-  min-width: 120px;
+  min-width: 160px;
   text-align: left;
-  transition: background-color 0.2s ease;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
 
   &:hover {
     background-color: #f9fafb;
+    border-color: #9ca3af;
   }
 
-  &:last-of-type {
-    border-right: none;
+  &:focus {
+    outline: none;
+    border-color: #7e57c2;
   }
 
   &::after {
     content: '▼';
     position: absolute;
-    right: 8px;
+    right: 16px;
     top: 50%;
     transform: translateY(-50%);
-    font-size: 10px;
+    font-size: 12px;
     color: #9ca3af;
   }
 `;
 
 export const buttonContainer = css`
-  margin-top: 2rem;
+  margin-top: 3rem;
   display: flex;
   justify-content: center;
   width: 100%;
-  max-width: 40rem;
+  max-width: 48rem;
 `;
 
 export const signupButton = css`
-  padding: 1rem 2rem;
+  padding: 1.2rem 2.5rem;
   background-color: #7e57c2;
   color: white;
-  font-size: 1.2rem;
+  font-size: 1.3rem;
   font-weight: 600;
   border: none;
-  border-radius: 1rem;
+  border-radius: 1.2rem;
   cursor: pointer;
   width: 100%;
 
@@ -110,7 +109,7 @@ export const signupButton = css`
     background-color: #d1d5db;
     color: #9ca3af;
     cursor: default;
-    
+
     &:hover {
       background-color: #d1d5db;
     }
@@ -133,7 +132,7 @@ export const dropdownMenu = css`
 export const dropdownItem = css`
   display: flex;
   align-items: center;
-  padding: 8px 12px;
+  padding: 12px 16px; /* 아이템 크기 키움 */
   cursor: pointer;
   transition: background-color 0.2s ease;
 
@@ -141,13 +140,13 @@ export const dropdownItem = css`
     background-color: #f3f4f6;
   }
 
-  input[type="radio"] {
-    margin-right: 8px;
+  input[type='radio'] {
+    margin-right: 10px;
     accent-color: #2563eb;
   }
 
   label {
-    font-size: 14px;
+    font-size: 1.05rem;
     color: #374151;
     cursor: pointer;
     display: flex;

@@ -2,13 +2,11 @@
 import * as s from './styles.js';
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import {  reqRegisterComment, reqDeleteForum, reqDetailForum, reqGetComment, reqDeleteComment, reqLike, reqDislike } from '../../../api/forumApi';
+import { reqRegisterComment, reqDeleteForum, reqDetailForum, reqDeleteComment, reqLike, reqDislike } from '../../../api/forumApi';
 import { BiLike, BiSolidLike } from 'react-icons/bi';
-import { FaCameraRetro, FaRegComment, FaRegHeart } from 'react-icons/fa';
+import { FaRegComment } from 'react-icons/fa';
 import { useQueryClient } from '@tanstack/react-query';
 import usePrincipalQuery from '../../../queries/usePrincipalQuery.jsx';
-import { SiKakaotalk } from 'react-icons/si';
-import { FcGoogle } from 'react-icons/fc';
 import { X } from 'lucide-react';
 import useCommentsQuery from '../../../queries/useCommentsQuery.jsx';
 import { MdReport } from 'react-icons/md';
@@ -23,74 +21,41 @@ import Oauth2 from '../../../Oauth2/Oauth2.jsx';
 function DetailedForum(props) {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
-    const principalQuery = usePrincipalQuery();
-    const inputRef = useRef(null);
 
-    const [ searchParam ] = useSearchParams();
+    const principalQuery = usePrincipalQuery();
+    const userId = principalQuery?.data?.data?.user?.userId;
+    const userRole = principalQuery?.data?.data?.user?.userRole;
+
+    const [searchParam] = useSearchParams();
     const forumId = parseInt(searchParam.get("forumId"));
 
-    const commentQuery = useCommentsQuery({ size:20 , forumId})
-    const allComments = commentQuery?.data?.pages?.map(page => page.data.body.contents).flat() || [];
-    console.log("allComments", allComments)
-    const isLast = commentQuery?.data?.data?.body.isLast || false;
+    const inputRef = useRef(null);
 
-    const loaderRef = useRef(null);
+    const [forum, setForum] = useState([]);
+    const [commentValue, setCommentValue] = useState("");
+    const [recomment, setRecomment] = useState(null);
 
-    useEffect(() => {
-        const observer = new IntersectionObserver((entries) => {
-            if (entries[0].isIntersecting) {
-                if(commentQuery.hasNextPage) {
-                    commentQuery.fetchNextPage();
-                }
-            }
-        }, { 
-            rootMargin: "500px",
-        });
-
-        if (loaderRef.current) {
-            observer.observe(loaderRef.current);
-        }
-
-        return () => {
-            if (loaderRef.current) {
-                observer.unobserve(loaderRef.current);
-            }
-        };
-    }, [loaderRef.current]);
-    
-    const [ commentValue, setCommentValue ] = useState("");
-    const [ recomment, setRecomment ] = useState(null);    
-    const [ forum, setForum ] = useState([]);
-    
     const [selectedUser, setSelectedUser] = useState(null);
     const [isUserModalOpen, setIsUserModalOpen] = useState(false);
-    
+
     const [isReportModalOpen, setIsReportModalOpen] = useState(false);
     const [selectedReason, setSelectedReason] = useState('');
     const [customReason, setCustomReason] = useState('');
     const [reportTargetType, setReportTargetType] = useState(3);
     const [reportTargetId, setReportTargetId] = useState(null);
-    
+
     const categoryQuery = useCategoryQuery();
     const categories = categoryQuery?.data?.data || [];
-    
-    const userId = principalQuery?.data?.data?.user?.userId;
-    // 관리자 권한 확인을 위한 userRole 추가
-    const userRole = principalQuery?.data?.data?.user?.userRole;
-    
-    const userBlockListQuery = useUserBlockListQuery({userId});
+
+    const commentQuery = useCommentsQuery({ size: 20, forumId });
+    const allComments = commentQuery?.data?.pages?.map(page => page.data.body.contents).flat() || [];
+    const loaderRef = useRef(null);
+
+    const userBlockListQuery = useUserBlockListQuery({ userId });
     const userBlockList = userBlockListQuery?.data?.data?.body;
     const isBlockedUser = userBlockList?.includes(selectedUser?.userId);
-    
-    const reportReasons = [
-        '스팸 / 광고성 활동',
-        '욕설 / 비방 / 혐오 발언',
-        '음란물 / 불건전한 내용',
-        '사기 / 도용 / 사칭',
-        '불법 행위 (범죄, 불법거래 등)',
-        '기타'
-    ];
-    
+
+
     let formatted = "";
     if (forum?.forumCreatedAt) {
         const date = new Date(forum.forumCreatedAt);
@@ -104,6 +69,15 @@ function DetailedForum(props) {
             timeZone: "Asia/Seoul",
         }).format(date);
     }
+
+    const reportReasons = [
+        '스팸 / 광고성 활동',
+        '욕설 / 비방 / 혐오 발언',
+        '음란물 / 불건전한 내용',
+        '사기 / 도용 / 사칭',
+        '불법 행위 (범죄, 불법거래 등)',
+        '기타'
+    ];
 
     const handleOpenUserModal = (user) => {
         setSelectedUser(user);
@@ -123,7 +97,7 @@ function DetailedForum(props) {
 
     const handleReportPostOnClick = () => {
         setReportTargetType(3);
-        setReportTargetId(parseInt(forumId));
+        setReportTargetId(forumId);
         setIsReportModalOpen(true);
     }
 
@@ -149,29 +123,19 @@ function DetailedForum(props) {
     }
 
     const handleSubmitReport = async () => {
-        if (!selectedReason) {
-            alert('신고 사유를 선택해주세요.');
-            return;
-        }
-
-        if (selectedReason === '기타' && !customReason.trim()) {
-            alert('기타 사유를 입력해주세요.');
-            return;
-        }
+        if (!selectedReason) return alert('신고 사유를 선택해주세요.');
+        if (selectedReason === '기타' && !customReason.trim()) return alert('기타 사유를 입력해주세요.');
 
         try {
             const reportData = {
-                userId: userId,
+                userId,
                 targetType: reportTargetType,
                 targetId: reportTargetId,
                 reason: selectedReason === '기타' ? customReason : selectedReason
             };
-
             await submitReport(reportData);
-            
             toast.success('신고가 접수되었습니다');
             handleCloseReportModal();
-            
         } catch (error) {
             console.error('신고 제출 실패:', error);
             toast.error('신고 제출에 실패했습니다.');
@@ -181,19 +145,13 @@ function DetailedForum(props) {
     const handleToggleUserBlock = async (targetUserId, nickName) => {
         const action = isBlockedUser ? '차단해제' : '차단';
         const isConfirmed = window.confirm(`"${nickName}" 님을 ${action}하시겠습니까?`);
-        
         if (!isConfirmed) return;
 
         try {
-            if (isBlockedUser) {
-                await reqUserUnBlock(targetUserId);
-            } else {
-                await reqUserBlock(targetUserId);
-            }
-            
+            if (isBlockedUser) await reqUserUnBlock(targetUserId);
+            else await reqUserBlock(targetUserId);
             await queryClient.invalidateQueries(['userBlockList', userId]);
-
-        } catch(error) {
+        } catch (error) {
             console.log(`사용자 ${action} 실패:`, error);
             alert(`${action}에 실패했습니다. 다시 시도해주세요.`);
         }
@@ -206,118 +164,67 @@ function DetailedForum(props) {
         } catch (error) {
             console.error("게시글 불러오기 실패:", error);
         }
-    };
-    
-    useEffect(() => {
-        if (forumId) {
-            fetchForum();
-        }
-    }, [forumId]);
-    
-    const handleDeleteForumOnClick = async (forumId, moimId) => {
-        const confirmDelete = window.confirm("게시글을 삭제하시겠습니까?");
-        if (!confirmDelete) return;
+    }
 
+    useEffect(() => { if (forumId) fetchForum(); }, [forumId]);
+
+    const handleDeleteForumOnClick = async (forumId, moimId) => {
+        if (!window.confirm("게시글을 삭제하시겠습니까?")) return;
         try {
             await reqDeleteForum(forumId, moimId);
-            queryClient.invalidateQueries(['forums']); 
+            queryClient.invalidateQueries(['forums']);
             navigate(`/moim/description?moimId=${moimId}`);
         } catch (error) {
             console.error("삭제 실패:", error);
             alert("게시글 삭제 중 오류 발생");
         }
-    };
+    }
 
     const handleCommentOnChange = (e) => {
-      const value = e.target.value;
-      setCommentValue(value);
-
-      if (recomment && !value.startsWith(`@${recomment?.user?.nickName}`)) {
-        setRecomment(null);
-      }
+        const value = e.target.value;
+        setCommentValue(value);
+        if (recomment && !value.startsWith(`@${recomment?.user?.nickName}`)) setRecomment(null);
     }
-    
+
     const handleRegisterCommentOnClick = async (forumId, moimId) => {
-        if (commentValue.trim() === "") {
-            return setCommentValue("");
-        }
+        if (!commentValue.trim()) return setCommentValue("");
 
         const content = /^@[가-힣\w]+(?=\s|$|[^가-힣\w])/.test(commentValue)
-                ? commentValue.substring(commentValue.indexOf(" ") + 1)
-                : commentValue;
-        
+            ? commentValue.substring(commentValue.indexOf(" ") + 1)
+            : commentValue;
+
         const comment = {
             parentCommentId: recomment?.forumCommentId,
             parentUserId: recomment?.user.userId,
             content
         }
-        
+
         try {
             await reqRegisterComment(forumId, moimId, comment);
             setCommentValue("");
             setRecomment(null);
-            
             await queryClient.invalidateQueries(['comments', forumId]);
             await fetchForum();
-            
         } catch (error) {
             console.error("댓글 등록 실패:", error);
             alert("댓글 등록에 실패했습니다.");
         }
     }
 
+    const handleLikeOnClick = async () => { try { await reqLike(forumId); await fetchForum(); queryClient.invalidateQueries(['forums']); } catch (error) { console.error("좋아요 실패", error); } }
+    const handleDislikeOnClick = async () => { try { await reqDislike(forumId); await fetchForum(); queryClient.invalidateQueries(['forums']); } catch (error) { console.error("좋아요 취소 실패", error); } }
+    const handleCommentDeleteOnClick = async (forumId, moimId, forumCommentId) => { if (!window.confirm("댓글을 삭제하시겠습니까?")) return; try { await reqDeleteComment(forumId, moimId, forumCommentId); alert("댓글이 삭제되었습니다."); await queryClient.invalidateQueries(['comments', forumId]); await fetchForum(); } catch { alert("권한이 없습니다."); } }
+
+    const canDeleteComment = (commentUserId) => userId === commentUserId || userRole === 'ADMIN';
+
     useEffect(() => {
-        if(!!recomment) {
-            setCommentValue(prev => {
-                const content = /^@[가-힣\w]+(?=\s|$|[^가-힣\w])/.test(commentValue)
-                    ? commentValue.substring(commentValue.indexOf(" ") + 1)
-                    : commentValue;
+        const observer = new IntersectionObserver((entries) => {
+            if (entries[0].isIntersecting && commentQuery.hasNextPage) commentQuery.fetchNextPage();
+        }, { rootMargin: "500px" });
 
-                return `@${recomment.user.nickName} ${content}`;
-            });
-        }
-    }, [recomment]);
-
-    const handleLikeOnClick = async (e) => {
-        try {
-            await reqLike(forumId);
-            await fetchForum();
-            queryClient.invalidateQueries(['forums']);
-        } catch (error) {
-            console.error("좋아요 처리 실패:", error);
-        }
-    }
-
-    const handleDislikeOnClick = async (e) => {
-        try {
-            await reqDislike(forumId);
-            await fetchForum();
-            queryClient.invalidateQueries(['forums']);
-        } catch (error) {
-            console.error("좋아요 취소 처리 실패:", error);
-        }
-    }
-
-    const handleCommentDeleteOnClick = async (forumId, moimId, forumCommentId) => {
-        const confirmDelete = window.confirm("댓글을 삭제하시겠습니까?");
-        if (!confirmDelete) return;
-
-        try {
-            await reqDeleteComment(forumId, moimId, forumCommentId);
-            alert("댓글이 삭제되었습니다.");
-            
-            await queryClient.invalidateQueries(['comments', forumId]);
-            await fetchForum();
-            
-        } catch (e) {
-            alert("권한이 없습니다.");
-        }
-    };
-
-    // 댓글 삭제 권한 확인 함수
-    const canDeleteComment = (commentUserId) => {
-        return userId === commentUserId || userRole === 'ADMIN';
-    };
+        if (loaderRef.current) observer.observe(loaderRef.current);
+        return () => { if (loaderRef.current) observer.unobserve(loaderRef.current); }
+    }, [loaderRef.current]);
 
     if(principalQuery.isFetched && principalQuery.isSuccess) {
         return (
@@ -558,7 +465,6 @@ function DetailedForum(props) {
                         </div>
                     </div>
                 )}
-                
                 <Toaster />
             </>
         );

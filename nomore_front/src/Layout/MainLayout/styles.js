@@ -14,7 +14,7 @@ export const containerStyle = css`
 `;
 
 export const headerStyle = css`
-  flex-shrink: 0; /* 헤더 크기 고정 */
+  flex-shrink: 0;
 `;
 
 export const body = css`

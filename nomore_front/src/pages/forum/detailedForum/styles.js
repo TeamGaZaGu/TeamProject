@@ -3,6 +3,7 @@ import { css } from "@emotion/react";
 export const forumCard = css`
   background: #fff;
   padding: 16px;
+  min-height: 100vh;
   border-bottom: 1px solid #e5e7eb;
   font-family: "Noto Sans KR", sans-serif;
 `;
