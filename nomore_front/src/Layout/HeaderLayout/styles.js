@@ -1,6 +1,5 @@
 import { css } from '@emotion/react';
 
-// 전체 헤더 컨테이너
 export const headerContainer = css`
   display: flex;
   align-items: center;
@@ -8,36 +7,41 @@ export const headerContainer = css`
   background-color: #ffffff;
   border-bottom: 1px solid #eeeded;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  gap: 40px;
+  height: 40px;
 `;
 
-// 로고 영역
 export const logoSection = css`
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
+  gap: 2px;
   
   &:hover {
     cursor: pointer;
   }
 `;
 
+export const logoImage = css`
+  height: 60px;
+  width: auto;
+  object-fit: contain;
+  margin-left: -35px;
+  margin-right: -25px;
+`;
+
+export const logoTextContainer = css`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+`;
+
 export const logoTitle = css`
-  font-size: 32px;
+  font-size: 26px;
   font-weight: bold;
-  color: #2563eb;
+  color: #ff5fd7;
   margin: 0;
   line-height: 1;
 `;
 
-export const logoSubtitle = css`
-  font-size: 12px;
-  color: #6b7280;
-  margin: 2px 0 0 0;
-  line-height: 1;
-`;
-
-// 중앙 컨트롤 영역 - overflow: hidden 제거!
 export const controlSection = css`
   display: flex;
   align-items: center;
@@ -46,9 +50,9 @@ export const controlSection = css`
   border-radius: 12px;
   background-color: #ffffff;
   flex: 1;
-  max-width: 800px;
+  max-width: 1100px;
   margin: 0 auto;
-  overflow: visible; 
+  overflow: visible;
 `;
 
 export const dropdownContainer = css`
@@ -56,7 +60,6 @@ export const dropdownContainer = css`
   display: inline-block;
 `;
 
-// 드롭다운 버튼 스타일
 export const dropdownButton = css`
   position: relative;
   padding: 12px 16px;
@@ -90,7 +93,6 @@ export const dropdownButton = css`
   }
 `;
 
-// 드롭다운 메뉴
 export const dropdownMenu = css`
   position: absolute;
   top: 100%;
@@ -103,16 +105,15 @@ export const dropdownMenu = css`
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   z-index: 1000;
   width: 140px;
-  max-height: 200px; 
-  overflow-y: auto; 
+  max-height: 200px;
+  overflow-y: auto;
   background-color: #fff;
 
   &::-webkit-scrollbar {
-    display: none; 
+    display: none;
   }
 `;
 
-// 드롭다운 아이템
 export const dropdownItem = css`
   display: flex;
   align-items: center;
@@ -139,7 +140,6 @@ export const dropdownItem = css`
   }
 `;
 
-// 검색 입력창
 export const searchInput = css`
   padding: 12px 16px;
   border: none;
@@ -155,25 +155,25 @@ export const searchInput = css`
   }
 `;
 
-// 검색 버튼
 export const searchButton = css`
   padding: 12px 16px;
-  background-color: #2563eb;
+  background-color: #ffffff;
   border: none;
-  color: #ffffff;
+  color: #6b7280;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background-color 0.2s ease;
+  transition: all 0.2s ease;
   border-radius: 0 11px 11px 0;
   height: 4.56rem;
   
   &:hover {
-    background-color: #1d4ed8;
+    background-color: #f9fafb;
+    color: #374151;
   }
   
   svg {
-    font-size: 18px;
+    font-size: 20px;
   }
 `;

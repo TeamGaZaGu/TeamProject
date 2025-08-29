@@ -1,19 +1,16 @@
 /** @jsxImportSource @emotion/react */
 import { css } from '@emotion/react';
 
-
 export const PageContainer = css`
   display: flex;
   flex: 1;
   height: 80vh;
-  width: 100%;          /* ✅ 꽉 채우기 */
-  max-width: 1200px;    /* ✅ 필요 시 제한 */
-  margin-top: 15px ;
-  margin-left: auto;
-  margin-right: auto;
+  width: 100%;
+  max-width: 1200px;
+  margin: 15px auto 0;
   border: 1px solid #9bbbd4;
   border-radius: 8px;
-  overflow: hidden;     /* ✅ 전체 스크롤 방지 */
+  overflow: hidden;
   background-color: skyblue;
 `;
 
@@ -23,13 +20,12 @@ export const UserListContainer = css`
   border-right: 1px solid #ddd;
   overflow-y: auto;
   padding: 16px;
-
 `;
 
 export const UserItem = css`
   display: flex;
   align-items: center;
-  justify-content:center;
+  justify-content: center;
   gap: 8px;
   padding: 8px 0;
   border-bottom: 1px solid #eee;
@@ -56,19 +52,18 @@ export const ChatContainer = css`
   flex: 1;
   display: flex;
   flex-direction: column;
-  overflow: hidden;      /* ✅ 여기서도 외부 스크롤 차단 */
+  overflow: hidden;
 `;
-
-
 
 export const MessageList = css`
   flex: 1;
-  overflow-y: auto;      /* ✅ 오직 여기만 스크롤 */
+  overflow-y: auto;
   padding: 16px;
   display: flex;
   flex-direction: column;
   gap: 8px;
 `;
+
 export const MyMessageWrapper = css`
   display: flex;
   justify-content: flex-end;
@@ -80,7 +75,6 @@ export const OtherMessageWrapper = css`
   align-items: flex-end;
   margin-bottom: 8px;
 `;
-
 
 export const MyMessageItem = css`
   align-self: flex-end;
@@ -94,7 +88,6 @@ export const MyMessageItem = css`
   strong {
     display: none;
   }
-
 `;
 
 export const OtherUserMessage = css`
@@ -106,6 +99,7 @@ export const OtherUserMessage = css`
   max-width: 60%;
   word-break: break-word;
 `;
+
 export const SmallProfileImage = css`
   width: 30px;
   height: 30px;
@@ -125,12 +119,14 @@ export const InputContainer = css`
   border-top: 1px solid #ddd;
   gap: 8px;
   background-color: #ffffff;
+
   input {
     flex: 1;
     padding: 8px 12px;
     border-radius: 8px;
     border: 1px solid #ddd;
   }
+
   button {
     padding: 8px 16px;
     border: none;
@@ -140,4 +136,3 @@ export const InputContainer = css`
     cursor: pointer;
   }
 `;
-

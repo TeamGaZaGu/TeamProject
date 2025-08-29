@@ -3,7 +3,7 @@ import { css } from '@emotion/react';
 // 메인 컨테이너
 export const containerStyle = css`
   min-height: 100vh;
-  background: #fafbfc;
+  background: #fff;
   padding: 24px 0;
   
   @media (max-width: 768px) {
