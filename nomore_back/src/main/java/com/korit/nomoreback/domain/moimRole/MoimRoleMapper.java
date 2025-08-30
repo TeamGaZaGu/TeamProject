@@ -19,5 +19,6 @@ public interface MoimRoleMapper {
     List<MoimRoleDto> findMembersByMoimIdExceptUser(@Param("moimId") Integer moimId, @Param("userId") Integer userId);
     List<MoimRoleDto> findAllMembersByMoimId(@Param("moimId") Integer moimId);
 
-    boolean hasOwnerMoims(Integer userId);
+    boolean hasOwnerMoims(@Param("userId") Integer userId);
+    int deleteAllByUserId(@Param("userId") Integer userId);
 }
