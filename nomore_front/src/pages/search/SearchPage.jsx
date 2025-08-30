@@ -8,8 +8,10 @@ import useMoimQuery from '../../queries/useMoimQuery';
 function SearchPage(props) {
     const navigate = useNavigate();
     const location = useLocation();
-    const searchMoim = location.state;
     const { categoryId, districtId, searchText } = location.state || {};
+    console.log(categoryId)
+    console.log(districtId)
+    console.log(searchText)
 
     const moimQuery = useMoimQuery({ size: 8, categoryId, districtId, searchText });
     const allMoims = moimQuery?.data?.pages?.map(page => page.data.body.contents).flat() || [];
@@ -44,7 +46,7 @@ function SearchPage(props) {
     }, [loaderRef.current]);
 
     const handleMoimOnClick = (moimId) => {
-        navigate(`/moim/description?moimId=${moimId}`);
+        navigate(`/moim/detail?moimId=${moimId}`);
     };
 
     console.log(allMoims);
@@ -115,7 +117,13 @@ function SearchPage(props) {
                                     <h3 css={s.titleStyle}>{moim.title}</h3>
                                     
                                     <p css={s.descriptionStyle}>
-                                        {moim.discription || '모임에 대한 자세한 설명이 곧 업데이트됩니다.'}
+                                        {moim.discription 
+                                            ? (moim.discription.length > 50 
+                                                ? `${moim.discription.substring(0, 50)}...` 
+                                                : moim.discription
+                                            )
+                                            : '모임에 대한 자세한 설명이 곧 업데이트됩니다.'
+                                        }
                                     </p>
                                     
                                     <div css={s.tagsStyle}>

@@ -40,7 +40,7 @@
     <update id="blockUser">
         update user_tb
         set
-            user_site_block = #{userSiteBlock}
+            user_site_block = 1
         where
             user_id = #{userId}
     </update>
@@ -48,7 +48,7 @@
     <update id="unBlockUser">
         update user_tb
         set
-            user_site_block = #{userSiteBlock}
+            user_site_block = 0
         where
             user_id = #{userId}
     </update>

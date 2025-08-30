@@ -9,67 +9,66 @@ import { BsSendArrowUpFill } from 'react-icons/bs';
 import { useQueryClient } from '@tanstack/react-query';
 
 function ModifyForum(props) {
-    const navigate = useNavigate()
+    const navigate = useNavigate();
     const queryClient = useQueryClient();
-    const [ searchParam ] = useSearchParams();
+    const [searchParam] = useSearchParams();
     const forumId = searchParam.get("forumId");
 
     const [forum, setForum] = useState(null);
 
-    const forumCategoryQuery = useForumCategoryQuery();
-    const respForumCategories = forumCategoryQuery?.data?.data || [];
-
-    const [ forumValue, setForumValue ] = useState({
+    const [forumValue, setForumValue] = useState({
         forumTitle: "",
         forumContent: "",
         forumImages: [],
         forumCategoryId: "",
     });
-    console.log(forumValue)
-    useEffect(() => {
-        if (forum) {
-            setForumValue({
-                forumTitle: forum.forumTitle || '',
-                forumContent: forum.forumContent || '',
-                forumImages: forum.forumImgList?.map(image => ({file: image.file, dataUrl: image.url})) || [],
-                forumCategoryId: forum.forumCategory?.forumCategoryId || '',
-            });
-        }
-    }, [forum]);
 
+    const forumCategoryQuery = useForumCategoryQuery();
+    const respForumCategories = forumCategoryQuery?.data?.data || [];
 
-    console.log(getImageBlobPromises)
     useEffect(() => {
         const fetchForum = async () => {
             try {
-                const blobs = [];
                 const response = await reqDetailForum(forumId);
+
                 const getImageBlobPromises = response.data.forumImgList.map(image => {
-                    return new Promise((rs, rj) => {
-                        reqDetailForumBlob({url: image.path, imageConfigsName: "forum"}).then(response => {
-                            rs(response);
-                        });
-                    })
+                    return new Promise((resolve) => {
+                        reqDetailForumBlob({ url: image.path, imageConfigsName: "forum" })
+                            .then(res => resolve(res));
+                    });
                 });
-                const results = (await Promise.all(getImageBlobPromises));
+
+                const results = await Promise.all(getImageBlobPromises);
                 const forumData = {
                     ...response.data,
                     forumImgList: response.data.forumImgList.map((img, index) => ({
                         ...img,
-                        file: new File([results[index].data], img.path.substring(img.path.indexOf("_") + 1), { type: results[index].headers['content-type'] }),
+                        file: new File([results[index].data], img.path.substring(img.path.indexOf("_") + 1), { 
+                            type: results[index].headers['content-type'] 
+                        }),
                         url: URL.createObjectURL(results[index].data),
                     }))
                 };
+
                 setForum(forumData);
             } catch (error) {
                 console.error("게시글 불러오기 실패:", error);
             }
         };
 
-        if (forumId) {
-            fetchForum();
-        }
+        if (forumId) fetchForum();
     }, [forumId]);
+
+    useEffect(() => {
+        if (forum) {
+            setForumValue({
+                forumTitle: forum.forumTitle || '',
+                forumContent: forum.forumContent || '',
+                forumImages: forum.forumImgList?.map(image => ({ file: image.file, dataUrl: image.url })) || [],
+                forumCategoryId: forum.forumCategory?.forumCategoryId || '',
+            });
+        }
+    }, [forum]);
 
     const handleInputChange = (e) => {
         setForumValue(prev => ({
@@ -81,73 +80,65 @@ function ModifyForum(props) {
     const handleOldImgDeleteOnClick = (index) => {
         setForumValue(prev => ({
             ...prev,
-            forumImages: prev.forumImages.filter((file, i) => i !== index)
+            forumImages: prev.forumImages.filter((_, i) => i !== index)
         }));
-    }
+    };
 
-    const handlePlusOnClick =  () => {
+    const handlePlusOnClick = () => {
         const fileInput = document.createElement("input");
-        fileInput.setAttribute("type", "file");
-        fileInput.setAttribute("multiple", "true");
+        fileInput.type = "file";
+        fileInput.multiple = true;
         fileInput.click();
+
         fileInput.onchange = async (e) => {
-            if (forumValue.forumImages.length + e.target.files.length > 10) {
-                    alert("이미지는 최대 10개까지만 등록할 수 있습니다.")
+            const files = [...e.target.files];
+
+            if (forumValue.forumImages.length + files.length > 10) {
+                alert("이미지는 최대 10개까지만 등록할 수 있습니다.");
                 return;
             }
-            const filesArray = [...e.target.files];
-            
-            Promise.all(filesArray.map(file => {
-                return new Promise(resolve => {
-                    const fileReader = new FileReader();
-                    fileReader.onload = (e) => {
-                        console.log({file, dataUrl: e.target.result})
-                        resolve({file, dataUrl: e.target.result});
-                    }
-                    fileReader.readAsDataURL(file);
-                });
-            })).then(resolves => {
-                setForumValue(prev => ({...prev, forumImages: [...prev.forumImages, ...resolves]}));
-            });
-        }
-    }
 
-    console.log(forumValue)
+            const filesWithDataUrl = await Promise.all(files.map(file => new Promise(resolve => {
+                const reader = new FileReader();
+                reader.onload = (ev) => resolve({ file, dataUrl: ev.target.result });
+                reader.readAsDataURL(file);
+            })));
+
+            setForumValue(prev => ({
+                ...prev,
+                forumImages: [...prev.forumImages, ...filesWithDataUrl]
+            }));
+        };
+    };
 
     const handleModifyOnClick = async () => {
-
         if (!forumValue.forumTitle.trim() || !forumValue.forumContent.trim() || !forumValue.forumCategoryId) {
             alert("모든 필수 항목을 입력해주세요.");
             return;
         }
 
         const formData = new FormData();
-
         formData.append("forumTitle", forumValue.forumTitle);
         formData.append("forumContent", forumValue.forumContent);
         formData.append("forumCategoryId", Number(forumValue.forumCategoryId));
 
-        forumValue.forumImages.forEach((image, index) => {
-            console.log("image.file", image.file)
-            formData.append("forumImages", image.file);
-        });
+        forumValue.forumImages.forEach(image => formData.append("forumImages", image.file));
 
         try {
-            await reqModifyForum(forumId, formData)
+            await reqModifyForum(forumId, formData);
             await navigate(`/forum/detail?forumId=${forumId}`);
             await queryClient.invalidateQueries({ queryKey: ['forums', forum?.moim?.moimId] });
         } catch (error) {
             console.error("게시글 등록 실패:", error);
             alert("게시글 등록에 실패했습니다.");
         }
-    }
-    
+    };
+
     return (
         <div css={s.layout}>
             <h1>게시글 수정</h1>
             <p>게시글을 수정하세요.</p>
-            
-            {/* 카테고리 선택 */}
+
             <div css={s.category}>
                 <p>카테고리</p>
                 <span>*</span>
@@ -158,18 +149,14 @@ function ModifyForum(props) {
                 value={forumValue.forumCategoryId}
                 onChange={handleInputChange}
                 required
-                >
+            >
                 {respForumCategories.map(category => (
-                    <option
-                        key={category.forumCategoryId}
-                        value={category.forumCategoryId}
-                        >
+                    <option key={category.forumCategoryId} value={category.forumCategoryId}>
                         {category.forumCategoryName}
                     </option>
                 ))}
             </select>
 
-            {/* 제목 */}
             <div css={s.title}>
                 <p>제목</p>
                 <span>*</span>
@@ -184,7 +171,6 @@ function ModifyForum(props) {
                 required
             />
 
-            {/* 내용 */}
             <div css={s.content}>
                 <p>내용</p>
                 <span>*</span>
@@ -203,37 +189,32 @@ function ModifyForum(props) {
                     이미지 ({forumValue.forumImages.length}/10)
                 </div>
                 <div css={s.imgContainer}>
-                    {
-                        <div css={s.uploadButton} onClick={handlePlusOnClick}>
-                            <Upload size={20} />
-                            <span>이미지 추가</span>
-                        </div>
-                    }
-                    {
-                        forumValue.forumImages?.map((image, index) => (
-                            <div key={index}>
-                                <div css={s.previewImg}>
-                                    <img src={`${image.dataUrl}`} alt={`forum-img-${index}`} />
-                                    <button
-                                        type="button"
-                                        onClick={() => handleOldImgDeleteOnClick(index)}
-                                        >
-                                        <X size={12} />
-                                    </button>
-                                </div>
+                    <div css={s.uploadButton} onClick={handlePlusOnClick}>
+                        <Upload size={20} />
+                        <span>이미지 추가</span>
+                    </div>
+                    {forumValue.forumImages.map((image, index) => (
+                        <div key={index}>
+                            <div css={s.previewImg}>
+                                <img src={image.dataUrl} alt={`forum-img-${index}`} />
+                                <button type="button" onClick={() => handleOldImgDeleteOnClick(index)}>
+                                    <X size={12} />
+                                </button>
                             </div>
-                        ))
-                    }
-                </div>
-                {
-                    forumValue.forumImages.length >= 10 && (
-                        <div css={s.errorMessage}>
-                            이미지는 최대 10개까지만 등록할 수 있습니다.
                         </div>
+                    ))}
+                </div>
+                {forumValue.forumImages.length >= 10 && (
+                    <div css={s.errorMessage}>
+                        이미지는 최대 10개까지만 등록할 수 있습니다.
+                    </div>
                 )}
             </div>
+
             <div css={s.submitContainer}>
-                <button css={s.submitButton} onClick={handleModifyOnClick}><BsSendArrowUpFill />게시글 수정하기</button>
+                <button css={s.submitButton} onClick={handleModifyOnClick}>
+                    <BsSendArrowUpFill />게시글 수정하기
+                </button>
             </div>
         </div>
     );

@@ -1,5 +1,4 @@
 // UserManagement.jsx 완전한 코드
-
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { reqAllUser, reqBlockUser, reqUnBlockUser } from '../../api/userApi';
@@ -28,9 +27,12 @@ function UserManagement(props) {
         }
     };
 
+    console.log(allUser)
     // 사용자 상세 페이지로 이동
     const handleUserDetailOnClick = (userId) => {
-        navigate(`/admin/user/${userId}`);
+        const choiceUser = allUser.find(user =>  user.userId === Number(userId));
+        console.log(choiceUser)
+        navigate(`/admin/user/${userId}`, { state: { user: choiceUser } });
     };
 
     const handleBlockUserOnClick = async (userId, nickName, siteBlock) => {

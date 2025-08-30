@@ -57,8 +57,8 @@ export const moimItemFlatStyle = css`
 
 export const moimImageContainerStyle = css`
   flex-shrink: 0;
-  width: 140px;
-  height: 100px;
+  width: 220px;
+  height: 120px;
   margin-right: 20px;
   overflow: hidden;
   border-radius: 8px;

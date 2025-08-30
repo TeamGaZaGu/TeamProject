@@ -15,7 +15,7 @@ function ModifyMoim(props) {
     const [inputValue, setInputValue] = useState({
         title: "",
         discription: "",
-        maxMembers: "",
+        maxMember: "",
         districtId: "",
         districtName: "",
         categoryId: "",
@@ -40,10 +40,11 @@ function ModifyMoim(props) {
     const [ selectedDistrict, setSelectedDistrict ] = useState('');
     const [ isDistrictOpen, setIsDistrictOpen ] = useState(false);
 
-    const [ selectedMaxMembers, setSelectedMaxMembers ] = useState();
-    const [ isMaxMembersOpen, setIsMaxMembersOpen ] = useState(false);
-    const maxMembersOptions = Array.from({ length: 29 }, (_, index) => index + 2);
+    const [ selectedmaxMember, setSelectedmaxMember ] = useState();
+    const [ ismaxMemberOpen, setIsmaxMemberOpen ] = useState(false);
+    const maxMemberOptions = Array.from({ length: 29 }, (_, index) => index + 2);
 
+    console.log(moim)
     useEffect(() => {
         const fetchMoim = async () => {
             try {
@@ -53,7 +54,7 @@ function ModifyMoim(props) {
                 setInputValue({
                     title: moimData.title || "",
                     discription: moimData.discription || "",
-                    maxMembers: moimData.maxMember || "",
+                    maxMember: moimData.maxMember || "",
                     districtId: moimData.districtId || "",
                     districtName: moimData.districtName || "",
                     categoryId: getCategory?.categoryId || "",
@@ -62,7 +63,7 @@ function ModifyMoim(props) {
 
                 setSelectedCategory(getCategory.categoryName);
                 setSelectedDistrict(moimData.districtName);
-                setSelectedMaxMembers(moimData.maxMember);
+                setSelectedmaxMember(moimData.maxMember);
                 setPreviewImg(`${moimData.moimImgPath}`);
 ;
             } catch (err) {
@@ -138,15 +139,15 @@ function ModifyMoim(props) {
         }
     }
 
-    const handleToggleMaxMembersOnClick = () => {
-        setIsMaxMembersOpen((prev) => !prev);
-        if (isMaxMembersOpen) {
-            setIsMaxMembersOpen(false);
+    const handleTogglemaxMemberOnClick = () => {
+        setIsmaxMemberOpen((prev) => !prev);
+        if (ismaxMemberOpen) {
+            setIsmaxMemberOpen(false);
         }
     }
 
     const handleCategoryOnChange = (e, category) => {
-        setSelectedCategory(category.categoryId);
+        setSelectedCategory(category.categoryName);
         setIsCategoryOpen(false);
         setInputValue(prev => ({
             ...prev,
@@ -154,41 +155,41 @@ function ModifyMoim(props) {
         }));
     }    
 
-    const handleMaxMembersOnChange = async (e, maxMembers) => {
-        setSelectedMaxMembers(maxMembers);
-        setIsMaxMembersOpen(false);
+    const handlemaxMemberOnChange = async (e, maxMember) => {
+        setSelectedmaxMember(maxMember);
+        setIsmaxMemberOpen(false);
         setInputValue(prev => ({
             ...prev,
-            maxMembers: maxMembers,
+            maxMember: maxMember,
         }));
     }
 
     const handleCreateMoimOnClick = async () => {
-    const { title, maxMember, districtId, categoryId, discription, moimImgFile } = inputValue;
+        const { title, maxMember, districtId, categoryId, discription, moimImgFile } = inputValue;
 
-    const formData = new FormData();
+        const formData = new FormData();
 
-        formData.append("title", title);
-        formData.append("discription", discription);
-        formData.append("maxMember", maxMember ? Number(maxMember) : 0);  // NaN 방지
-        formData.append("districtId", districtId ? Number(districtId) : 0);
-        formData.append("categoryId", categoryId ? Number(categoryId) : 0);
+            formData.append("title", title);
+            formData.append("discription", discription);
+            formData.append("maxMember", maxMember);  // NaN 방지
+            formData.append("districtId", districtId);
+            formData.append("categoryId", categoryId);
 
-    if (moimImgFile) {
-        formData.append("moimImgPath", moimImgFile);
-    }
+        if (moimImgFile) {
+            formData.append("moimImgPath", moimImgFile);
+        }
 
-    try {
-        await reqModifyMoim(formData, moimId);
-        alert("모임 수정 성공!");
-        navigate(`/moim/description?moimId=${moimId}`);
-    } catch (error) {
-        console.error("모임 수정 실패:", error);
-        alert("모임 수정 실패");
-    }
-};
+        try {
+            await reqModifyMoim(formData, moimId);
+            alert("모임 수정 성공!");
+            navigate(`/moim/detail?moimId=${moimId}`);
+        } catch (error) {
+            console.error("모임 수정 실패:", error);
+            alert("모임 수정 실패");
+        }
+    };
 
-
+    console.log(categories)
     if (categoryQuery.isFetched && categoryQuery.isSuccess) {
         return (
             <div css={s.layout}>
@@ -215,25 +216,25 @@ function ModifyMoim(props) {
                     </div>
                     
                     <div css={s.dropdownContainer}>
-                        <button css={s.dropdownButton} onClick={handleToggleMaxMembersOnClick}>
-                            {selectedMaxMembers
-                                ? `최대 ${selectedMaxMembers}명`
+                        <button css={s.dropdownButton} onClick={handleTogglemaxMemberOnClick}>
+                            {selectedmaxMember
+                                ? `최대 ${selectedmaxMember}명`
                                 : '최대인원수 설정'
                             }
                         </button>
-                        {isMaxMembersOpen && (
+                        {ismaxMemberOpen && (
                             <div css={s.dropdownMenu}>
-                                {maxMembersOptions.map((maxMembers) => (
-                                    <div key={maxMembers} css={s.dropdownItem}>
+                                {maxMemberOptions.map((maxMember) => (
+                                    <div key={maxMember} css={s.dropdownItem}>
                                         <label>
                                             <input
                                                 type="radio"
-                                                name='maxMembers'
-                                                value={inputValue.maxMembers}
-                                                checked={selectedMaxMembers === maxMembers}
-                                                onChange={(e) => handleMaxMembersOnChange(e, maxMembers)}
+                                                name='maxMember'
+                                                value={inputValue.maxMember}
+                                                checked={selectedmaxMember === maxMember}
+                                                onChange={(e) => handlemaxMemberOnChange(e, maxMember)}
                                             />
-                                            {maxMembers}명
+                                            {maxMember}명
                                         </label>
                                     </div>
                                 ))}

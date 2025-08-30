@@ -36,7 +36,7 @@ function FindMoim() {
     }, [loaderRef.current]);
 
     const handleMoimOnClick = (moimId) => {
-        navigate(`/moim/description?moimId=${moimId}`);
+        navigate(`/moim/detail?moimId=${moimId}`);
     };
 
     const handleCreateMoimOnClick = () => {

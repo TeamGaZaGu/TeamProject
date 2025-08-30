@@ -15,10 +15,14 @@ public class MoimModifyDto {
     private Integer categoryId;
     private MultipartFile moimImgPath;
 
-    public Moim modify(Moim modifyMoim) {
-        if (title != null ) modifyMoim.setTitle(title);
-        if (discription != null ) modifyMoim.setDiscription(discription);
-        if (maxMember != null ) modifyMoim.setMaxMember(maxMember);
-        return modifyMoim;
+    public Moim toEntity() {
+        return Moim.builder()
+                .moimId(moimId)
+                .title(title)
+                .discription(discription)
+                .maxMember(maxMember)
+                .districtId(districtId)
+                .categoryId(categoryId)
+                .build();
     }
 }

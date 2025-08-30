@@ -6,7 +6,7 @@ import api, { baseURL } from "../../api/axios";
 import usePrincipalQuery from '../../queries/usePrincipalQuery';
 import { reqCheckUserIsOwner, reqMyMoimList } from '../../api/moimApi';
 import { useNavigate } from 'react-router-dom';
-import { deleteUser } from '../../api/userApi';
+import { deleteUser, reqModifyUserBlob } from '../../api/userApi';
 import { reqGetForumsWithParams } from '../../api/forumApi';
 
 function Mypage(props) {
@@ -16,6 +16,7 @@ function Mypage(props) {
     const categories = categoryQuery?.data?.data || []
     const principalQuery = usePrincipalQuery();
     const user = principalQuery?.data?.data?.user;
+    const [ modifyUser, setModifyUser ] = useState({}); 
     const [categoryList, setCategoryList] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState('');
     const [isCategoryOpen, setIsCategoryOpen] = useState(false);
@@ -23,8 +24,18 @@ function Mypage(props) {
 
     const [myMoims, setMyMoims] = useState([]);
     const [myPosts, setMyPosts] = useState([]); // [추가]
-
-    console.log(myMoims)
+    useEffect(() => {( async() => {
+        const userImg = await reqModifyUserBlob({url: user.profileImgPath, imageConfigsName: "profile"});
+        const fileName = user.profileImgPath.substring(user.profileImgPath.indexOf("_") + 1);
+        const getUserImg = {
+            ...user,
+            profileImgPath: {
+                file: new File([userImg.data], fileName, { type: userImg.headers['content-type'] }),
+                url: URL.createObjectURL(userImg.data),
+            }
+        }
+        setModifyUser(getUserImg)
+    })()}, [])
 
     useEffect(() => {
         if (user?.userId) {
@@ -56,7 +67,6 @@ function Mypage(props) {
                     myMoims.map(m =>
                         reqGetForumsWithParams(m.moimId, params)
                             .then(resp => {
-                                console.log(`✅ 모임 ${m.moimId} 성공:`, resp);
 
                                 // 실제 데이터 추출
                                 let list = [];
@@ -69,7 +79,6 @@ function Mypage(props) {
                                 return { moimId: m.moimId, list };
                             })
                             .catch(err => {
-                                console.error(`❌ 모임 ${m.moimId} 실패:`, err);
                                 return { moimId: m.moimId, list: [] };
                             })
                     )
@@ -109,48 +118,32 @@ function Mypage(props) {
         setIsCategoryOpen(false);
     }
 
-    const mypageInputEmpty = {
-        nickName: user?.nickName || '',
-        introduction: user?.introduction || '',
-    }
+    const handleProfileImageChange = (e) => {
+        const file = e.target.files[0];
 
-    const [mypageModify, setMypageModify] = useState(mypageInputEmpty);
+        setModifyUser(prev => ({
+            ...prev,
+            profileImgPath: {
+            file,
+            url: URL.createObjectURL(file),
+            }
+        }));
+    };
 
     const handleMypageModifyOnChange = (e) => {
-        setMypageModify(prev => ({
+        setModifyUser(prev => ({
             ...prev,
             [e.target.name]: e.target.value,
         }))
     }
 
-    const [profileImageFile, setProfileImageFile] = useState(null);
-    const [profileImagePreview, setProfileImagePreview] = useState(null);
-
-    const handleProfileImageChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            if (profileImagePreview) URL.revokeObjectURL(profileImagePreview);
-            setProfileImageFile(file);
-            setProfileImagePreview(URL.createObjectURL(file));
-        } else {
-            setProfileImageFile(null);
-            setProfileImagePreview(null);
-        }
-    };
-
-    useEffect(() => {
-        return () => {
-            if (profileImagePreview) URL.revokeObjectURL(profileImagePreview);
-        };
-    }, [profileImagePreview]);
-
     const handleSaveOnclick = async () => {
         const formData = new FormData();
         const choice = categoryList.find(prev => prev.categoryName === selectedCategory)
-        formData.append("nickName", mypageModify.nickName);
-        formData.append("introduction", mypageModify.introduction);
+        formData.append("nickName", modifyUser.nickName);
+        formData.append("introduction", modifyUser.introduction);
         formData.append("categoryId", choice?.categoryId || user.categoryId);
-         if (profileImageFile) formData.append("profileImgPath", profileImageFile);
+        formData.append("profileImgPath", modifyUser.profileImgPath.file)
 
         try {
             await api.put("/api/user/profile", formData, {
@@ -202,15 +195,12 @@ function Mypage(props) {
 
     return (
         <div css={s.mypageLayout}>
-            {/* 왼쪽 섹션 - 개인정보 수정 */}
             <div css={s.leftSection}>
                 <h1 css={s.pageTitle}>마이페이지</h1>
-
-                {/* 프로필 이미지 섹션 */}
                 <div css={s.profileSection}>
                     <div css={s.profileImage}>
                         <img
-                            src={profileImagePreview || `${user?.profileImgPath}`}
+                            src={`${modifyUser?.profileImgPath?.url}`}
                             alt="프로필"
                             onError={(e) => {
                                 e.target.style.display = 'none';
@@ -243,7 +233,7 @@ function Mypage(props) {
                             css={s.inputStyle}
                             type="text"
                             name='nickName'
-                            value={mypageModify.nickName}
+                            value={modifyUser.nickName}
                             onChange={handleMypageModifyOnChange}
                         />
                     </div>
@@ -254,7 +244,7 @@ function Mypage(props) {
                             css={s.inputStyle}
                             type="text"
                             name='introduction'
-                            value={mypageModify.introduction}
+                            value={modifyUser.introduction}
                             onChange={handleMypageModifyOnChange}
                         />
                     </div>

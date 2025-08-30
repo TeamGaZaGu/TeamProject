@@ -12,8 +12,6 @@ export const reqfindAllMoim = async ({page, size, categoryId, districtId, search
 
 export const reqCreateMoim = async (data) => await api.post("/api/moim/register", data)
 
-export const reqfindMoim = async () => await api.get("/api/moim/find/categoryIdInUserId")
-
 export const reqSelectMoim = async (moimId) => await api.get(`/api/moim/${moimId}/select`)
 
 export const reqJoinMoim = async (moimId) => await api.post(`/api/moim/${moimId}/join`)

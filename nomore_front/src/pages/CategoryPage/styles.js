@@ -8,7 +8,6 @@ export const containerStyle = css`
   min-height: 100vh;
 `;
 
-// 카테고리 헤더 스타일
 export const categoryHeaderStyle = css`
   background: white;
   padding: 20px 24px;
@@ -28,7 +27,6 @@ export const categoryNameStyle = css`
   color: #1f2937;
 `;
 
-// 모임 리스트 스타일
 export const moimListStyle = css`
   padding: 0;
 `;
@@ -54,8 +52,8 @@ export const moimItemStyle = css`
 
 export const moimImageContainerStyle = css`
   flex-shrink: 0;
-  width: 140px;
-  height: 100px;
+  width: 220px;
+  height: 120px;
   margin-right: 20px;
   overflow: hidden;
   border-radius: 8px;

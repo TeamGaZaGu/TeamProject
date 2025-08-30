@@ -69,7 +69,7 @@
         WHERE moim_id = #{moimId}
     </delete>
 
-    <select id="findByMoimId" resultMap="MoimResultMap">
+    <select id="findMoimId" resultMap="MoimResultMap">
         SELECT
             mt.moim_id,
             mt.moim_title,
@@ -209,7 +209,7 @@
                 and mt.district_id = #{districtId}
             </if>
             <if test="searchText != null and searchText != ''">
-                and (moim_title = concat('%', #{searchText}, '%') or moim_discription = concat('%', #{searchText}, '%'))
+                and (moim_title like concat('%', #{searchText}, '%') or moim_discription like concat('%', #{searchText}, '%'))
             </if>
         limit #{startIndex}, #{size}
     </select>
@@ -219,7 +219,6 @@
             count(*)
         from
             moim_tb mt
-            left outer join district_tb dt on(dt.district_id = mt.district_id)
         where
             1 = 1
             <if test="categoryId != null and categoryId != 1">
