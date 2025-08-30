@@ -37,6 +37,10 @@
             moim_id = #{moimId}
             and user_id = #{userId}
     </delete>
+    <delete id="deleteAllByUserId">
+        delete from moim_role_tb
+        where user_id = #{userId}
+    </delete>
 
     <update id="updateMoimRole">
         UPDATE moim_role_tb
@@ -74,11 +78,14 @@
             u.nick_name
     </select>
 
-    <select id="hasOwnerMoims" resultType="java.lang.Boolean">
-        select count(*) > 0
-        from moim_role_tb
-        where user_id = ${userId}
-        and moim_role = 'OWNER'
+    <select id="hasOwnerMoims" resultType="boolean">
+        select exists (
+        select 1
+        from moim_role_tb mr
+        join moim_tb m ON mr.moim_id = m.moim_id
+        where mr.user_id = #{userId}
+        and upper(trim(mr.moim_role)) = 'OWNER'
+        )
     </select>
 
 </mapper>
