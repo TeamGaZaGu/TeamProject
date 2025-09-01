@@ -10,6 +10,11 @@
         VALUES (default ,#{chattingContent}, NOW(), #{userNickName}, #{moimId})
     </insert>
 
+    <delete id="deleteChatById">
+        delete from chat_tb
+        where chat_id = #{chatId}
+    </delete>
+
     <select id="getMessages" resultType="com.korit.nomoreback.domain.chat.Chat">
         select
         chat_id as chatId,
@@ -24,6 +29,21 @@
         order by
         chatted_at DESC
         limit #{offset},#{limit}
+    </select>
+
+
+    <select id="findByChatId" resultType="com.korit.nomoreback.domain.chat.Chat">
+        select
+        chat_id as chatId,
+        chatting_content as chattingContent,
+        chatted_at as chattedAt,
+
+        user_nickname as userNickName,
+        moim_id as moimId
+        from
+        chat_tb
+        where
+        chat_id = #{chatId}
     </select>
 
 </mapper>

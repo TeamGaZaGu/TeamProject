@@ -9,8 +9,10 @@ import com.korit.nomoreback.domain.user.UserMapper;
 import com.korit.nomoreback.dto.chat.ChatImgRepDto;
 import com.korit.nomoreback.dto.chat.ChatMessageDto;
 import com.korit.nomoreback.dto.chat.ChatResponseDto;
+import com.korit.nomoreback.security.model.PrincipalUtil;
 import com.korit.nomoreback.util.ImageUrlUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -26,8 +28,10 @@ public class ChatService {
     private final ChatMapper chatMapper;
     private final UserMapper userMapper;
     private final ChatImgMapper chatImgMapper;
-    private final FileService fileService;
+
     private final ImageUrlUtil imageUrlUtil;
+    private final PrincipalUtil principalUtil;
+
 
     @Transactional
     public ChatResponseDto registerChat(Integer userId, ChatMessageDto chatMessageDto) {
@@ -87,5 +91,26 @@ public class ChatService {
 
     public User getUserById(Integer userId) {
         return userMapper.findById(userId);
+    }
+
+    public void deleteChat(Integer chatId) {
+        Integer userId = principalUtil.getPrincipalUser().getUser().getUserId();
+
+        Chat chat = chatMapper.findByChatId(chatId);
+
+        User user = userMapper.findById(userId);
+
+        if (chat == null) {
+            throw new IllegalArgumentException("존재하지 않는 채팅입니다.");
+        }
+
+        if (!chat.getUserNickName().equals(user.getNickName())){
+            throw new IllegalArgumentException("본인 채팅만 삭제 가능");
+        }
+
+        chatMapper.deleteChatById(chatId);
+        chatImgMapper.deleteByChatId(chatId);
+
+
     }
 }

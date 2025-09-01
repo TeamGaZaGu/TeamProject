@@ -38,6 +38,7 @@ public class ChattingController {
     private final FileService fileService;
     private final ImageUrlUtil imageUrlUtil;
 
+
     // WebSocket 채팅 메시지 수신
     @MessageMapping("/chat/{moimId}")
     public void message(@DestinationVariable Integer moimId,
@@ -122,6 +123,12 @@ public class ChattingController {
         return ResponseEntity.ok(uploaded);
     }
 
+    @DeleteMapping("/{chatId}")
+    public ResponseEntity<Void> deleteChat(@PathVariable Integer chatId) {
+        chatService.deleteChat(chatId);
+        template.convertAndSend("/sub/chat/delete", chatId);
+        return ResponseEntity.noContent().build();
+    }
 
     // WebSocket: 온라인 유저 리스트 조회
     @MessageMapping("/chat/{moimId}/online")
