@@ -183,7 +183,7 @@ function Mypage(props) {
     };
 
     const handleMoimOnClick = (moimId) => {
-        navigate(`/moim/description?moimId=${moimId}`);
+        navigate(`/moim/detail?moimId=${moimId}`);
     };
 
     const handleMyForumOnClick = (mf) => {
