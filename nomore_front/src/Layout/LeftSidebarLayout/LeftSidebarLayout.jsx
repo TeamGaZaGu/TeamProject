@@ -58,7 +58,7 @@ function LeftSidebarLayout() {
                 {principalQuery.isFetched && principalQuery.isSuccess ? <MypageButton /> : <Oauth2 />}
             </div>
             <div css={s.sideMenu}>
-                <button onClick={handleHometOnClick}><IoHomeSharp />홈</button>
+                <button onClick={handleHomeOnClick}><IoHomeSharp />홈</button>
                 <button onClick={handleSuggestOnClick}><HiUsers />추천모임</button>
                 <button onClick={handleRecentViewedOnClick}><BsClockHistory />최근 본 모임</button>
                 {
