@@ -64,6 +64,10 @@
         where
             forum_comment_id = #{forumCommentId}
     </delete>
+    <delete id="deleteByUserId">
+        delete from forum_comment_tb
+        where user_id = #{userId}
+    </delete>
 
     <select id="findAllByForumId" resultMap="CommentMap">
         with recursive comment_tb as (

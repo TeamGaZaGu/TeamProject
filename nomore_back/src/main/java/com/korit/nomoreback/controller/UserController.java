@@ -107,10 +107,13 @@ public class UserController {
         List<Moim> userMoims = moimService.findMoimsByUserId(userId);
         return ResponseEntity.ok(userMoims);
     }
+
     @GetMapping("/admin/user/{userId}/posts")
     public ResponseEntity<?> getUserPosts(@PathVariable Integer userId) {
+        Integer currentUserId = principalUtil.getPrincipalUser().getUser().getUserId();
         String currentUserRole = principalUtil.getPrincipalUser().getUser().getUserRole();
-        if (!"ROLE_ADMIN".equals(currentUserRole)) {
+
+        if (!"ROLE_ADMIN".equals(currentUserRole) && !currentUserId.equals(userId)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("접근 권한이 없습니다");
         }
 

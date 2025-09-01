@@ -15,6 +15,10 @@
         where forum_id = #{forumId}
         and user_id = #{userId}
     </delete>
+    <delete id="deleteByUserId">
+        delete from forum_like_tb
+        where user_id = #{userId}
+    </delete>
 
     <select id="getLikeCount" resultType="java.lang.Integer">
         select count(*)

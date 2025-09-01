@@ -18,5 +18,5 @@ public interface ForumCommentMapper {
     Integer getCountOfOptions(ForumsCommentSearchOption option);
     List<ForumComment> findAllOfOptions(ForumsCommentSearchOption option);
 
-
+    void deleteByUserId(@Param("userId") Integer userId);
 }

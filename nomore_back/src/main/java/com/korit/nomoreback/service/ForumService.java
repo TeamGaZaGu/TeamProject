@@ -94,9 +94,6 @@ public class ForumService {
                 .build();
     }
 
-
-
-
     public List<Forum> getForumsByCategoryId(Integer moimId, Integer categoryId) {
         Integer userId = getCurrentUser();
         return forumMapper.findByCategoryId(moimId, categoryId, userId);
