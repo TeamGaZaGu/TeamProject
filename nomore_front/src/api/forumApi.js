@@ -14,7 +14,7 @@ export const reqGetForums = async ({page, size, moimId}) => await api.get("/api/
   }
 });
 
-export const reqGetForumsWithParams = async (moimId, params) => await api.get(`/api/forum/${moimId}/forums`, { params });
+export const reqGetForumsWithParams = async (moimId, params) => await api.get(`/api/moims/${moimId}/forums`, { params });
 
 export const reqGetForumCategories = async () => await api.get("/api/forum/forumCategories");
 

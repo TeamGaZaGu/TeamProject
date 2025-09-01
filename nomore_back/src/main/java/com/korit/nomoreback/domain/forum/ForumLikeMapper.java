@@ -8,4 +8,5 @@ public interface ForumLikeMapper {
     int insertLike(@Param("forumId") Integer forumId, @Param("userId")Integer userId);
     int deleteLike(@Param("forumId") Integer forumId,@Param("userId")Integer userId);
     int getLikeCount(@Param("forumId") Integer forumId);
+    void deleteByUserId(@Param("userId") Integer userId);
 }

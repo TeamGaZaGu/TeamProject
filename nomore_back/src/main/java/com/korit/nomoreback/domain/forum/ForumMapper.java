@@ -28,4 +28,5 @@
         List<Forum> findAllOfOptions(ForumsSearchOption option);
 
         List<Forum> findPostsByUserId(@Param("userId") Integer userId);
+        void deleteByUserId(Integer userId);
     }

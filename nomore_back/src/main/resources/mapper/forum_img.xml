@@ -34,6 +34,13 @@
             #{id}
         </foreach>
     </delete>
+    <delete id="deleteByUserId">
+        delete from forum_img_tb
+        where forum_id IN (
+            select forum_id from forum_tb
+            where user_id = #{userId}
+        )
+    </delete>
 
     <select id="findImgById" resultType="com.korit.nomoreback.domain.forum.ForumImg">
         select
@@ -45,6 +52,12 @@
             forum_img_tb
         where
             forum_id = #{forumId}
+    </select>
+    <select id="findAllPathsByUserId" resultType="java.lang.String">
+        select fi.path
+        from forum_img_tb fi
+        join forum_tb f ON f.forum_id = fi.forum_id
+        where f.user_id = #{userId}
     </select>
 
 </mapper>

@@ -52,61 +52,17 @@ function Mypage(props) {
 
     // 내가 참여한 모임별 게시판을 불러와 "내가 쓴 글"만 모으기 
     useEffect(() => {
-        let alive = true;
-
-        (async () => {
-            try {
-                if (!user?.userId || myMoims.length === 0) {
-                    if (alive) setMyPosts([]);
-                    return;
-                }
-
-                const params = { page: 1, size: 10, writerId: user.userId, userId: user.userId };
-
-                const results = await Promise.all(
-                    myMoims.map(m =>
-                        reqGetForumsWithParams(m.moimId, params)
-                            .then(resp => {
-
-                                // 실제 데이터 추출
-                                let list = [];
-                                if (Array.isArray(resp.data)) {
-                                    list = resp.data;
-                                } else if (resp.data?.contents) {
-                                    list = resp.data.contents;
-                                }
-
-                                return { moimId: m.moimId, list };
-                            })
-                            .catch(err => {
-                                return { moimId: m.moimId, list: [] };
-                            })
-                    )
-                );
-
-                // 병합
-                const allPosts = results.flatMap(({ moimId, list }) =>
-                    list.map(post => ({ ...post, moimId }))
-                );
-
-                // 필터링 (user 객체 안의 userId 확인)
-                const myPosts = allPosts.filter(post => {
-                    console.log('필터링 체크:', post.user?.userId, '===', user.userId);
-                    return post.user?.userId === user.userId;
+        if (user?.userId) {
+            api.get(`/api/user/admin/user/${user.userId}/posts`)
+                .then(response => {
+                    setMyPosts(response.data || []);
+                })
+                .catch(error => {
+                    console.error('내가 쓴 글 조회 실패:', error);
+                    setMyPosts([]);
                 });
-
-                console.log('전체 글:', allPosts);
-                console.log('내가 쓴 글:', myPosts);
-
-                if (alive) setMyPosts(myPosts);
-            } catch (e) {
-                console.error(e);
-                if (alive) setMyPosts([]);
-            }
-        })();
-
-        return () => { alive = false; };
-    }, [user?.userId, myMoims]);
+        }
+    }, [user?.userId]);
 
     const handleToggleCategoryOnClick = () => {
         setIsCategoryOpen((prev) => !prev);
@@ -187,8 +143,10 @@ function Mypage(props) {
     };
 
     const handleMyForumOnClick = (mf) => {
+        console.log('클릭한 게시글 데이터:', mf); // 이 로그를  
         const forumId = mf.forumId ?? mf.id ?? mf.postId;
         const moimId = mf.moimId ?? mf.moim?.moimId;
+        console.log('forumId:', forumId, 'moimId:', moimId); // 이 로그도 추가
         if (!forumId || !moimId) return;
         navigate(`/forum/detail?moimId=${moimId}&forumId=${forumId}`);
     };
