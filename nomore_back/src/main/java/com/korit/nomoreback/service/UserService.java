@@ -53,7 +53,6 @@ public class UserService {
 
         User userEntity = dto.toUser();
         if (dto.getProfileImgPath() != null) {
-            String userImg = user.getProfileImgPath();
             fileService.deleteFile(userImg);
             String profileImgPath = fileService.uploadFile(dto.getProfileImgPath(), "profile");
             userEntity.setProfileImgPath(profileImgPath);
