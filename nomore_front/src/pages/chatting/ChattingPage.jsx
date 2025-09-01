@@ -2,7 +2,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import SockJS from 'sockjs-client';
 import { Client } from '@stomp/stompjs';
-import ReactModal from 'react-modal';
 import Slider from "react-slick";
 import * as s from './styles';
 import { reqGetMessages } from '../../api/chatApi';
@@ -24,9 +23,13 @@ function ChattingPage({ moimId }) {
   const [page, setPage] = useState(0); 
   const [hasMore, setHasMore] = useState(true); 
   const [isLoading, setIsLoading] = useState(false);
+  const [hoveredMessageId, setHoveredMessageId] = useState(null);
 
-  const [modalImages, setModalImages] = useState([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Lightbox 관련 state
+  const [lightboxImages, setLightboxImages] = useState([]);
+  const [currentLightboxIndex, setCurrentLightboxIndex] = useState(0);
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
 
   const principalQuery = usePrincipalQuery();
   const userObj = principalQuery?.data?.data?.user;
@@ -34,14 +37,14 @@ function ChattingPage({ moimId }) {
   if (!moimId || isNaN(moimIdNum)) return <div>올바른 채팅방 ID가 필요합니다.</div>;
   if (!userObj) return <div>사용자 정보를 가져오는 중...</div>;
 
-  const openModal = (images) => {
-    setModalImages(images);
-    setIsModalOpen(true);
+  const openLightbox = (images, index = 0) => {
+    setLightboxImages(images);
+    setCurrentLightboxIndex(index);
+    setIsLightboxOpen(true);
   };
-
-  const closeModal = () => {
-    setIsModalOpen(false);
-    setModalImages([]);
+  const closeLightbox = () => {
+    setIsLightboxOpen(false);
+    setLightboxImages([]);
   };
 
   const handleScroll = async () => {
@@ -112,13 +115,25 @@ function ChattingPage({ moimId }) {
 
     stompClient.onConnect = () => {
       console.log('✅ WebSocket connected');
+
+      // 메시지 수신
       stompClient.subscribe(`/sub/chat/${moimIdNum}`, (msg) => {
         const chatMessage = JSON.parse(msg.body);
-        setMessages((prev) => [...prev, chatMessage]);
+        setMessages(prev => [...prev, chatMessage]);
         if (chatMessage.userNickName === userObj.nickName) {
-          messageEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+          setTimeout(() => {
+            messageEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+          }, 50);
         }
       });
+
+      // 삭제 이벤트 수신
+      stompClient.subscribe(`/sub/chat/delete`, (msg) => {
+        const deletedChatId = Number(msg.body);
+        setMessages(prev => prev.filter(m => m.chatId !== deletedChatId));
+      });
+
+      // 온라인 상태
       stompClient.subscribe(`/sub/chat/${moimIdNum}/online`, (msg) => {
         const onlineData = JSON.parse(msg.body);
         setOnlineUsers(onlineData.map((id) => Number(id)));
@@ -176,7 +191,21 @@ function ChattingPage({ moimId }) {
 
     setInput('');
     setFiles([]);
-    setTimeout(() => messageEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
+    setTimeout(() => {
+      messageEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, 50);
+  };
+
+  const deleteChat = async (chatId) => {
+    try {
+      await fetch(`http://localhost:8080/api/chat/${chatId}`, {
+        method: 'DELETE',
+        headers: { Authorization: localStorage.getItem('AccessToken') },
+      });
+      // WebSocket에서 삭제 이벤트 받으면 메시지 state에서 자동 제거
+    } catch (err) {
+      console.error('채팅 삭제 실패:', err);
+    }
   };
 
   const findUserProfile = (nickName) => {
@@ -184,20 +213,9 @@ function ChattingPage({ moimId }) {
     return member ? member.profileImgPath : null;
   };
 
-  const NextArrow = ({ onClick }) => (
-    <div style={{ position: 'absolute', right: '10px', top: '50%', zIndex: 10, cursor: 'pointer', fontSize: '24px', color: 'black' }} onClick={onClick}>
-      ▶
-    </div>
-  );
-
-  const PrevArrow = ({ onClick }) => (
-    <div style={{ position: 'absolute', left: '10px', top: '50%', zIndex: 10, cursor: 'pointer', fontSize: '24px', color: '#black' }} onClick={onClick}>
-      ◀
-    </div>
-  );
-
   return (
     <div css={s.PageContainer}>
+      {/* 유저 리스트 */}
       <div css={s.UserListContainer}>
         {members.map((member) => {
           const isMe = member.userId === userObj.userId;
@@ -216,30 +234,85 @@ function ChattingPage({ moimId }) {
         })}
       </div>
 
+      {/* 채팅 영역 */}
       <div css={s.ChatContainer}>
         <div css={s.MessageList} ref={chatContainerRef} onScroll={handleScroll}>
           {messages.map((msg, idx) => {
             const isCurrentUser = msg.userNickName === userObj.nickName;
+            const hasText = msg.chattingContent && msg.chattingContent.trim() !== '';
+            const hasImages = msg.images && msg.images.length > 0;
+
             return (
-              <div key={idx} style={{ marginBottom: '12px' }}>
+              <div
+                key={idx}
+                style={{ marginBottom: '12px' }}
+                onMouseEnter={() => setHoveredMessageId(msg.chatId)}
+                onMouseLeave={() => setHoveredMessageId(null)}
+              >
                 {!isCurrentUser && (
                   <div style={{ fontSize: '12px', marginLeft: '32px', marginBottom: '2px', color: '#444' }}>
                     {msg.userNickName}
                   </div>
                 )}
+
                 <div css={isCurrentUser ? s.MyMessageWrapper : s.OtherMessageWrapper}>
-                  {!isCurrentUser && <img src={findUserProfile(msg.userNickName)} alt="프로필" css={s.SmallProfileImage} />}
-                  <div css={isCurrentUser ? s.MyMessageItem : s.OtherUserMessage}>
-                    {msg.chattingContent}
-                    {msg.images && msg.images.length > 0 && (
-                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginTop: '4px' }}>
-                        {msg.images.map((img, i) => (
-                          <img key={i} src={img.path} alt="chat-img" style={{ width: '120px', height: '120px', objectFit: 'cover', borderRadius: '6px', cursor: 'pointer' }} onClick={() => openModal(msg.images)} />
-                        ))}
-                      </div>
-                    )}
-                    {msg.chattedAt && <span css={s.Timestamp}>{new Date(msg.chattedAt).toLocaleTimeString()}</span>}
-                  </div>
+                  {!isCurrentUser && (
+                    <img
+                      src={findUserProfile(msg.userNickName)}
+                      alt="프로필"
+                      css={s.SmallProfileImage}
+                    />
+                  )}
+
+                  {hasText && (
+                    <div css={isCurrentUser ? s.MyMessageItem : s.OtherUserMessage}>
+                      {msg.chattingContent}
+                      {msg.chattedAt && (
+                        <span css={s.Timestamp}>
+                          {new Date(msg.chattedAt).toLocaleTimeString()}
+                        </span>
+                      )}
+                    </div>
+                  )}
+
+                  {hasImages && (
+                    <div
+                      style={{
+                        display: 'flex',
+                        flexWrap: 'wrap',
+                        flexDirection:'row-reverse',
+                        gap: '4px',
+                        marginTop: hasText ? '6px' : '0',
+                        maxWidth: 'calc(120px * 3 + 8px)',
+                      }}
+                    >
+                      {msg.images.map((img, i) => (
+                        <img
+                          key={i}
+                          src={img.path}
+                          alt="chat-img"
+                          style={{
+                            width: '120px',
+                            height: '120px',
+                            objectFit: 'cover',
+                            borderRadius: '6px',
+                            cursor: 'pointer',
+                          }}
+                          onClick={() => openLightbox(msg.images, i)}
+                        />
+                      ))}
+                    </div>
+                  )}
+
+                  {/* 마우스 올릴 때만 삭제 버튼 */}
+                  {isCurrentUser && hoveredMessageId === msg.chatId && (
+                    <button
+                      onClick={() => deleteChat(msg.chatId)}
+                      style={{ marginLeft: '8px', cursor: 'pointer', fontSize: '12px', color: 'red' }}
+                    >
+                      삭제
+                    </button>
+                  )}
                 </div>
               </div>
             );
@@ -247,65 +320,142 @@ function ChattingPage({ moimId }) {
           <div ref={messageEndRef}></div>
         </div>
 
+        {/* 입력창 */}
         <div css={s.InputContainer}>
-  <input
-    value={input}
-    onChange={(e) => setInput(e.target.value)}
-    onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
-    placeholder="메시지를 입력하세요"
-  />
-  <label htmlFor="imageUpload" style={{ cursor: 'pointer', padding: '0 12px', background: '#eee', borderRadius: '6px', marginLeft: '8px' }}>📷</label>
-  <input
-    type="file"
-    id="imageUpload"
-    multiple
-    style={{ display: 'none' }}
-    onChange={async (e) => {
-      const selectedFiles = Array.from(e.target.files);
-      if (!selectedFiles.length) return;
+          <input
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
+            placeholder="메시지를 입력하세요"
+          />
+          <label htmlFor="imageUpload" style={{ cursor: 'pointer', padding: '0 12px', background: '#eee', borderRadius: '6px', marginLeft: '8px' }}>파일</label>
+          <input
+            type="file"
+            id="imageUpload"
+            multiple
+            style={{ display: 'none' }}
+            onChange={async (e) => {
+              const selectedFiles = Array.from(e.target.files);
+              if (!selectedFiles.length) return;
 
-      try {
-        const paths = await handleFileUpload(selectedFiles);
-        if (paths.length === 0) return;
+              try {
+                const paths = await handleFileUpload(selectedFiles);
+                if (paths.length === 0) return;
 
-        const chatMessage = {
-          chattingContent: '', // 텍스트 없이 이미지 전송
-          moimId: moimIdNum,
-          imagePaths: paths,
-        };
+                const chatMessage = {
+                  chattingContent: '',
+                  moimId: moimIdNum,
+                  imagePaths: paths,
+                };
 
-        stompClientRef.current.publish({
-          destination: `/pub/chat/${moimIdNum}`,
-          body: JSON.stringify(chatMessage),
-        });
-      } catch (err) {
-        console.error('이미지 전송 실패', err);
-      } finally {
-        e.target.value = ''; // 선택 초기화
-      }
-    }}
-  />
-  <button onClick={sendMessage}>전송</button>
-</div>
+                stompClientRef.current.publish({
+                  destination: `/pub/chat/${moimIdNum}`,
+                  body: JSON.stringify(chatMessage),
+                });
+
+                setTimeout(() => {
+                  messageEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+                }, 50);
+
+              } catch (err) {
+                console.error('이미지 전송 실패', err);
+              } finally {
+                e.target.value = '';
+              }
+            }}
+          />
+          <button onClick={sendMessage}>전송</button>
+        </div>
       </div>
 
-      <ReactModal
-        isOpen={isModalOpen}
-        onRequestClose={closeModal}
-        style={{
-          overlay: { backgroundColor: 'rgba(0,0,0,0.6)' },
-          content: { maxWidth: '600px', margin: 'auto', padding: '40px 20px 20px 20px', borderRadius: '8px', position: 'relative' }
-        }}
-      >
-        <button onClick={closeModal} style={{ position: 'absolute', top: '10px', right: '10px', zIndex: 10, background: 'transparent', border: 'none', fontSize: '24px', cursor: 'pointer' }}>❌</button>
-        <Slider dots={true} infinite={false} speed={300} slidesToShow={1} slidesToScroll={1} nextArrow={<NextArrow />} prevArrow={<PrevArrow />}>
-          {modalImages.map((img, i) => (
-            <div key={i}>
-              <img src={img.path} alt="chat-img" style={{ width: '100%', maxHeight: '80vh', objectFit: 'contain', margin: '0 auto', borderRadius: '6px' }} />
-            </div>
-          ))}
-        </Slider>
-      </ReactModal>
+      {/* Lightbox */}
+      {isLightboxOpen && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100vw',
+            height: '100vh',
+            backgroundColor: 'rgba(0,0,0,0.8)',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            zIndex: 9999,
+          }}
+          onClick={closeLightbox}
+        >
+          <div
+            style={{ position: 'relative', maxWidth: '90%', maxHeight: '90%' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <img
+              src={lightboxImages[currentLightboxIndex].path}
+              alt="lightbox-img"
+              style={{ maxWidth: '100%', maxHeight: '100%', borderRadius: '8px' }}
+            />
+            <button
+              onClick={closeLightbox}
+              style={{
+                position: 'fixed',
+                top: '5%',
+                right: '5%',
+                fontSize: '32px',
+                background: 'transparent',
+                border: 'none',
+                color: 'white',
+                cursor: 'pointer',
+              }}
+            >
+              ❌
+            </button>
+            {lightboxImages.length > 1 && (
+              <>
+                <button
+                  onClick={() =>
+                    setCurrentLightboxIndex((prev) =>
+                      prev === 0 ? lightboxImages.length - 1 : prev - 1
+                    )
+                  }
+                  style={{
+                      position: 'fixed',
+                      top: '50%',
+                      left: '5%',
+                      transform: 'translateY(-50%)',
+                      fontSize: '48px',
+                      background: 'transparent',
+                      border: 'none',
+                      color: 'white',
+                      cursor: 'pointer',
+                    }}
+                >
+                  ◀
+                </button>
+                 <button
+                    onClick={() =>
+                      setCurrentLightboxIndex((prev) =>
+                        prev === lightboxImages.length - 1 ? 0 : prev + 1
+                      )
+                    }
+                    style={{
+                      position: 'fixed',
+                      top: '50%',
+                      right: '5%',
+                      transform: 'translateY(-50%)',
+                      fontSize: '48px',
+                      background: 'transparent',
+                      border: 'none',
+                      color: 'white',
+                      cursor: 'pointer',
+                    }}
+                  >
+                  ▶
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

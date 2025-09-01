@@ -8,21 +8,26 @@
     <insert id="insertMany" useGeneratedKeys="true" keyProperty="chatImgId">
         insert into chat_img_tb (chat_id, seq, path)
         values
-            <foreach item="chatImg" collection="chatImg" separator=",">
-                (#{chatImg.chatId},#{chatImg.seq},#{chatImg.path})
-            </foreach>
+        <foreach item="chatImg" collection="chatImg" separator=",">
+            (#{chatImg.chatId},#{chatImg.seq},#{chatImg.path})
+        </foreach>
     </insert>
+
+    <delete id="deleteByChatId">
+        delete from chat_img_tb
+        where chat_id = #{chatId}
+    </delete>
 
     <select id="findByChatId" resultType="com.korit.nomoreback.domain.chat.ChatImg">
         select
-            chat_img_id,
-            chat_id,
-            seq,
-            path
+        chat_img_id,
+        chat_id,
+        seq,
+        path
         from
-            chat_img_tb
+        chat_img_tb
         where
-            chat_id = #{chatId}
+        chat_id = #{chatId}
     </select>
 
 </mapper>

@@ -12,4 +12,6 @@ public interface ChatImgMapper {
 
     List<ChatImg> findByChatId(@Param("chatId")Integer chatId);
 
+    void deleteByChatId(@Param("chatId") Integer chatId);
+
 }
