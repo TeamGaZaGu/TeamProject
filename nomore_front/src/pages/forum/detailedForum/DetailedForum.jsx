@@ -249,7 +249,7 @@ function DetailedForum(props) {
                             </div>
                         </div>
                         <div css={s.buttonWrapper}>
-                            {userId === forum?.user?.userId ? (
+                            {userRole === "ROLE_ADMIN" || userId === forum?.user?.userId ? (
                                 <>
                                     <button css={s.editButton} onClick={() => navigate(`/forum/modify?forumId=${forumId}`)}>수정</button>
                                     <button css={s.deleteButton} onClick={() => handleDeleteForumOnClick(forumId, forum?.moim?.moimId)}>삭제</button>
