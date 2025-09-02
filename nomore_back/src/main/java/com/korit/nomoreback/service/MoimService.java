@@ -47,6 +47,7 @@ public class MoimService {
 
     public void createMoim(MoimCreateDto dto) {
         Moim moimEntity = dto.toEntity();
+
         String moimImgPath = fileService.uploadFile(dto.getMoimImg(), "moim");
         moimEntity.setMoimImgPath(moimImgPath);
 
@@ -89,7 +90,7 @@ public class MoimService {
         roleDto.setUserId(userId);
         moimRoleMapper.insertMoimRole(roleDto);
 
-        moimMapper.increaseMoimCount(moimId);
+        moimMapper.updateMoimCount(moimId);
     }
 
     public void exitMoim(Integer moimId) {
@@ -102,11 +103,12 @@ public class MoimService {
             return;
         }
 
-        moimMapper.moimMemberDiscount(moimId);
+        moimMapper.updateMoimCount(moimId);
         moimRoleMapper.exitMoim(moimId, userId);
     }
 
     public Moim findMoim (Integer moimId) {
+        moimMapper.updateMoimCount(moimId);
         Moim findMoim = moimMapper.findMoimId(moimId).buildImageUrl(imageUrlUtil);
         return findMoim;
     }
@@ -121,7 +123,7 @@ public class MoimService {
         if (!"ROLE_ADMIN".equals(userRole) || !"OWNER".equals(role)) {
             Moim originMoim = moimMapper.findMoimId(modifyDto.getMoimId());
             MultipartFile newImgFile = modifyDto.getMoimImgPath();
-                if (originMoim.getMemberCount() >= modifyDto.getMaxMember()) {
+                if (originMoim.getMemberCount() > modifyDto.getMaxMember()) {
                     throw new IllegalArgumentException("모임 정원 초과.");
                 }
                 if (newImgFile != null && !newImgFile.isEmpty()) {

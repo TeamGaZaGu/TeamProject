@@ -3,16 +3,25 @@ import * as s from './styles';
 import { useNavigate } from 'react-router-dom';
 import useMoimQuery from '../../queries/useMoimQuery';
 import useCategoryQuery from '../../queries/useCategoryQuery';
+import { useEffect, useState } from 'react';
 
 function HomeMoims({ category, customMoims }) {
     const navigate = useNavigate();
-    const moimQuery = useMoimQuery({ size: 8, categoryId: category.categoryId });
+    const moimQuery = useMoimQuery({ size: 8, categoryId: category.categoryId, refetchInterval: 1000 });
     const categoryQuery = useCategoryQuery();
 
     const categoryList = categoryQuery?.data?.data;
-    const allMoims = moimQuery?.data?.pages
-        ?.map(page => page.data.body.contents)
-        .flat() || [];
+
+    const [allMoims, setAllMoims] = useState([]);
+
+    useEffect(() => {
+        if (moimQuery.data) {
+            const updatedMoims = moimQuery.data.pages
+                .map(page => page.data.body.contents)
+                .flat();
+            setAllMoims(updatedMoims);
+        }
+    }, [moimQuery.data]);
 
     const handleMoimOnClick = (moimId) => {
         navigate(`/moim/detail?moimId=${moimId}`);
