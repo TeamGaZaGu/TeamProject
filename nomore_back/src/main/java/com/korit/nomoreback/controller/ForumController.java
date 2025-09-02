@@ -23,7 +23,6 @@ public class ForumController {
     public ResponseEntity<?> registerForum(@PathVariable Integer moimId ,
                                            @ModelAttribute ForumRegisterDto dto) {
         dto.setMoimId(moimId);
-
         forumService.registerForum(dto);
         return ResponseEntity.ok("게시글작성");
     }

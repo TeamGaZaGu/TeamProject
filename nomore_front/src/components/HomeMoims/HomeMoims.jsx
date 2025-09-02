@@ -23,6 +23,7 @@ function HomeMoims({ category, customMoims }) {
         }
     }, [moimQuery.data]);
 
+    console.log("allMoims", allMoims)
     const handleMoimOnClick = (moimId) => {
         navigate(`/moim/detail?moimId=${moimId}`);
     };

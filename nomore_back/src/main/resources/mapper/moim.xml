@@ -138,21 +138,22 @@
         WHERE
             (#{categoryId} = 1 OR category_id = #{categoryId})
     </select>
+
     <select id="searchMoim" parameterType="com.korit.nomoreback.dto.moim.MoimSearchReqDto" resultType="com.korit.nomoreback.dto.moim.MoimListRespDto">
         SELECT
-        m.moim_id AS moimId,
-        m.moim_title AS moimTitle,
-        m.moim_discription AS moimDiscription,
-        m.moim_member_count AS moimMemberCount,
-        m.moim_max_member AS moimMaxMember,
-        m.district_id AS districtId, d.district_name AS districtName,
-        m.category_id AS categoryId, c.category_name AS categoryName,
-        m.user_id AS userId, u.nick_name AS nickName,
-        m.moim_img_path AS moimImagePath
+            m.moim_id AS moimId,
+            m.moim_title AS moimTitle,
+            m.moim_discription AS moimDiscription,
+            m.moim_member_count AS moimMemberCount,
+            m.moim_max_member AS moimMaxMember,
+            m.district_id AS districtId, d.district_name AS districtName,
+            m.category_id AS categoryId, c.category_name AS categoryName,
+            m.user_id AS userId, u.nick_name AS nickName,
+            m.moim_img_path AS moimImagePath
         FROM moim_tb m
-        JOIN district_tb d ON m.district_id = d.district_id
-        JOIN category_tb c ON m.category_id = c.category_id
-        JOIN user_tb u ON m.user_id = u.user_id
+            JOIN district_tb d ON m.district_id = d.district_id
+            JOIN category_tb c ON m.category_id = c.category_id
+            JOIN user_tb u ON m.user_id = u.user_id
         <where>
             <if test="districtId != null">
                 m.district_id = #{districtId}
@@ -171,8 +172,9 @@
                 AND (m.moim_title LIKE CONCAT('%', #{keyword}, '%') OR m.moim_discription LIKE CONCAT('%', #{keyword}, '%'))
             </if>
         </where>
-        ORDER BY m.moim_id DESC
+            ORDER BY m.moim_id DESC
     </select>
+
     <select id="moimUserList" resultType="com.korit.nomoreback.domain.user.User">
         select
             ut.*,
@@ -247,9 +249,9 @@
 
     <select id="findMoimsByUserId" resultMap="MoimResultMap">
         select m.*
-        from moim_tb m
-        join moim_role_tb mr ON m.moim_id = mr.moim_id
-        left join district_tb dt ON m.district_id = dt.district_id
+            from moim_tb m
+            join moim_role_tb mr ON m.moim_id = mr.moim_id
+            left join district_tb dt ON m.district_id = dt.district_id
         where mr.user_id = #{userId}
         order by m.moim_id DESC
     </select>

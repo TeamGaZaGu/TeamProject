@@ -9,6 +9,7 @@ import com.korit.nomoreback.security.model.PrincipalUtil;
 import com.korit.nomoreback.util.ImageUrlUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -113,13 +114,14 @@ public class MoimService {
         return findMoim;
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public void modifyMoim(MoimModifyDto modifyDto) {
         Integer userId = getCurrentUser().getUserId();
+
         MoimRoleDto roleDto = moimRoleMapper.findMoimRole(userId, modifyDto.getMoimId());
         String userRole = getCurrentUser().getUserRole();
-        String role = roleDto.getMoimRole();
-        Moim moim = modifyDto.toEntity();
-
+        String role = (roleDto != null) ? roleDto.getMoimRole() : null;
+      
         if (!"ROLE_ADMIN".equals(userRole) || !"OWNER".equals(role)) {
             Moim originMoim = moimMapper.findMoimId(modifyDto.getMoimId());
             MultipartFile newImgFile = modifyDto.getMoimImgPath();
