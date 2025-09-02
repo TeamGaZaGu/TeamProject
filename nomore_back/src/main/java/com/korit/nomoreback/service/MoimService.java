@@ -78,6 +78,7 @@ public class MoimService {
         }
 
         boolean moimOk = moimRoleMapper.isMoimIdAndUserId(moimId, userId);
+
         if (moimOk) {
             throw new IllegalArgumentException("이미 가입 된 모임");
         }
@@ -120,11 +121,14 @@ public class MoimService {
         if (!"ROLE_ADMIN".equals(userRole) || !"OWNER".equals(role)) {
             Moim originMoim = moimMapper.findMoimId(modifyDto.getMoimId());
             MultipartFile newImgFile = modifyDto.getMoimImgPath();
-            if (newImgFile != null && !newImgFile.isEmpty()) {
-                fileService.deleteFile(originMoim.getMoimImgPath());
-                String savedFileName = fileService.uploadFile(newImgFile, "moim");
-                moim.setMoimImgPath(savedFileName);
-            }
+                if (originMoim.getMemberCount() >= modifyDto.getMaxMember()) {
+                    throw new IllegalArgumentException("모임 정원 초과.");
+                }
+                if (newImgFile != null && !newImgFile.isEmpty()) {
+                    fileService.deleteFile(originMoim.getMoimImgPath());
+                    String savedFileName = fileService.uploadFile(newImgFile, "moim");
+                    moim.setMoimImgPath(savedFileName);
+                }
             moimMapper.updateMoim(moim);
         }
     }
