@@ -29,7 +29,7 @@ public class MoimBanService {
                 .userId(userId)
                 .build();
         moimBanMapper.insertBan(moimBan);
-        moimMapper.moimMemberDiscount(moimId);
+        moimMapper.updateMoimCount(moimId);
     }
 
     public List<MoimBan> banUserList(Integer moimId) {

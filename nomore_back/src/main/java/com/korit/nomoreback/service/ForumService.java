@@ -62,7 +62,16 @@ public class ForumService {
 
     public Forum getForumById(Integer forumId) {
         Integer userId = getCurrentUser();
+
         Forum forum = forumMapper.getForum(forumId, userId);
+
+        if (forum == null && hasAdminRole()) {
+            forum = forumMapper.findByForumId(forumId);
+        }
+
+        if (forum == null) {
+            throw new IllegalArgumentException("존재하지 않는 게시글이거나 접근 권한이 없습니다.");
+        }
         List<ForumImg> forumImgs = forumImgMapper.findImgById(forum.getForumId());
         forumImgs.forEach(img -> img.buildImageUrl(imageUrlUtil));
         forum.setForumImgList(forumImgs);
@@ -72,6 +81,13 @@ public class ForumService {
     }
 
     public ForumSearchRespDto getForumsByMoimId(ForumSearchReqDto dto) {
+        Integer userId = getCurrentUser();
+        Integer moimId = dto.getMoimId();
+
+        if (!hasAdminRole() && !moimRoleMapper.isMoimIdAndUserId(moimId, userId)) {
+            throw new IllegalArgumentException("게시판 접근 권한이 없습니다. 모임에 가입해주세요.");
+        }
+
         Integer totalElements = forumMapper.getCountOfOptions(dto.toOption());
         Integer totalPages = (int) Math.ceil(totalElements.doubleValue() / dto.getSize().doubleValue());
         List<Forum> foundForums = forumMapper.findAllOfOptions(dto.toOption());
@@ -96,6 +112,11 @@ public class ForumService {
 
     public List<Forum> getForumsByCategoryId(Integer moimId, Integer categoryId) {
         Integer userId = getCurrentUser();
+
+        if (!hasAdminRole() && !moimRoleMapper.isMoimIdAndUserId(moimId, userId)) {
+            throw new IllegalArgumentException("게시판 접근 권한이 없습니다. 모임에 가입해주세요.");
+        }
+
         return forumMapper.findByCategoryId(moimId, categoryId, userId);
     }
 
@@ -169,51 +190,39 @@ public class ForumService {
         return forumCommentMapper.getCountByForumId(dto.getForumId());
     }
 
+    public void modifyComment(ForumCommentModifyDto dto, Integer forumId) {
+        Integer userId = getCurrentUser();
+        ForumComment comment = forumCommentMapper.findByCommentId(dto.getForumCommentId());
+        forumCommentMapper.modifyComment(dto.toEntity(comment));
+    }
+
+    public void deleteComment(Integer forumCommentId, Integer forumId, Integer moimId) {
+        Integer userId = getCurrentUser();
+        ForumComment comment = forumCommentMapper.findByCommentId(forumCommentId);
+        if (comment == null) {
+            throw new IllegalArgumentException("댓글을 찾을 수 없습니다.");
+        }
+        forumCommentMapper.deleteComment(forumCommentId);
+    }
+
     public ForumCommentSearchRespDto getCommentsByForumId(ForumCommentSearchReqDto dto) {
         Integer totalElements = forumCommentMapper.getCountOfOptions(dto.toOption());
         Integer totalPages = (int) Math.ceil(totalElements.doubleValue() / dto.getSize().doubleValue());
-        System.out.println("totalPages " + totalPages);
-        List<ForumComment> getComments =
-                forumCommentMapper.findAllOfOptions(dto.toOption())
-                        .stream().map(comment -> {
-                            comment.getUser().buildImageUrl(imageUrlUtil);
-                            return comment;
-                        }).collect(Collectors.toList());
+        List<ForumComment> foundComments = forumCommentMapper.findAllOfOptions(dto.toOption());
+        boolean isLast = foundComments.size() < dto.getSize();
 
-        boolean isLast = getComments.size() < dto.getSize();
+        for (ForumComment comment : foundComments) {
+            comment.getUser().buildImageUrl(imageUrlUtil);
+        }
 
         return ForumCommentSearchRespDto.builder()
-                .contents(getComments)
+                .contents(foundComments)
                 .totalElements(totalElements)
                 .totalPages(totalPages)
                 .page(dto.getPage())
                 .size(dto.getSize())
                 .isLast(isLast)
                 .build();
-    }
-
-    public void modifyComment (ForumCommentModifyDto modifyDto,Integer forumId) {
-        List<ForumComment> forumCommentList = forumCommentMapper.findAllByForumId(forumId);
-        Integer userId = getCurrentUser();
-        forumCommentList
-                .stream().filter(comment -> comment.getUserId().equals(userId))
-                .forEach(forumComment -> forumCommentMapper.modifyComment(modifyDto.toEntity(forumComment)));
-    }
-
-    public void deleteComment(Integer forumCommentId, Integer forumId, Integer moimId) {
-        Integer userId = getCurrentUser();
-        ForumComment comment = forumCommentMapper.findByCommentId(forumCommentId);
-        MoimRoleDto moimRoleDto = moimRoleMapper.findMoimRole(userId,moimId);
-
-        if (comment == null || !comment.getForumId().equals(forumId)) {
-            throw new IllegalArgumentException("댓글이 존재하지 않거나 게시판이 다릅니다.");
-        }
-
-        if (!comment.getUserId().equals(userId) && moimRoleDto.getMoimRole().equals("MEMBER")) {
-            throw new IllegalArgumentException("권한 없음");
-        }
-
-        forumCommentMapper.deleteComment(forumCommentId);
     }
 
     public void like(Integer forumId) {
@@ -227,6 +236,18 @@ public class ForumService {
     }
 
     public List<Forum> findPostsByUserId(Integer userId) {
-        return forumMapper.findPostsByUserId(userId);
+        List<Forum> forums = forumMapper.findPostsByUserId(userId);
+        for (Forum forum : forums) {
+            List<ForumImg> forumImgs = forumImgMapper.findImgById(forum.getForumId());
+            forumImgs.forEach(img -> img.buildImageUrl(imageUrlUtil));
+            forum.setForumImgList(forumImgs);
+            forum.getUser().buildImageUrl(imageUrlUtil);
+        }
+        return forums;
+    }
+
+    private boolean hasAdminRole() {
+        String userRole = principalUtil.getPrincipalUser().getUser().getUserRole();
+        return "ROLE_ADMIN".equals(userRole);
     }
 }

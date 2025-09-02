@@ -29,6 +29,7 @@ public class UserService {
     private final PrincipalUtil principalUtil;
     private final FileService fileService;
 
+
     // 추가: 유저-모임 역할/참여 테이블 처리용
     private final MoimRoleMapper moimRoleMapper;
 
@@ -96,6 +97,7 @@ public class UserService {
             e.printStackTrace();
             throw e;
         }
+
     }
 
     private List<String> collectUserImagePaths(Integer userId) {

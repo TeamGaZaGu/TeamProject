@@ -45,19 +45,19 @@
 
     <insert id="registerForum" useGeneratedKeys="true" keyProperty="forumId" keyColumn="forum_id">
         INSERT INTO forum_tb (
-            forum_title,
-            forum_content,
-            forum_created_at,
-            moim_id,
-            user_id,
-            forum_category_id
+        forum_title,
+        forum_content,
+        forum_created_at,
+        moim_id,
+        user_id,
+        forum_category_id
         ) VALUES (
-            #{forumTitle},
-            #{forumContent},
-            #{forumCreatedAt},
-            #{moim.moimId},
-            #{user.userId},
-            #{forumCategory.forumCategoryId}
+        #{forumTitle},
+        #{forumContent},
+        #{forumCreatedAt},
+        #{moim.moimId},
+        #{user.userId},
+        #{forumCategory.forumCategoryId}
         )
     </insert>
 
@@ -78,77 +78,81 @@
         delete from forum_tb
         where forum_id = #{forumId}
     </delete>
+
     <delete id="deleteByUserId">
         delete from forum_tb
         where user_id = #{userId}
     </delete>
+    <delete id="deleteByUserIdAndMoimId">
+        delete from forum_tb
+        where user_id = #{userId} and moim_id = #{moimId}
+    </delete>
 
     <select id="getForum" resultMap="forumMap" parameterType="map">
         select
-            f.forum_id,
-            f.forum_title,
-            f.forum_content,
-            f.forum_created_at,
-            f.moim_id,
-            f.forum_category_id,
+        f.forum_id,
+        f.forum_title,
+        f.forum_content,
+        f.forum_created_at,
+        f.moim_id,
+        f.forum_category_id,
 
-            u.user_id,
-            u.nick_name,
-            u.profile_img_path,
+        u.user_id,
+        u.nick_name,
+        u.profile_img_path,
 
-            fc.forum_category_id,
-            fc.forum_category_name,
+        fc.forum_category_id,
+        fc.forum_category_name,
+        mt.moim_id,
+        mt.user_id as moim_owner,
 
-            mt.moim_id,
-            mt.user_id as moim_owner,
+        ifnull(flc.like_count, 0) as like_count,
+        ifnull(fcc.comment_count, 0) as comment_count,
+        ifnull(flt.forum_like_id, 0) as is_like
 
-            ifnull(flc.like_count, 0) as like_count,
-            ifnull(fcc.comment_count, 0) as comment_count,
-            ifnull(flt.forum_like_id, 0) as is_like
-
-        from forum_tb f
-            join user_tb u on u.user_id = f.user_id
-            join forum_category_tb fc on fc.forum_category_id = f.forum_category_id
-            left outer join moim_tb mt on mt.moim_id = f.moim_id
+    from forum_tb f
+        join user_tb u on u.user_id = f.user_id
+        join forum_category_tb fc on fc.forum_category_id = f.forum_category_id
+        left outer join moim_tb mt on mt.moim_id = f.moim_id
 
         left join (
-            select forum_id, count(*) as like_count
-            from forum_like_tb
-            group by forum_id
+        select forum_id, count(*) as like_count
+        from forum_like_tb
+        group by forum_id
         ) flc on flc.forum_id = f.forum_id
 
         left join (
-            select forum_id, count(*) as comment_count
-            from forum_comment_tb
-            group by forum_id
+        select forum_id, count(*) as comment_count
+        from forum_comment_tb
+        group by forum_id
         ) fcc on fcc.forum_id = f.forum_id
 
         left join forum_like_tb flt on flt.forum_id = f.forum_id and flt.user_id = #{userId}
 
         where f.forum_id = #{forumId}
     </select>
-  
+
     <select id="getFourumCategories" resultMap="forumCategoryMap">
         select
-            *
+        *
         from
-            forum_category_tb
+        forum_category_tb
     </select>
 
     <select id="findByForumId" resultMap="forumMap">
         select
-            forum_id,
-            forum_title,
-            forum_content,
-            forum_created_at,
-            forum_updated_at,
-            user_id,
-            moim_id,
-            forum_category_id
+        forum_id,
+        forum_title,
+        forum_content,
+        forum_created_at,
+        forum_updated_at,
+        user_id,
+        moim_id,
+        forum_category_id
         from
-            forum_tb
+        forum_tb
         where
-            forum_id = #{forumId}
+        forum_id = #{forumId}
     </select>
 
     <select id="findByMoimId" resultMap="forumMap" parameterType="map">
@@ -262,70 +266,70 @@
 
     <select id="findAllOfOptions" resultMap="forumMap">
         select
-            f.forum_id,
-            f.forum_title,
-            f.forum_content,
-            f.forum_created_at,
-            f.moim_id,
-            f.forum_category_id,
+        f.forum_id,
+        f.forum_title,
+        f.forum_content,
+        f.forum_created_at,
+        f.moim_id,
+        f.forum_category_id,
 
-            u.user_id,
-            u.nick_name,
-            u.profile_img_path,
+        u.user_id,
+        u.nick_name,
+        u.profile_img_path,
 
-            -- 첫 번째 이미지만 가져오기
-            fi.forum_img_id,
-            fi.seq,
-            fi.path,
+        -- 첫 번째 이미지만 가져오기
+        fi.forum_img_id,
+        fi.seq,
+        fi.path,
 
-            fc.forum_category_id,
-            fc.forum_category_name,
+        fc.forum_category_id,
+        fc.forum_category_name,
 
-            ifnull(flc.like_count, 0) as like_count,
-            ifnull(fcc.comment_count, 0) as comment_count
+        ifnull(flc.like_count, 0) as like_count,
+        ifnull(fcc.comment_count, 0) as comment_count
         from forum_tb f
-            join user_tb u on u.user_id = f.user_id
-            left join (
-                select forum_id, forum_img_id, seq, path
-                from forum_img_tb
-                where seq = 1   -- 첫 번째 이미지만
-                ) fi on fi.forum_id = f.forum_id
-            join forum_category_tb fc on fc.forum_category_id = f.forum_category_id
+        join user_tb u on u.user_id = f.user_id
+        left join (
+        select forum_id, forum_img_id, seq, path
+        from forum_img_tb
+        where seq = 1   -- 첫 번째 이미지만
+        ) fi on fi.forum_id = f.forum_id
+        join forum_category_tb fc on fc.forum_category_id = f.forum_category_id
 
-            left join (
-                select forum_id, count(*) as like_count
-                from forum_like_tb
-                group by forum_id
-                ) flc on flc.forum_id = f.forum_id
+        left join (
+        select forum_id, count(*) as like_count
+        from forum_like_tb
+        group by forum_id
+        ) flc on flc.forum_id = f.forum_id
 
-            left join (
-                select forum_id, count(*) as comment_count
-                from forum_comment_tb
-                group by forum_id
-                ) fcc on fcc.forum_id = f.forum_id
+        left join (
+        select forum_id, count(*) as comment_count
+        from forum_comment_tb
+        group by forum_id
+        ) fcc on fcc.forum_id = f.forum_id
         where
-            f.moim_id = #{moimId}
+        f.moim_id = #{moimId}
         limit #{startIndex}, #{size}
     </select>
 
     <select id="getCountOfOptions" resultType="java.lang.Integer">
         select
-            count(*)
+        count(*)
         from
-            forum_tb f
+        forum_tb f
         where
-            f.moim_id = #{moimId}
+        f.moim_id = #{moimId}
     </select>
 
     <select id="findPostsByUserId" resultType="com.korit.nomoreback.domain.forum.Forum">
         select
-            f.forum_id as forumId,
-            f.forum_title as forumTitle,
-            f.forum_content as forumContent,
-            f.moim_id as moimId
+        f.forum_id as forumId,
+        f.forum_title as forumTitle,
+        f.forum_content as forumContent,
+        f.moim_id as moimId
         from
-            forum_tb f
+        forum_tb f
         where
-            f.user_id = #{userId}
+        f.user_id = #{userId}
     </select>
 </mapper>

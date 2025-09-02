@@ -4,6 +4,7 @@
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.korit.nomoreback.domain.moim.MoimMapper">
+
     <resultMap id="MoimResultMap" type="com.korit.nomoreback.domain.moim.Moim">
         <id property="moimId" column="moim_id" />
         <result property="title" column="moim_title" />
@@ -38,10 +39,17 @@
         )
     </insert>
 
-    <update id="increaseMoimCount">
-        UPDATE moim_tb
-        set moim_member_count = moim_member_count + 1
-        where moim_id = #{moimId}
+    <update id="updateMoimCount">
+        UPDATE
+            moim_tb mt
+        SET
+            mt.moim_member_count = (
+                SELECT COUNT(*)
+                FROM moim_role_tb mrt
+                WHERE mrt.moim_id = mt.moim_id
+            )
+        WHERE
+            mt.moim_id = #{moimId}
     </update>
 
     <update id="updateMoim">
@@ -55,14 +63,7 @@
         WHERE moim_id = #{moimId}
     </update>
 
-    <update id="moimMemberDiscount">
-        update
-            moim_tb
-        set
-            moim_member_count = moim_member_count - 1
-        where
-            moim_id = #{moimId}
-    </update>
+
 
     <delete id="deleteMoimById" parameterType="int">
         DELETE FROM moim_tb

@@ -69,6 +69,14 @@
         where user_id = #{userId}
     </delete>
 
+    <delete id="deleteByUserIdAndMoimId">
+        delete fc
+        from forum_comment_tb fc
+        join forum_tb f on fc.forum_id = f.forum_id
+        where fc.user_id = #{userId}
+        and f.moim_id = #{moimId}
+    </delete>
+
     <select id="findAllByForumId" resultMap="CommentMap">
         with recursive comment_tb as (
             select
