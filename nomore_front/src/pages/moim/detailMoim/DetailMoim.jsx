@@ -634,7 +634,26 @@ function DetailMoim(props) {
                     )}
                     {/* 채팅 탭 콘텐츠 */}
                     {activeTab === "chat" && (
-                        moimId ? (
+                        userId === undefined ? (
+                            <div css={s.loginContainer}>
+                                <h2>로그인이 필요한 페이지입니다</h2>
+                                <div css={s.loginBox}>
+                                <button
+                                    css={s.googleLogin}
+                                    onClick={() => { window.location.href = "http://localhost:8080/oauth2/authorization/google"; }}
+                                >
+                                    <FcGoogle />구글 로그인
+                                </button>
+                                <button
+                                    css={s.kakaoLogin}
+                                    onClick={() => { window.location.href = "http://localhost:8080/oauth2/authorization/kakao"; }}
+                                >
+                                    <SiKakaotalk />카카오 로그인
+                                </button>
+                                </div>
+                            </div>
+                            )   :
+                        (moimId ? (
                             userList.find(user => user.userId === userId) ? (
                                 <ChattingPage 
                                     moimId={Number(moimId)}
@@ -651,7 +670,7 @@ function DetailMoim(props) {
                         ) : (
                             <div>올바른 채팅방 ID가 필요합니다.</div>
                         )
-                    )}
+                    ))}
                 </div>
                 <div css={s.rightSidebar}>
                     <div css={s.sidebarTitle}>모임 사진</div>
