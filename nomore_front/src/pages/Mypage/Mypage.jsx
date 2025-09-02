@@ -8,9 +8,11 @@ import { reqCheckUserIsOwner, reqMyMoimList } from '../../api/moimApi';
 import { useNavigate } from 'react-router-dom';
 import { deleteUser, reqModifyUserBlob } from '../../api/userApi';
 import { reqGetForumsWithParams } from '../../api/forumApi';
+import { useQueryClient } from '@tanstack/react-query';
 
 function Mypage(props) {
 
+    const queryClient = useQueryClient();
     const navigate = useNavigate();
     const categoryQuery = useCategoryQuery();
     const categories = categoryQuery?.data?.data || []
@@ -128,6 +130,9 @@ function Mypage(props) {
 
             await deleteUser(user.userId);
             localStorage.removeItem("AccessToken");
+            
+            queryClient.invalidateQueries(['moims']);
+            queryClient.invalidateQueries(['principal']);
 
             await principalQuery.refetch();
             alert("회원 탈퇴가 완료되었습니다.");

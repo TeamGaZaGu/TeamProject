@@ -48,6 +48,7 @@ public class MoimService {
 
     public void createMoim(MoimCreateDto dto) {
         Moim moimEntity = dto.toEntity();
+
         String moimImgPath = fileService.uploadFile(dto.getMoimImg(), "moim");
         moimEntity.setMoimImgPath(moimImgPath);
 
@@ -90,7 +91,7 @@ public class MoimService {
         roleDto.setUserId(userId);
         moimRoleMapper.insertMoimRole(roleDto);
 
-        moimMapper.increaseMoimCount(moimId);
+        moimMapper.updateMoimCount(moimId);
     }
 
     public void exitMoim(Integer moimId) {
@@ -103,11 +104,12 @@ public class MoimService {
             return;
         }
 
-        moimMapper.moimMemberDiscount(moimId);
+        moimMapper.updateMoimCount(moimId);
         moimRoleMapper.exitMoim(moimId, userId);
     }
 
     public Moim findMoim (Integer moimId) {
+        moimMapper.updateMoimCount(moimId);
         Moim findMoim = moimMapper.findMoimId(moimId).buildImageUrl(imageUrlUtil);
         return findMoim;
     }
@@ -119,20 +121,20 @@ public class MoimService {
         MoimRoleDto roleDto = moimRoleMapper.findMoimRole(userId, modifyDto.getMoimId());
         String userRole = getCurrentUser().getUserRole();
         String role = (roleDto != null) ? roleDto.getMoimRole() : null;
-
-        if (!"ROLE_ADMIN".equals(userRole) && !"OWNER".equals(role)) {
-            System.out.println("권한 없음");
+      
+        if (!"ROLE_ADMIN".equals(userRole) || !"OWNER".equals(role)) {
+            Moim originMoim = moimMapper.findMoimId(modifyDto.getMoimId());
+            MultipartFile newImgFile = modifyDto.getMoimImgPath();
+                if (originMoim.getMemberCount() > modifyDto.getMaxMember()) {
+                    throw new IllegalArgumentException("모임 정원 초과.");
+                }
+                if (newImgFile != null && !newImgFile.isEmpty()) {
+                    fileService.deleteFile(originMoim.getMoimImgPath());
+                    String savedFileName = fileService.uploadFile(newImgFile, "moim");
+                    moim.setMoimImgPath(savedFileName);
+                }
+            moimMapper.updateMoim(moim);
         }
-        Moim moim = modifyDto.toEntity();
-        Moim originMoim = moimMapper.findMoimId(modifyDto.getMoimId());
-        MultipartFile newImgFile = modifyDto.getMoimImgPath();
-        if (newImgFile != null && !newImgFile.isEmpty()) {
-            fileService.deleteFile(originMoim.getMoimImgPath());
-            String savedFileName = fileService.uploadFile(newImgFile, "moim");
-            moim.setMoimImgPath(savedFileName);
-        }
-        moimMapper.updateMoim(moim);
-
     }
 
     public void deleteMoim(Integer moimId) {

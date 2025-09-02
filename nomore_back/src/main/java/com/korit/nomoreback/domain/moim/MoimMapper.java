@@ -16,7 +16,7 @@ public interface MoimMapper {
 
     Integer createMoim(Moim moim);
     Moim findMoimId(Integer moimId);
-    void increaseMoimCount(@Param("moimId") Integer moimId);
+    int updateMoimCount(@Param("moimId") Integer moimId);
     int updateMoim(Moim moim);
     int deleteMoimById(@Param("moimId") Integer moimId);
     List<Moim> findMoimByCategoryId(@Param("categoryId") Integer categoryId);
@@ -25,7 +25,6 @@ public interface MoimMapper {
 
     List<User> moimUserList(Integer moimId);
 
-    void moimMemberDiscount(Integer moimId);
 
     List<Moim> myMoimList(Integer userId);
 
