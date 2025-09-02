@@ -256,6 +256,22 @@ function ChattingPage({ moimId }) {
                 )}
 
                 <div css={isCurrentUser ? s.MyMessageWrapper : s.OtherMessageWrapper}>
+                  {/* 마우스 올릴 때만 삭제 버튼 */}
+                  {isCurrentUser && hoveredMessageId === msg.chatId && (
+                    <button
+                      onClick={() => deleteChat(msg.chatId)}
+                      style={{ 
+                        marginRight: '8px', 
+                        cursor: 'pointer', 
+                        fontSize: '12px', 
+                        color: 'black',
+                        backgroundColor:'transparent',
+                        border:'none'
+                      }}
+                    >
+                      삭제
+                    </button>
+                  )}
                   {!isCurrentUser && (
                     <img
                       src={findUserProfile(msg.userNickName)}
@@ -304,15 +320,7 @@ function ChattingPage({ moimId }) {
                     </div>
                   )}
 
-                  {/* 마우스 올릴 때만 삭제 버튼 */}
-                  {isCurrentUser && hoveredMessageId === msg.chatId && (
-                    <button
-                      onClick={() => deleteChat(msg.chatId)}
-                      style={{ marginLeft: '8px', cursor: 'pointer', fontSize: '12px', color: 'red' }}
-                    >
-                      삭제
-                    </button>
-                  )}
+                  
                 </div>
               </div>
             );
