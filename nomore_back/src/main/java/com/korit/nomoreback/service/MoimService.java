@@ -79,6 +79,7 @@ public class MoimService {
         }
 
         boolean moimOk = moimRoleMapper.isMoimIdAndUserId(moimId, userId);
+
         if (moimOk) {
             throw new IllegalArgumentException("이미 가입 된 모임");
         }

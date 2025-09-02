@@ -2,6 +2,7 @@ package com.korit.nomoreback.controller;
 
 import com.korit.nomoreback.domain.moim.Moim;
 import com.korit.nomoreback.domain.moim.MoimBan;
+import com.korit.nomoreback.domain.moim.MoimMapper;
 import com.korit.nomoreback.domain.user.User;
 import com.korit.nomoreback.dto.moim.*;
 import com.korit.nomoreback.dto.response.ResponseDto;
@@ -29,6 +30,7 @@ public class MoimController {
     private final MoimService moimService;
     private final PrincipalUtil principalUtil;
     private final MoimBanService moimBanService;
+    private final MoimMapper moimMapper;
 
     @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> create(@ModelAttribute MoimCreateDto dto) {
@@ -62,6 +64,7 @@ public class MoimController {
     @PatchMapping(value = "/{moimId}/modify", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> updateMoim(@PathVariable Integer moimId, @ModelAttribute MoimModifyDto dto) {
         System.out.println(dto);
+
         dto.setMoimId(moimId);
         moimService.modifyMoim(dto);
         return ResponseEntity.ok("수정 완");
