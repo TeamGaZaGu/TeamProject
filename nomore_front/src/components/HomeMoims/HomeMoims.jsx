@@ -14,6 +14,7 @@ function HomeMoims({ category, customMoims }) {
         ?.map(page => page.data.body.contents)
         .flat() || [];
 
+    console.log("allMoims", allMoims)
     const handleMoimOnClick = (moimId) => {
         navigate(`/moim/detail?moimId=${moimId}`);
     };

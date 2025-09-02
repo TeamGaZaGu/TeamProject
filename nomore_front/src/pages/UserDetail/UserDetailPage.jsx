@@ -8,7 +8,7 @@ import * as s from './styles';
 function UserDetailPage() {
     const navigate = useNavigate();
     const location = useLocation();
-    const user = location.state.user
+    const user = location?.state?.user
     const { userId } = useParams();
     const [userMoims, setUserMoims] = useState([]);
     const [userPosts, setUserPosts] = useState([]);
