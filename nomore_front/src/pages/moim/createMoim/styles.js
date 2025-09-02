@@ -1,13 +1,10 @@
-// styles.ts
 import { css } from "@emotion/react";
 
 // 전체 레이아웃
 export const layout = css`
-  max-width: 1000px;
-  margin: 60px auto;
+  width: 100%;
   padding: 40px;
   background: #fff;
-  border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
   box-sizing: border-box;
 
