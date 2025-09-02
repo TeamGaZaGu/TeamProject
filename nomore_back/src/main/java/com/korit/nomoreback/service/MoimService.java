@@ -9,6 +9,7 @@ import com.korit.nomoreback.security.model.PrincipalUtil;
 import com.korit.nomoreback.util.ImageUrlUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -111,26 +112,27 @@ public class MoimService {
         return findMoim;
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public void modifyMoim(MoimModifyDto modifyDto) {
         Integer userId = getCurrentUser().getUserId();
+
         MoimRoleDto roleDto = moimRoleMapper.findMoimRole(userId, modifyDto.getMoimId());
         String userRole = getCurrentUser().getUserRole();
-        String role = roleDto.getMoimRole();
-        Moim moim = modifyDto.toEntity();
+        String role = (roleDto != null) ? roleDto.getMoimRole() : null;
 
-        if (!"ROLE_ADMIN".equals(userRole) || !"OWNER".equals(role)) {
-            Moim originMoim = moimMapper.findMoimId(modifyDto.getMoimId());
-            MultipartFile newImgFile = modifyDto.getMoimImgPath();
-                if (originMoim.getMemberCount() >= modifyDto.getMaxMember()) {
-                    throw new IllegalArgumentException("모임 정원 초과.");
-                }
-                if (newImgFile != null && !newImgFile.isEmpty()) {
-                    fileService.deleteFile(originMoim.getMoimImgPath());
-                    String savedFileName = fileService.uploadFile(newImgFile, "moim");
-                    moim.setMoimImgPath(savedFileName);
-                }
-            moimMapper.updateMoim(moim);
+        if (!"ROLE_ADMIN".equals(userRole) && !"OWNER".equals(role)) {
+            System.out.println("권한 없음");
         }
+        Moim moim = modifyDto.toEntity();
+        Moim originMoim = moimMapper.findMoimId(modifyDto.getMoimId());
+        MultipartFile newImgFile = modifyDto.getMoimImgPath();
+        if (newImgFile != null && !newImgFile.isEmpty()) {
+            fileService.deleteFile(originMoim.getMoimImgPath());
+            String savedFileName = fileService.uploadFile(newImgFile, "moim");
+            moim.setMoimImgPath(savedFileName);
+        }
+        moimMapper.updateMoim(moim);
+
     }
 
     public void deleteMoim(Integer moimId) {
