@@ -20,6 +20,14 @@
         where user_id = #{userId}
     </delete>
 
+    <delete id="deleteByUserIdAndMoimId">
+        delete fl
+        from forum_like_tb fl
+        join forum_tb f on fl.forum_id = f.forum_id
+        where fl.user_id = #{userId}
+        and f.moim_id = #{moimId}
+    </delete>
+
     <select id="getLikeCount" resultType="java.lang.Integer">
         select count(*)
         from forum_like_tb
