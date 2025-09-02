@@ -62,7 +62,8 @@ public class ForumService {
 
     public Forum getForumById(Integer forumId) {
         Integer userId = getCurrentUser();
-        Forum forum = forumMapper.findByForumIdAndUserId(forumId, userId);
+
+        Forum forum = forumMapper.getForum(forumId, userId);
 
         if (forum == null && hasAdminRole()) {
             forum = forumMapper.findByForumId(forumId);
@@ -71,7 +72,6 @@ public class ForumService {
         if (forum == null) {
             throw new IllegalArgumentException("존재하지 않는 게시글이거나 접근 권한이 없습니다.");
         }
-
         List<ForumImg> forumImgs = forumImgMapper.findImgById(forum.getForumId());
         forumImgs.forEach(img -> img.buildImageUrl(imageUrlUtil));
         forum.setForumImgList(forumImgs);
@@ -125,7 +125,7 @@ public class ForumService {
         Integer userId = getCurrentUser();
         Integer forumId = dto.getForumId();
         Forum forum = forumMapper.findByForumId(forumId);
-        Forum originForum = forumMapper.findByForumIdAndUserId(forumId,userId);
+        Forum originForum = forumMapper.getForum(forumId,userId);
 
         List<ForumImg> forumImgs = forumImgMapper.findImgById(forumId);
         if (forumImgs != null && !forumImgs.isEmpty()) {

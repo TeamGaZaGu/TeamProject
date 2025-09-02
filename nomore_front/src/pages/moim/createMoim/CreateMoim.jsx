@@ -5,7 +5,7 @@ import { reqCreateMoim } from '../../../api/moimApi';
 import useCategoryQuery from '../../../queries/useCategoryQuery';
 import usePrincipalQuery from '../../../queries/usePrincipalQuery';
 import * as s from './styles';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 
 function CreateMoim(props) {

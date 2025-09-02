@@ -22,6 +22,7 @@
 
     <resultMap id="moimMap" type="com.korit.nomoreback.domain.moim.Moim">
         <id property="moimId" column="moim_id"/>
+        <result property="userId" column="moim_owner"/>
     </resultMap>
 
     <resultMap id="forumCategoryMap" type="com.korit.nomoreback.domain.forum.ForumCategory">
@@ -87,7 +88,7 @@
         where user_id = #{userId} and moim_id = #{moimId}
     </delete>
 
-    <select id="findByForumIdAndUserId" resultMap="forumMap" parameterType="map">
+    <select id="getForum" resultMap="forumMap" parameterType="map">
         select
         f.forum_id,
         f.forum_title,
@@ -102,14 +103,17 @@
 
         fc.forum_category_id,
         fc.forum_category_name,
+        mt.moim_id,
+        mt.user_id as moim_owner,
 
         ifnull(flc.like_count, 0) as like_count,
         ifnull(fcc.comment_count, 0) as comment_count,
         ifnull(flt.forum_like_id, 0) as is_like
 
-        from forum_tb f
+    from forum_tb f
         join user_tb u on u.user_id = f.user_id
         join forum_category_tb fc on fc.forum_category_id = f.forum_category_id
+        left outer join moim_tb mt on mt.moim_id = f.moim_id
 
         left join (
         select forum_id, count(*) as like_count

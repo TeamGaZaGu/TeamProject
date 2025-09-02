@@ -22,7 +22,7 @@ function Mypage(props) {
     const [categoryList, setCategoryList] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState('');
     const [isCategoryOpen, setIsCategoryOpen] = useState(false);
-    const oldCategory = categories.find(prev => prev.categoryId === user.categoryId)
+    const oldCategory = categories?.find(prev => prev?.categoryId === user?.categoryId)
 
     const [myMoims, setMyMoims] = useState([]);
     const [myPosts, setMyPosts] = useState([]); // [추가]

@@ -70,7 +70,6 @@ public class MoimService {
 
 
     public void joinMoim(Integer moimId) {
-
         Integer userId = getCurrentUser().getUserId();
 
         Moim moim = moimMapper.findMoimId(moimId);

@@ -5,12 +5,18 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { reqModifyMoim, reqSelectMoim } from '../../../api/moimApi';
 import useCategoryQuery from '../../../queries/useCategoryQuery';
 import { reqDistrict } from '../../../api/searchApi';
+import usePrincipalQuery from '../../../queries/usePrincipalQuery';
+import Oauth2 from '../../../Oauth2/Oauth2';
 
 function ModifyMoim(props) {
     const navigate = useNavigate();
     const [ searchParam ] = useSearchParams();
     const moimId = searchParam.get("moimId");
     const [ moim, setMoim ] = useState("");
+    const principalQuery = usePrincipalQuery();
+    const user = principalQuery?.data?.data?.user;
+
+    console.log(user)
     
     const [inputValue, setInputValue] = useState({
         title: "",
@@ -28,8 +34,6 @@ function ModifyMoim(props) {
     const getCategory = categories?.find(category => category.categoryId === moim?.categoryId)
     const categoryList = (categories || []).filter(category => category.categoryName !== '전체');
 
-    console.log(moim)
-
     const fileRef = useRef();
     const [ previewImg, setPreviewImg ] = useState('');
     
@@ -44,7 +48,6 @@ function ModifyMoim(props) {
     const [ ismaxMemberOpen, setIsmaxMemberOpen ] = useState(false);
     const maxMemberOptions = Array.from({ length: 29 }, (_, index) => index + 2);
 
-    console.log(moim)
     useEffect(() => {
         const fetchMoim = async () => {
             try {
@@ -65,7 +68,6 @@ function ModifyMoim(props) {
                 setSelectedDistrict(moimData.districtName);
                 setSelectedmaxMember(moimData.maxMember);
                 setPreviewImg(`${moimData.moimImgPath}`);
-;
             } catch (err) {
                 console.error(err);
             }
@@ -189,107 +191,120 @@ function ModifyMoim(props) {
         }
     };
 
-    console.log(categories)
-    if (categoryQuery.isFetched && categoryQuery.isSuccess) {
-        return (
-            <div css={s.layout}>
-                <h1>모임 수정</h1>
-                <div css={s.inputContainer}>
-                    <div css={s.imgStyle}>
-                        <div css={s.ImgBox} onClick={handleMoimImgEditOnClick}>
-                            <input type="file" name='moimImgPath' onChange={handleFileOnChange} ref={fileRef} accept="image/*" style={{ display: 'none' }} />
-                            <img src={previewImg} alt="" />
-                        </div>
-                    </div>
-                    <div>
-                        <input type="text" name='title' value={inputValue.title} onChange={handleOnChange} placeholder="모임 제목" css={s.titleInput} />
-                    </div>
-                    <div>
-                       <textarea
-                            css={s.contentTextarea}
-                            name="discription"
-                            value={inputValue.discription}
-                            onChange={handleOnChange}
-                            placeholder="모임 소개"
-                            required
-                        />
-                    </div>
-                    
-                    <div css={s.dropdownContainer}>
-                        <button css={s.dropdownButton} onClick={handleTogglemaxMemberOnClick}>
-                            {selectedmaxMember
-                                ? `최대 ${selectedmaxMember}명`
-                                : '최대인원수 설정'
-                            }
-                        </button>
-                        {ismaxMemberOpen && (
-                            <div css={s.dropdownMenu}>
-                                {maxMemberOptions.map((maxMember) => (
-                                    <div key={maxMember} css={s.dropdownItem}>
-                                        <label>
-                                            <input
-                                                type="radio"
-                                                name='maxMember'
-                                                value={inputValue.maxMember}
-                                                checked={selectedmaxMember === maxMember}
-                                                onChange={(e) => handlemaxMemberOnChange(e, maxMember)}
-                                            />
-                                            {maxMember}명
-                                        </label>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-                            <button css={s.dropdownButton} onClick={handleToggleDistrictOnClick}>
-                                {selectedDistrict || '지역설정'}
-                            </button>
-                            {isDistrictOpen && (
-                                <div css={s.dropdownMenu}>
-                                    {districtList.map((district, index) => (
-                                        <div key={index} css={s.dropdownItem}>
-                                            <label>
-                                                <input
-                                                    type='radio'
-                                                    name='districtId'
-                                                    value={district.districtName}
-                                                    checked={selectedDistrict === district.districtName}
-                                                    onChange={handleDistrictOnChange}
-                                                />
-                                                {district.districtName}
-                                            </label>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-                    </div>
-                
-                    <div css={s.dropdownContainer}>
-                        <button css={s.dropdownButton} onClick={handleToggleCategoryOnClik}>
-                            {selectedCategory}
-                        </button>
-                        {isCategoryOpen && (
-                            <div css={s.dropdownMenu}>
-                                {categoryList.map((category) => (
-                                    <div key={category.categoryId} css={s.dropdownItem}>
-                                        <label>
-                                            <input
-                                                type="radio"
-                                                name='categoryId'
-                                                value={category.categoryName}
-                                                checked={selectedCategory === category.categoryId}
-                                                onChange={(e) => handleCategoryOnChange(e, category)}
-                                            />
-                                            {category.categoryName}
-                                        </label>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
+    useEffect(() => {
+        if (user && moim) {
+            if (user.userId !== moim.userId && user.userRole !== "ROLE_ADMIN") {
+                alert("권한이 없습니다");
+                navigate("/");
+            }
+        }
+    }, [user, moim]);
+
+    if(user === undefined) {
+        return <div css={s.loginContainer}>
+                    <h2>로그인이 필요한 페이지입니다</h2>
+                    <Oauth2 customStyle={s.customLoginStyle} />
+                </div>;
+    }
+    return (
+        <div css={s.layout}>
+            <h1>모임 수정</h1>
+            <div css={s.inputContainer}>
+                <div css={s.imgStyle}>
+                    <div css={s.ImgBox} onClick={handleMoimImgEditOnClick}>
+                        <input type="file" name='moimImgPath' onChange={handleFileOnChange} ref={fileRef} accept="image/*" style={{ display: 'none' }} />
+                        <img src={previewImg} alt="" />
                     </div>
                 </div>
-                <button css={s.button} onClick={handleCreateMoimOnClick}>모임 수정</button>
+                <div>
+                    <input type="text" name='title' value={inputValue.title} onChange={handleOnChange} placeholder="모임 제목" css={s.titleInput} />
+                </div>
+                <div>
+                   <textarea
+                        css={s.contentTextarea}
+                        name="discription"
+                        value={inputValue.discription}
+                        onChange={handleOnChange}
+                        placeholder="모임 소개"
+                        required
+                    />
+                </div>
+                
+                <div css={s.dropdownContainer}>
+                    <button css={s.dropdownButton} onClick={handleTogglemaxMemberOnClick}>
+                        {selectedmaxMember
+                            ? `최대 ${selectedmaxMember}명`
+                            : '최대인원수 설정'
+                        }
+                    </button>
+                    {ismaxMemberOpen && (
+                        <div css={s.dropdownMenu}>
+                            {maxMemberOptions.map((maxMember) => (
+                                <div key={maxMember} css={s.dropdownItem}>
+                                    <label>
+                                        <input
+                                            type="radio"
+                                            name='maxMember'
+                                            value={inputValue.maxMember}
+                                            checked={selectedmaxMember === maxMember}
+                                            onChange={(e) => handlemaxMemberOnChange(e, maxMember)}
+                                        />
+                                        {maxMember}명
+                                    </label>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                        <button css={s.dropdownButton} onClick={handleToggleDistrictOnClick}>
+                            {selectedDistrict || '지역설정'}
+                        </button>
+                        {isDistrictOpen && (
+                            <div css={s.dropdownMenu}>
+                                {districtList.map((district, index) => (
+                                    <div key={index} css={s.dropdownItem}>
+                                        <label>
+                                            <input
+                                                type='radio'
+                                                name='districtId'
+                                                value={district.districtName}
+                                                checked={selectedDistrict === district.districtName}
+                                                onChange={handleDistrictOnChange}
+                                            />
+                                            {district.districtName}
+                                        </label>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                </div>
+            
+                <div css={s.dropdownContainer}>
+                    <button css={s.dropdownButton} onClick={handleToggleCategoryOnClik}>
+                        {selectedCategory}
+                    </button>
+                    {isCategoryOpen && (
+                        <div css={s.dropdownMenu}>
+                            {categoryList.map((category) => (
+                                <div key={category.categoryId} css={s.dropdownItem}>
+                                    <label>
+                                        <input
+                                            type="radio"
+                                            name='categoryId'
+                                            value={category.categoryName}
+                                            checked={selectedCategory === category.categoryId}
+                                            onChange={(e) => handleCategoryOnChange(e, category)}
+                                        />
+                                        {category.categoryName}
+                                    </label>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
             </div>
-    )};
+            <button css={s.button} onClick={handleCreateMoimOnClick}>모임 수정</button>
+        </div>
+    )
 }
 
 export default ModifyMoim;

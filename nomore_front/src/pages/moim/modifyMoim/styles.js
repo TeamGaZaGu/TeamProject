@@ -1,6 +1,63 @@
 // styles.ts
 import { css } from "@emotion/react";
 
+export const loginContainer = css`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-width: 30rem;
+  min-height: 60vh;
+  padding: 40px;
+  background-color: #f9f9f9;
+`;
+
+export const customLoginStyle = css`
+  background: linear-gradient(to bottom right, #7e57c2, #673ab7);
+  border: 1px solid #e0e0e0;
+  padding: 2rem;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+
+   & > button {
+    width: 260px;
+    height: 48px;
+    font-size: 15px;
+    border-radius: 10px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+  }
+
+  & > button:nth-of-type(1) {
+    background-color: #ffffff;
+    color: #000000;
+    border: 1px solid #dcdcdc;
+
+    &:hover {
+      background-color: #f1f1f1;
+    }
+  }
+
+  & > button:nth-of-type(2) {
+    background-color: #fee500;
+    color: #000000;
+
+    &:hover {
+      background-color: #ffeb3b;
+    }
+  }
+`;
+
 // 전체 레이아웃
 export const layout = css`
   max-width: 1000px;
