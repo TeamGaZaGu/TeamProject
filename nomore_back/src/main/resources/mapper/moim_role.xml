@@ -18,7 +18,7 @@
         )
     </select>
 
-    <select id="findMoimRole" resultType="com.korit.nomoreback.dto.moim.MoimRoleDto">
+    <select id="findMoimRole" resultType="string">
         SELECT
             moim_role
         FROM

@@ -210,6 +210,18 @@ function DetailedForum(props) {
             alert("댓글 등록에 실패했습니다.");
         }
     }
+    
+    useEffect(() => {
+        if (!!recomment) {
+            setCommentValue(prev => {
+                const content = /^@\w+\s/.test(commentValue) 
+                    ? commentValue.substring(commentValue.indexOf(" ") + 1)
+                    : commentValue;
+
+                return `@${recomment.user.nick} ${content}`;
+            });
+        }
+    }, [recomment]);
 
     const handleLikeOnClick = async () => { try { await reqLike(forumId); await fetchForum(); queryClient.invalidateQueries(['forums']); } catch (error) { console.error("좋아요 실패", error); } }
     const handleDislikeOnClick = async () => { try { await reqDislike(forumId); await fetchForum(); queryClient.invalidateQueries(['forums']); } catch (error) { console.error("좋아요 취소 실패", error); } }
@@ -225,6 +237,8 @@ function DetailedForum(props) {
         if (loaderRef.current) observer.observe(loaderRef.current);
         return () => { if (loaderRef.current) observer.unobserve(loaderRef.current); }
     }, [loaderRef.current]);
+
+    console.log(forum)
 
     if(principalQuery.isFetched && principalQuery.isSuccess) {
         return (
@@ -249,7 +263,7 @@ function DetailedForum(props) {
                             </div>
                         </div>
                         <div css={s.buttonWrapper}>
-                            {userRole === "ROLE_ADMIN" || userId === forum?.user?.userId ? (
+                            {userRole === "ROLE_ADMIN" || userId === forum?.user?.userId || userId === forum?.moim?.userId ? (
                                 <>
                                     <button css={s.editButton} onClick={() => navigate(`/forum/modify?forumId=${forumId}`)}>수정</button>
                                     <button css={s.deleteButton} onClick={() => handleDeleteForumOnClick(forumId, forum?.moim?.moimId)}>삭제</button>

@@ -100,9 +100,9 @@ public class MoimService {
 
         Integer userId = getCurrentUser().getUserId();
 
-        MoimRoleDto isOwner = moimRoleMapper.findMoimRole(userId,moimId);
+        String isOwner = moimRoleMapper.findMoimRole(userId,moimId);
 
-        if ("OWNER".equals(isOwner.getMoimRole())){
+        if ("OWNER".equals(isOwner)){
             return;
         }
 
@@ -121,9 +121,9 @@ public class MoimService {
 
     public void modifyMoim(MoimModifyDto modifyDto) {
         Integer userId = getCurrentUser().getUserId();
-        MoimRoleDto roleDto = moimRoleMapper.findMoimRole(userId, modifyDto.getMoimId());
+        String roleDto = moimRoleMapper.findMoimRole(userId, modifyDto.getMoimId());
         String userRole = getCurrentUser().getUserRole();
-        String role = roleDto.getMoimRole();
+        String role = roleDto;
         Moim moim = modifyDto.toEntity();
 
         if (!"ROLE_ADMIN".equals(userRole) || !"OWNER".equals(role)) {
@@ -144,7 +144,7 @@ public class MoimService {
     public void deleteMoim(Integer moimId) {
         Integer userId = getCurrentUser().getUserId();
         String userRole = getCurrentUser().getUserRole();
-        MoimRoleDto roleDto = moimRoleMapper.findMoimRole(userId, moimId);
+        String roleDto = moimRoleMapper.findMoimRole(userId, moimId);
 
         if ("ROLE_ADMIN".equals(userRole)) {
             moimMapper.deleteMoimById(moimId);
@@ -152,7 +152,7 @@ public class MoimService {
             if (roleDto == null) {
                 return;
             }
-            String role = roleDto.getMoimRole();
+            String role = roleDto;
             if (!"OWNER".equals(role)){
                 throw new IllegalArgumentException("권한 없는 사용자");
             }

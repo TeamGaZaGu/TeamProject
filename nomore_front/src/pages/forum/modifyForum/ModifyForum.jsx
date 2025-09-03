@@ -13,6 +13,8 @@ function ModifyForum(props) {
     const principalQuery = usePrincipalQuery();
     const userId = principalQuery?.data?.data?.user?.userId;
     const userRole = principalQuery?.data?.data?.user?.userRole;
+    console.log("userId",userId)
+    console.log("userRole",userRole)
     const navigate = useNavigate();
     const queryClient = useQueryClient();
     const [searchParam] = useSearchParams();
@@ -138,15 +140,20 @@ function ModifyForum(props) {
             alert("게시글 등록에 실패했습니다.");
         }
     };
+    if (principalQuery.isLoading || !forum) {
+        return <div>로딩 중입니다...</div>;
+    }
 
-    useEffect(() => {
-        if (!forum || !forum.user || !forum.moim) return;
-        if(userRole !== "ROLE_ADMIN" && userId !== forum?.user?.userId && userId !== forum?.moim?.userId) {
-            alert("권한이 없습니다")
-            navigate("/")
-        }
-    },[forum, userId, userRole])
+    if (!userId || !userRole) {
+        return <div>로그인이 필요합니다.</div>;
+    }
 
+    const isAdmin = userRole === "ROLE_ADMIN";
+    const isOwner = userId === forum?.user?.userId || userId === forum?.moim?.userId;
+
+    if (!isAdmin && !isOwner) {
+        return <div>권한이 없습니다.</div>;
+    }
     return (
         <div css={s.layout}>
             <h1>게시글 수정</h1>

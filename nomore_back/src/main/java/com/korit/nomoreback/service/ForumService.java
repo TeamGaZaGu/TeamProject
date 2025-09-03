@@ -169,15 +169,15 @@ public class ForumService {
                 .map(ForumImg::getForumImgId)
                 .toList();
 
-        if (userId.equals(forum.getUser().getUserId()) ||
-                moimRoleMapper.findMoimRole(userId,moimId).equals("OWNER")){
+        System.out.println(moimRoleMapper.findMoimRole(userId,moimId));
+        if (userId.equals(forum.getUser().getUserId()) || moimRoleMapper.findMoimRole(userId,moimId).equals("OWNER")) {
             if (!imgIds.isEmpty()) {
                 forumImgMapper.deleteImg(imgIds);
             }
             forumMapper.deleteForum(forumId);
             return;
         }
-        throw new IllegalArgumentException("권한 없음");
+        System.out.println("권한 없음");
     }
 
     public List<ForumCategory> getFourumCategories() {
