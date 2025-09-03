@@ -10,6 +10,16 @@
         VALUES (default ,#{chattingContent}, NOW(), #{userNickName}, #{moimId})
     </insert>
 
+    <update id="softDeleteChat" parameterType="integer">
+        update
+        chat_tb
+        set
+        deleted_at = now(),
+        deleted = 1
+        where
+        chat_id = #{chatId}
+    </update>
+
     <delete id="deleteChatById">
         delete from chat_tb
         where chat_id = #{chatId}
@@ -21,7 +31,9 @@
         chatting_content as chattingContent,
         chatted_at as chattedAt,
         user_nickname as userNickName,
-        moim_id as moimId
+        moim_id as moimId,
+        deleted as deleted,
+        deleted_at as deletedAt
         from
         chat_tb
         where

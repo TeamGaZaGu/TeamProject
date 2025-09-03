@@ -93,7 +93,26 @@ public class ChatService {
         return userMapper.findById(userId);
     }
 
-    public void deleteChat(Integer chatId) {
+//    public void deleteChat(Integer chatId) {
+//        Integer userId = principalUtil.getPrincipalUser().getUser().getUserId();
+//
+//        Chat chat = chatMapper.findByChatId(chatId);
+//
+//        User user = userMapper.findById(userId);
+//
+//        if (chat == null) {
+//            throw new IllegalArgumentException("존재하지 않는 채팅입니다.");
+//        }
+//
+//        if (!chat.getUserNickName().equals(user.getNickName())){
+//            throw new IllegalArgumentException("본인 채팅만 삭제 가능");
+//        }
+//
+//        chatMapper.deleteChatById(chatId);
+//        chatImgMapper.deleteByChatId(chatId);
+//    }
+
+    public void softDelete(Integer chatId) {
         Integer userId = principalUtil.getPrincipalUser().getUser().getUserId();
 
         Chat chat = chatMapper.findByChatId(chatId);
@@ -108,9 +127,6 @@ public class ChatService {
             throw new IllegalArgumentException("본인 채팅만 삭제 가능");
         }
 
-        chatMapper.deleteChatById(chatId);
-        chatImgMapper.deleteByChatId(chatId);
-
-
+        chatMapper.softDeleteChat(chatId);
     }
 }

@@ -20,6 +20,8 @@ public class Chat {
     private LocalDateTime chattedAt;
     private String userNickName;
     private Integer moimId;
+    private boolean deleted;
+    private LocalDateTime deletedAt;
 
     private User user;
     private Moim moim;

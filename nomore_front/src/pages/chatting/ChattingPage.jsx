@@ -25,7 +25,6 @@ function ChattingPage({ moimId }) {
   const [isLoading, setIsLoading] = useState(false);
   const [hoveredMessageId, setHoveredMessageId] = useState(null);
 
-
   // Lightbox 관련 state
   const [lightboxImages, setLightboxImages] = useState([]);
   const [currentLightboxIndex, setCurrentLightboxIndex] = useState(0);
@@ -127,10 +126,14 @@ function ChattingPage({ moimId }) {
         }
       });
 
-      // 삭제 이벤트 수신
+      // 삭제 이벤트 수신 → deleted=true로 처리
       stompClient.subscribe(`/sub/chat/delete`, (msg) => {
         const deletedChatId = Number(msg.body);
-        setMessages(prev => prev.filter(m => m.chatId !== deletedChatId));
+        setMessages(prev =>
+          prev.map(m =>
+            m.chatId === deletedChatId ? { ...m, deleted: true } : m
+          )
+        );
       });
 
       // 온라인 상태
@@ -158,7 +161,7 @@ function ChattingPage({ moimId }) {
     fileList.forEach((file) => formData.append("files", file));
     try {
       const token = localStorage.getItem("AccessToken");
-      const res = await fetch(`http://localhost:8080/api/chat/${moimIdNum}/upload`, {
+      const res = await fetch(`http://192.168.2.17:8080/api/chat/${moimIdNum}/upload`, {
         method: "POST",
         headers: { Authorization: token },
         body: formData,
@@ -198,11 +201,11 @@ function ChattingPage({ moimId }) {
 
   const deleteChat = async (chatId) => {
     try {
-      await fetch(`http://localhost:8080/api/chat/${chatId}`, {
+      await fetch(`http://192.168.2.17:8080/api/chat/${chatId}`, {
         method: 'DELETE',
         headers: { Authorization: localStorage.getItem('AccessToken') },
       });
-      // WebSocket에서 삭제 이벤트 받으면 메시지 state에서 자동 제거
+      // WebSocket에서 삭제 이벤트 받으면 메시지 state에서 deleted=true로 변경
     } catch (err) {
       console.error('채팅 삭제 실패:', err);
     }
@@ -256,8 +259,7 @@ function ChattingPage({ moimId }) {
                 )}
 
                 <div css={isCurrentUser ? s.MyMessageWrapper : s.OtherMessageWrapper}>
-                  {/* 마우스 올릴 때만 삭제 버튼 */}
-                  {isCurrentUser && hoveredMessageId === msg.chatId && (
+                  {isCurrentUser && hoveredMessageId === msg.chatId && !msg.deleted && (
                     <button
                       onClick={() => deleteChat(msg.chatId)}
                       style={{ 
@@ -272,55 +274,62 @@ function ChattingPage({ moimId }) {
                       삭제
                     </button>
                   )}
-                  {!isCurrentUser && (
-                    <img
-                      src={findUserProfile(msg.userNickName)}
-                      alt="프로필"
-                      css={s.SmallProfileImage}
-                    />
-                  )}
 
-                  {hasText && (
-                    <div css={isCurrentUser ? s.MyMessageItem : s.OtherUserMessage}>
-                      {msg.chattingContent}
+                  {msg.deleted ? (
+                    <div
+                      css={isCurrentUser ? s.MyMessageItem : s.OtherUserMessage}
+                      // style={{ fontStyle: 'italic', color: '#888' }}
+                    >
+                      삭제된 메시지입니다.
                       {msg.chattedAt && (
                         <span css={s.Timestamp}>
                           {new Date(msg.chattedAt).toLocaleTimeString()}
                         </span>
                       )}
                     </div>
-                  )}
+                  ) : (
+                    <>
+                      {hasText && (
+                        <div css={isCurrentUser ? s.MyMessageItem : s.OtherUserMessage}>
+                          {msg.chattingContent}
+                          {msg.chattedAt && (
+                            <span css={s.Timestamp}>
+                              {new Date(msg.chattedAt).toLocaleTimeString()}
+                            </span>
+                          )}
+                        </div>
+                      )}
 
-                  {hasImages && (
-                    <div
-                      style={{
-                        display: 'flex',
-                        flexWrap: 'wrap',
-                        flexDirection:'row-reverse',
-                        gap: '4px',
-                        marginTop: hasText ? '6px' : '0',
-                        maxWidth: 'calc(120px * 3 + 8px)',
-                      }}
-                    >
-                      {msg.images.map((img, i) => (
-                        <img
-                          key={i}
-                          src={img.path}
-                          alt="chat-img"
+                      {hasImages && (
+                        <div
                           style={{
-                            width: '120px',
-                            height: '120px',
-                            objectFit: 'cover',
-                            borderRadius: '6px',
-                            cursor: 'pointer',
+                            display: 'flex',
+                            flexWrap: 'wrap',
+                            flexDirection: 'row-reverse',
+                            gap: '4px',
+                            marginTop: hasText ? '6px' : '0',
+                            maxWidth: 'calc(120px * 3 + 8px)',
                           }}
-                          onClick={() => openLightbox(msg.images, i)}
-                        />
-                      ))}
-                    </div>
+                        >
+                          {msg.images.map((img, i) => (
+                            <img
+                              key={i}
+                              src={img.path}
+                              alt="chat-img"
+                              style={{
+                                width: '120px',
+                                height: '120px',
+                                objectFit: 'cover',
+                                borderRadius: '6px',
+                                cursor: 'pointer',
+                              }}
+                              onClick={() => openLightbox(msg.images, i)}
+                            />
+                          ))}
+                        </div>
+                      )}
+                    </>
                   )}
-
-                  
                 </div>
               </div>
             );
