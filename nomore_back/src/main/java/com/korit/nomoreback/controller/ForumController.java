@@ -41,6 +41,7 @@ public class ForumController {
 
     @GetMapping("/forums/blobs")
     public ResponseEntity<byte[]> getImage(@RequestParam String url, @RequestParam String imageConfigsName) {
+        System.out.println("url " + url);
         byte[] data = blobService.getBlob(url, imageConfigsName);
 
         HttpHeaders headers = new HttpHeaders();
