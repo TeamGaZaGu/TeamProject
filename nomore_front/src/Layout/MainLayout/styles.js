@@ -7,6 +7,7 @@ export const containerStyle = css`
   flex-shrink: 0;
   overflow: auto;
   scrollbar-width: none;
+  background-color: #fff;
 
   &::-webkit-scrollbar {
     display: none;
@@ -15,6 +16,7 @@ export const containerStyle = css`
 
 export const headerStyle = css`
   flex-shrink: 0;
+  background-color: #fff;
 `;
 
 export const body = css`

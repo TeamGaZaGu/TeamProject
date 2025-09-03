@@ -5,7 +5,6 @@ export const layout = css`
   width: 100%;
   padding: 40px;
   background: #fff;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
   box-sizing: border-box;
 
   h1 {

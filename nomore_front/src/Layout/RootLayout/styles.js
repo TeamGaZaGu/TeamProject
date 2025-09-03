@@ -4,5 +4,5 @@ export const layout = css`
     margin: 0 auto;
     width: 100%;
     height: 100vh;
-    background-color: #dbdbdb;
+    background-color: #fff;
 `;
