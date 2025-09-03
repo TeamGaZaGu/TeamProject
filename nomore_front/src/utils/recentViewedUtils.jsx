@@ -20,7 +20,7 @@ export const saveRecentlyViewed = (moimData) => {
         viewedAt: new Date().toISOString()
       },
       ...filteredItems
-    ].slice(0, 5);
+    ].slice(0, 8);
     
     localStorage.setItem('recentlyViewed', JSON.stringify(newItems));
   } catch (error) {
