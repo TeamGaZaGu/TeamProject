@@ -92,10 +92,10 @@ public class ChattingController {
 
             result.add(ChatResponseDto.builder()
                     .chatId(chat.getChatId())
-                    .chattingContent(chat.getChattingContent())
+                    .chattingContent(chat.isDeleted() ? "삭제된 메시지입니다." : chat.getChattingContent())
                     .userNickName(chat.getUserNickName())
                     .chattedAt(chat.getChattedAt())
-                    .images(imgDtos)
+                    .images(chat.isDeleted() ? List.of() : imgDtos)
                     .build());
         }
 
@@ -123,9 +123,16 @@ public class ChattingController {
         return ResponseEntity.ok(uploaded);
     }
 
+//    @DeleteMapping("/{chatId}")
+//    public ResponseEntity<Void> deleteChat(@PathVariable Integer chatId) {
+//        chatService.deleteChat(chatId);
+//        template.convertAndSend("/sub/chat/delete", chatId);
+//        return ResponseEntity.noContent().build();
+//    }
+
     @DeleteMapping("/{chatId}")
-    public ResponseEntity<Void> deleteChat(@PathVariable Integer chatId) {
-        chatService.deleteChat(chatId);
+    public ResponseEntity<?> deleteChat(@PathVariable Integer chatId) {
+        chatService.softDelete(chatId);
         template.convertAndSend("/sub/chat/delete", chatId);
         return ResponseEntity.noContent().build();
     }
