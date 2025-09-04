@@ -1,6 +1,5 @@
 import { css } from '@emotion/react';
 
-// 메인 컨테이너
 export const container = css`
   padding: 2rem;
   max-width: 1200px;
@@ -21,12 +20,11 @@ export const filterLabel = css`
   cursor: pointer;
 
   input[type="radio"] {
-    accent-color: #4f46e5; /* 보라색 강조 */
+    accent-color: #4f46e5;
     cursor: pointer;
   }
 `;
 
-// 페이지 제목
 export const pageTitle = css`
   font-size: 2rem;
   font-weight: bold;
@@ -35,7 +33,6 @@ export const pageTitle = css`
   text-align: center;
 `;
 
-// 테이블 컨테이너
 export const tableContainer = css`
   background-color: white;
   border-radius: 8px;
@@ -44,21 +41,19 @@ export const tableContainer = css`
   border: 1px solid #e5e7eb;
 `;
 
-// 테이블 스크롤 영역
 export const tableWrapper = css`
   overflow-x: auto;
   overflow-y: auto;
   max-height: 70vh;
 `;
 
-// 테이블 기본 스타일
 export const table = css`
   width: 100%;
   border-collapse: collapse;
   font-size: 0.875rem;
+  table-layout: fixed;
 `;
 
-// 테이블 헤더
 export const tableHead = css`
   background-color: #f8fafc;
   position: sticky;
@@ -66,7 +61,6 @@ export const tableHead = css`
   z-index: 10;
 `;
 
-// 헤더 셀
 export const tableHeader = css`
   padding: 1rem;
   text-align: left;
@@ -76,7 +70,6 @@ export const tableHeader = css`
   white-space: nowrap;
 `;
 
-// 테이블 행
 export const tableRow = css`
   transition: background-color 0.2s ease;
 
@@ -93,7 +86,6 @@ export const tableRow = css`
   }
 `;
 
-// 테이블 셀
 export const tableCell = css`
   padding: 0.75rem 1rem;
   border-bottom: 1px solid #e5e7eb;
@@ -104,12 +96,36 @@ export const tableCell = css`
   text-overflow: ellipsis;
 `;
 
-// 로딩 컨테이너
 export const loadingContainer = css`
   text-align: center;
   padding: 2rem;
   color: #6b7280;
   font-size: 1.1rem;
+`;
+
+export const detailButton = css`
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background-color: #5a6268;
+  }
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(108, 117, 125, 0.3);
+  }
+
+  &:active {
+    background-color: #545b62;
+  }
 `;
 
 export const processButton = css`
@@ -129,7 +145,7 @@ export const processButton = css`
 
   &:focus {
     outline: none;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
   }
 
   &:active {

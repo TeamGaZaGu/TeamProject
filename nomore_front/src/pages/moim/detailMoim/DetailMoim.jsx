@@ -712,7 +712,10 @@
                                         )}
                                         <div css={s.modalButtonContainer}>
                                             {selectedUser.userId !== userId && (
-                                                <button onClick={() => handleToggleUserBlock(selectedUser.userId, selectedUser.nickName)}>
+                                                <button 
+                                                css={isBlockedUser ? s.unblockButton : s.blockButton} 
+                                                onClick={() => handleToggleUserBlock(selectedUser.userId, selectedUser.nickName)}
+                                                >
                                                     {isBlockedUser ? '차단 해제' : '차단하기'}
                                                 </button>
                                             )}

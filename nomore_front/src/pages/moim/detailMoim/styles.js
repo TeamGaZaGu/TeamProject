@@ -947,6 +947,7 @@ export const modalButtonContainer = css`
   gap: 8px;
   margin-top: 16px;
   justify-content: center;
+
 `;
 
 export const modalKickButton = css`
@@ -1162,5 +1163,45 @@ export const submitReportButton = css`
   &:disabled {
     background-color: #ccc;
     cursor: not-allowed;
+  }
+`;
+
+export const blockButton = css`
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: #c82333;
+  }
+
+  &:active {
+    transform: translateY(1px);
+  }
+`;
+
+export const unblockButton = css`
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: #545b62;
+  }
+
+  &:active {
+    transform: translateY(1px);
   }
 `;
