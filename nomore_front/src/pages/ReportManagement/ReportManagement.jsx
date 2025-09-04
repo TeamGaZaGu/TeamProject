@@ -184,8 +184,8 @@ function ReportManagement() {
                                                 hour12: true,
                                             })}
                                         </td>
-                                        <td>
-                                            <button css={s.tableCell} onClick={() => handleNavigate(report)}>
+                                        <td css={s.tableCell}>
+                                            <button css={s.detailButton} onClick={() => handleNavigate(report)}>
                                                 상세보기
                                             </button>
                                         </td>
