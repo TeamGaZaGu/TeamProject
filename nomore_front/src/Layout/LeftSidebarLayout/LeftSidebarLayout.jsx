@@ -9,7 +9,7 @@ import { reqAllUser } from '../../api/userApi';
 import { reqReport } from '../../api/reportApi';
 import { IoHomeSharp } from 'react-icons/io5';
 import { HiUsers } from 'react-icons/hi';
-import { FaUserSlash } from 'react-icons/fa';
+import { FaPlus, FaUserSlash } from 'react-icons/fa';
 import { MdReport } from 'react-icons/md';
 import useCategoryQuery from '../../queries/useCategoryQuery';
 import { BsClockHistory } from 'react-icons/bs';
@@ -52,10 +52,20 @@ function LeftSidebarLayout() {
         navigate("/recent-viewed")
     }
 
+    const handleCreateMoimOnClick = () => {
+        navigate("/moim/create");
+    };
+
     return (
         <div css={s.leftSideBar}>
             <div css={s.loginContainer}>
                 {principalQuery.isFetched && principalQuery.isSuccess ? <MypageButton /> : <Oauth2 />}
+            </div>
+            <div css={s.createMoimContainer}>
+                <button css={s.createMoimButton} onClick={handleCreateMoimOnClick}>
+                    <FaPlus />
+                    모임만들기
+                </button>
             </div>
             <div css={s.sideMenu}>
                 <button onClick={handleHomeOnClick}><IoHomeSharp />홈</button>

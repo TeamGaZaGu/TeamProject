@@ -148,10 +148,10 @@ function Mypage(props) {
     };
 
     const handleMyForumOnClick = (mf) => {
-        console.log('클릭한 게시글 데이터:', mf); // 이 로그를  
+        console.log('클릭한 게시글 데이터:', mf); 
         const forumId = mf.forumId ?? mf.id ?? mf.postId;
         const moimId = mf.moimId ?? mf.moim?.moimId;
-        console.log('forumId:', forumId, 'moimId:', moimId); // 이 로그도 추가
+        console.log('forumId:', forumId, 'moimId:', moimId); 
         if (!forumId || !moimId) return;
         navigate(`/forum/detail?moimId=${moimId}&forumId=${forumId}`);
     };
@@ -198,6 +198,28 @@ function Mypage(props) {
                             name='nickName'
                             value={modifyUser.nickName}
                             onChange={handleMypageModifyOnChange}
+                        />
+                    </div>
+                    <div css={s.infoItem}>
+                        <label css={s.infoLabel}>성별</label>
+                        <input
+                            css={s.inputStyle}
+                            type="text"
+                            name="gender"
+                            value={modifyUser.gender === 'male' ? '남자' : '여자'}
+                            onChange={handleMypageModifyOnChange}
+                            disabled
+                        />
+                    </div>
+                    <div css={s.infoItem}>
+                        <label css={s.infoLabel}>이메일</label>
+                        <input
+                            css={s.inputStyle}
+                            type="text"
+                            name="email"
+                            value={modifyUser.email}
+                            onChange={handleMypageModifyOnChange}
+                            disabled
                         />
                     </div>
 

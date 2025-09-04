@@ -5,8 +5,8 @@ export const layout = css`
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: 3rem;
-  padding: 2rem;
+  margin: 0;
+  padding: 1rem;
   width: 100%;
   max-width: 600px;
   min-width: 300px;
@@ -14,8 +14,9 @@ export const layout = css`
   margin-right: auto;
   background-color: #fafafa;
   border-radius: 1rem;
-  min-height: 80vh;
   box-sizing: border-box;
+  height: 100vh; 
+  overflow-y: hidden; 
 `;
 
 // 페이지 제목
@@ -370,11 +371,11 @@ export const mypageLayout = css`
   display: grid;
   grid-template-columns: 1.6fr 1fr;   
   width: 100%;
-  margin: 0;
+  margin-top: 5rem;
   padding: 2rem;
   box-sizing: border-box;
-  background-color: #fafafa;
-  min-height: 100vh;
+  background-color: #fff;
+  max-height: 100vh;
   align-items: start;
 
     @media (max-width: 1200px) {
