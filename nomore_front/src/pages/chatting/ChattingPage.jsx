@@ -9,6 +9,10 @@ import { reqMoimUserList } from '../../api/moimApi';
 import usePrincipalQuery from '../../queries/usePrincipalQuery';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import { MdReport } from 'react-icons/md';
+import { IoClose } from 'react-icons/io5';
+import useCategoryQuery from '../../queries/useCategoryQuery';
+import useUserBlockListQuery from '../../queries/useUserBlockListQuery';
 
 function ChattingPage({ moimId }) {
   const moimIdNum = Number(moimId);
@@ -23,15 +27,30 @@ function ChattingPage({ moimId }) {
   const [page, setPage] = useState(0); 
   const [hasMore, setHasMore] = useState(true); 
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [isUserModalOpen, setIsUserModalOpen] = useState(false);
+  const categoryQuery = useCategoryQuery();
+  const categories = categoryQuery?.data?.data || [];
   const [hoveredMessageId, setHoveredMessageId] = useState(null);
 
   // Lightbox 관련 state
   const [lightboxImages, setLightboxImages] = useState([]);
   const [currentLightboxIndex, setCurrentLightboxIndex] = useState(0);
-  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);   
+  
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+  const [selectedReason, setSelectedReason] = useState('');
+  const [customReason, setCustomReason] = useState('');
+  const [reportTargetType, setReportTargetType] = useState(3);
+  const [reportTargetId, setReportTargetId] = useState(null);
 
   const principalQuery = usePrincipalQuery();
   const userObj = principalQuery?.data?.data?.user;
+  const userBlockListQuery = useUserBlockListQuery(userObj.userId);
+  const userBlockList = userBlockListQuery?.data?.data?.body; 
+  const isBlockedUser = userBlockList?.includes(selectedUser?.userId);
+
+
 
   if (!moimId || isNaN(moimIdNum)) return <div>올바른 채팅방 ID가 필요합니다.</div>;
   if (!userObj) return <div>사용자 정보를 가져오는 중...</div>;
@@ -45,6 +64,61 @@ function ChattingPage({ moimId }) {
     setIsLightboxOpen(false);
     setLightboxImages([]);
   };
+
+  const handleOpenUserModal = (member) => {
+        setSelectedUser(member);
+        setIsUserModalOpen(true);
+    }
+
+  const handleCloseUserModal = () => {
+      setIsUserModalOpen(false);
+      setSelectedUser(null);
+  }    
+  const handleModalBackdropClick = (e) => {
+      if (e.target === e.currentTarget) {
+          handleCloseUserModal();
+      }
+  }
+  const handleReportUserOnClick = () => {
+      setReportTargetType(1);
+      setReportTargetId(selectedUser.userId);
+      setIsReportModalOpen(true);
+  }
+  const handleCloseReportModal = () => {
+        setIsReportModalOpen(false);
+        setSelectedReason('');
+        setCustomReason('');
+        setReportTargetType(3);
+        setReportTargetId(null);
+    }
+
+      const reportReasons = [
+      '스팸 / 광고성 활동',
+      '욕설 / 비방 / 혐오 발언',
+      '음란물 / 불건전한 내용',
+      '사기 / 도용 / 사칭',
+      '불법 행위 (범죄, 불법거래 등)',
+      '기타'
+  ];
+  const handleSubmitReport = async () => {
+        if (!selectedReason) return alert('신고 사유를 선택해주세요.');
+        if (selectedReason === '기타' && !customReason.trim()) return alert('기타 사유를 입력해주세요.');
+
+        try {
+            const reportData = {
+                userId,
+                targetType: reportTargetType,
+                targetId: reportTargetId,
+                reason: selectedReason === '기타' ? customReason : selectedReason
+            };
+            await submitReport(reportData);
+            toast.success('신고가 접수되었습니다');
+            handleCloseReportModal();
+        } catch (error) {
+            console.error('신고 제출 실패:', error);
+            toast.error('신고 제출에 실패했습니다.');
+        }
+    }
 
   const handleScroll = async () => {
     if (!chatContainerRef.current || isLoading || !hasMore) return;
@@ -71,6 +145,21 @@ function ChattingPage({ moimId }) {
       setIsLoading(false);
     }
   };
+
+  const handleToggleUserBlock = async (targetUserId, nickName) => {
+          const action = isBlockedUser ? '차단해제' : '차단';
+          const isConfirmed = window.confirm(`"${nickName}" 님을 ${action}하시겠습니까?`);
+          if (!isConfirmed) return;
+  
+          try {
+              if (isBlockedUser) await reqUserUnBlock(targetUserId);
+              else await reqUserBlock(targetUserId);
+              await queryClient.invalidateQueries(['userBlockList', userId]);
+          } catch (error) {
+              console.log(`사용자 ${action} 실패:`, error);
+              alert(`${action}에 실패했습니다. 다시 시도해주세요.`);
+          }
+      }
 
   useEffect(() => {
     async function fetchInitial() {
@@ -226,7 +315,13 @@ function ChattingPage({ moimId }) {
           const circleColor = isMe ? 'blue' : isOnline ? 'green' : 'gray';
           return (
             <div key={member.userId} css={s.UserItem}>
-              <img src={member.profileImgPath} alt="프로필" css={s.UserProfileImage} />
+              <img 
+                src={member.profileImgPath} 
+                alt="프로필"
+                css={s.UserProfileImage}
+                onClick={() => handleOpenUserModal(member)}
+                style={{cursor: 'pointer'}}
+               />
               <div css={s.UserDetails}>
                 <span>{member.nickName}</span>
                 <span css={s.RoleTag}>{member.moimRole === 'OWNER' ? '👑 방장' : '👤 멤버'}</span>
@@ -245,21 +340,38 @@ function ChattingPage({ moimId }) {
             const hasText = msg.chattingContent && msg.chattingContent.trim() !== '';
             const hasImages = msg.images && msg.images.length > 0;
 
+            const prevMsg = idx > 0 ? messages[idx - 1] : null;
+            const showProfileAndName =
+              !isCurrentUser &&
+              (!prevMsg || prevMsg.userNickName !== msg.userNickName);
+
             return (
               <div
                 key={idx}
-                style={{ marginBottom: '12px' }}
+                style={{ 
+                  marginBottom: '12px'
+                 }}
                 onMouseEnter={() => setHoveredMessageId(msg.chatId)}
                 onMouseLeave={() => setHoveredMessageId(null)}
               >
-                {!isCurrentUser && (
-                  <div style={{ fontSize: '12px', marginLeft: '32px', marginBottom: '2px', color: '#444' }}>
+                {showProfileAndName && (
+                  
+                  <div style={{ fontSize: '12px',  marginBottom: '2px', color: '#444' }}>
+                     <img
+                        src={findUserProfile(msg.userNickName) || '/default-profile.png'}
+                        alt="프로필"
+                        style={{
+                          width:'40px',
+                          borderRadius:'50%',
+                          gap:'5px'
+                        }}
+                      />
                     {msg.userNickName}
                   </div>
                 )}
 
-                <div css={isCurrentUser ? s.MyMessageWrapper : s.OtherMessageWrapper}>
-                  {isCurrentUser && hoveredMessageId === msg.chatId && !msg.deleted && (
+                <div css={isCurrentUser ?  s.MyMessageWrapper : s.OtherMessageWrapper}>
+                  {isCurrentUser &&  hoveredMessageId === msg.chatId && !msg.deleted && (
                     <button
                       onClick={() => deleteChat(msg.chatId)}
                       style={{ 
@@ -345,7 +457,17 @@ function ChattingPage({ moimId }) {
             onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
             placeholder="메시지를 입력하세요"
           />
-          <label htmlFor="imageUpload" style={{ cursor: 'pointer', padding: '0 12px', background: '#eee', borderRadius: '6px', marginLeft: '8px' }}>파일</label>
+          <label htmlFor="imageUpload" 
+          style={{ 
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            cursor: 'pointer',
+            padding: '0 12px',
+            background: '#eee',
+            borderRadius: '6px',
+            marginLeft: '8px',
+          }}>파일</label>
           <input
             type="file"
             id="imageUpload"
@@ -384,6 +506,98 @@ function ChattingPage({ moimId }) {
           <button onClick={sendMessage}>전송</button>
         </div>
       </div>
+
+      {isUserModalOpen && selectedUser && (
+        <div css={s.modalOverlay} onClick={handleModalBackdropClick}>
+            <div css={s.modalContent}>
+                <div css={s.modalHeader}>
+                    <h3>사용자 프로필</h3>
+                    <div css={s.modalHeaderButtons}>
+                        <button css={s.reportButton} onClick={handleReportUserOnClick}>
+                            <MdReport />
+                        </button>
+                        <button css={s.closeButton} onClick={handleCloseUserModal}>
+                            <IoClose />
+                        </button>
+                    </div>
+                </div>
+                <div css={s.modalBody}>
+                    <div css={s.userProfile}>
+                        <img
+                            src={`${selectedUser.profileImgPath}`}
+                            alt="프로필"
+                            css={s.modalProfileImageLarge}
+                        />
+                        <div css={s.userDetails}>
+                            <div css={s.userNameRow}>
+                                <h4>{selectedUser.nickName}</h4>
+                                {selectedUser.birthDate && <div>{selectedUser.birthDate}</div>}
+                            </div>
+                            <div css={s.userCategory}>
+                                {categories?.find(category => category.categoryId === selectedUser.categoryId)?.categoryEmoji}
+                                {categories?.find(category => category.categoryId === selectedUser.categoryId)?.categoryName}
+                            </div>
+                            {selectedUser.introduction && (
+                                <p css={s.userIntroduction}>{selectedUser.introduction}</p>
+                            )}
+                            <div css={s.modalButtonContainer}>
+                                <button onClick={() => handleToggleUserBlock(selectedUser.userId, selectedUser.nickName)}>
+                                    {isBlockedUser ? '차단 해제' : '차단하기'}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    )}
+
+    {isReportModalOpen && (
+      <div css={s.reportModalOverlay} onClick={(e) => e.target === e.currentTarget && handleCloseReportModal()}>
+          <div css={s.reportModalContent}>
+              <div css={s.reportModalHeader}>
+                  <h3>
+                      {reportTargetType === 3 ? '게시글 신고' : 
+                        reportTargetType === 4 ? '댓글 신고' : '사용자 신고'}
+                  </h3>
+                  <button css={s.closeButton} onClick={handleCloseReportModal}>
+                      <IoClose />
+                  </button>
+              </div>
+              <div css={s.reportModalBody}>
+                  <p css={s.reportModalDescription}>신고 사유를 선택해주세요:</p>
+                  <div css={s.reasonList}>
+                      {reportReasons.map((reason, index) => (
+                          <label key={index} css={s.reasonItem}>
+                              <input
+                                  type="radio"
+                                  name="reportReason"
+                                  value={reason}
+                                  checked={selectedReason === reason}
+                                  onChange={() => handleReasonChange(reason)}
+                              />
+                              <span css={s.reasonText}>{reason}</span>
+                          </label>
+                      ))}
+                  </div>
+                  {selectedReason === '기타' && (
+                      <textarea
+                          css={s.customReasonInput}
+                          placeholder="기타 사유를 입력해주세요..."
+                          value={customReason}
+                          onChange={(e) => setCustomReason(e.target.value)}
+                          maxLength={200}
+                      />
+                  )}
+                  <div css={s.reportModalFooter}>
+                      <button css={s.submitReportButton} onClick={handleSubmitReport}>
+                          신고하기
+                      </button>
+                  </div>
+              </div>
+          </div>
+      </div>
+  )}
 
       {/* Lightbox */}
       {isLightboxOpen && (
