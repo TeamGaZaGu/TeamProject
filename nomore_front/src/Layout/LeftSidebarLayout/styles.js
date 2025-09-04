@@ -20,7 +20,7 @@ export const leftSideBar = css`
 `;
 
 export const loginContainer = css`
-  margin-bottom: 2rem;
+  margin: 0 0 2rem 0;
   padding-bottom: 1rem;
   border-bottom: 1px solid #ddd;
 `;
@@ -90,5 +90,37 @@ export const category = css`
         color: #0052cc;
       }
     }
+  }
+`;
+
+export const createMoimContainer = css`
+  margin: -1rem 0 2rem 0;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #ddd;
+`;
+
+export const createMoimButton = css`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 14px; 
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+  margin: 0; 
+
+  &:hover {
+    background-color: #0056b3;
+  }
+
+  &:active {
+    transform: translateY(1px);
   }
 `;
