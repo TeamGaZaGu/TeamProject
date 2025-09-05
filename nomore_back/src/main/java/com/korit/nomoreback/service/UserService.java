@@ -58,10 +58,10 @@ public class UserService {
     public void updateProfile(UserProfileUpdateReqDto dto) {
         User user = principalUtil.getPrincipalUser().getUser();
         String userImg = user.getProfileImgPath();
-        fileService.deleteFile(userImg);
+        System.out.println("userImg " + userImg);
         User userEntity = dto.toUser();
         if (dto.getProfileImgPath() != null) {
-            fileService.deleteFile(userImg);
+            fileService.deleteFile(userImg, "profile");
             String profileImgPath = fileService.uploadFile(dto.getProfileImgPath(), "profile");
             userEntity.setProfileImgPath(profileImgPath);
         }
@@ -133,7 +133,7 @@ public class UserService {
         for (String imagePath : imagePaths) {
             if (imagePath != null && !imagePath.isEmpty()) {
                 try {
-                    fileService.deleteFile(imagePath);
+//                    fileService.deleteFile(imagePath);
                 } catch (Exception e) {
                     System.err.println("이미지 파일 삭제 실패: " + imagePath + ", 오류: " + e.getMessage());
                 }

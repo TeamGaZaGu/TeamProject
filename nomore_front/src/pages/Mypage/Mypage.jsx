@@ -26,9 +26,13 @@ function Mypage(props) {
 
     const [myMoims, setMyMoims] = useState([]);
     const [myPosts, setMyPosts] = useState([]); // [추가]
+
     useEffect(() => {( async() => {
         const userImg = await reqModifyUserBlob({url: user.profileImgPath, imageConfigsName: "profile"});
-        const fileName = user.profileImgPath.substring(user.profileImgPath.indexOf("_") + 1);
+        const fileNameIndex = user.profileImgPath.indexOf("_");
+        const fileName = fileNameIndex >= 0 
+            ? user.profileImgPath.substring(fileNameIndex + 1) 
+            : user.profileImgPath.split("/").pop();
         const getUserImg = {
             ...user,
             profileImgPath: {
@@ -94,6 +98,8 @@ function Mypage(props) {
             [e.target.name]: e.target.value,
         }))
     }
+
+    console.log(modifyUser)
 
     const handleSaveOnclick = async () => {
         const formData = new FormData();

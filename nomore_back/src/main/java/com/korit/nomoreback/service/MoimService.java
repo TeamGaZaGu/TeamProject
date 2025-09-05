@@ -120,20 +120,22 @@ public class MoimService {
     }
 
     public void modifyMoim(MoimModifyDto modifyDto) {
+        System.out.println(modifyDto);
         Integer userId = getCurrentUser().getUserId();
         String roleDto = moimRoleMapper.findMoimRole(userId, modifyDto.getMoimId());
         String userRole = getCurrentUser().getUserRole();
         String role = roleDto;
         Moim moim = modifyDto.toEntity();
 
-        if (!"ROLE_ADMIN".equals(userRole) || !"OWNER".equals(role)) {
+        if ("ROLE_ADMIN".equals(userRole) || "OWNER".equals(role)) {
             Moim originMoim = moimMapper.findMoimId(modifyDto.getMoimId());
+            System.out.println("img: " + originMoim.getMoimImgPath());
             MultipartFile newImgFile = modifyDto.getMoimImgPath();
             if (originMoim.getMemberCount() > modifyDto.getMaxMember()) {
                 throw new IllegalArgumentException("모임 정원 초과.");
             }
             if (newImgFile != null && !newImgFile.isEmpty()) {
-                fileService.deleteFile(originMoim.getMoimImgPath());
+                fileService.deleteFile(originMoim.getMoimImgPath(), "moim");
                 String savedFileName = fileService.uploadFile(newImgFile, "moim");
                 moim.setMoimImgPath(savedFileName);
             }
