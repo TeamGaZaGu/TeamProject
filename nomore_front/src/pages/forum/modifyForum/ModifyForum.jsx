@@ -140,20 +140,21 @@ function ModifyForum(props) {
             alert("게시글 등록에 실패했습니다.");
         }
     };
-    if (principalQuery.isLoading || !forum) {
+    if (principalQuery.isLoading) {
         return <div>로딩 중입니다...</div>;
     }
 
     if (!userId || !userRole) {
-        return <div>로그인이 필요합니다.</div>;
+        navigate("/")
     }
 
     const isAdmin = userRole === "ROLE_ADMIN";
     const isOwner = userId === forum?.user?.userId || userId === forum?.moim?.userId;
 
     if (!isAdmin && !isOwner) {
-        return <div>권한이 없습니다.</div>;
+        navigate("/")
     }
+    
     return (
         <div css={s.layout}>
             <h1>게시글 수정</h1>

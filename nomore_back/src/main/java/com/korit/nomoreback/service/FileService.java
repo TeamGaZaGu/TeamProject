@@ -25,6 +25,10 @@ public class FileService {
         System.out.println("imageConfigName" + imageConfigName);
         String dirPath = appProperties.getImageConfigs().get(imageConfigName).getDirPath();
         String originalFilename = file.getOriginalFilename();
+        if ("default.jpg".equals(originalFilename)) {
+            return "default.jpg";
+        }
+        System.out.println("originalFilename" + originalFilename);
 
         // 같은 원본명 + 같은 크기의 파일 찾기
         String existingFile = findSimilarFile(dirPath, originalFilename, file.getSize());
@@ -83,16 +87,36 @@ public class FileService {
         }
     }
 
-    public void deleteFile(String storedFilename) {
-        if (storedFilename == null || storedFilename.isEmpty()) {
+    public void deleteFile(String path,  String imageConfigName) {
+        if (path == null || path.isEmpty()) {
             return;
         }
+        System.out.println(1);
 
-        File file = new File(storedFilename);
+        String key = "/" + imageConfigName + "/";
+        int idx = path.indexOf(key);
+        String deleteImg;
+        if (idx != -1) {
+            deleteImg = path.substring(idx + key.length());
+        } else {
+            deleteImg = path;
+        }
+        if ("default.jpg".equals(deleteImg)) {
+            return;
+        }
+        System.out.println(2);
+        String dirPath = appProperties.getImageConfigs().get(imageConfigName).getDirPath();
+
+        String filePath = dirPath + "/" + deleteImg;
+
+        File file = new File(filePath);
+        System.out.println("file " + file);
         if (!file.exists()) {
             return;
         }
+        System.out.println(3);
         file.delete();
+        System.out.println(4);
     }
 
     public byte[] convertToBlob(String path) {

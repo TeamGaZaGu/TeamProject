@@ -2,6 +2,7 @@ package com.korit.nomoreback.service;
 
 import com.korit.nomoreback.domain.forum.*;
 import com.korit.nomoreback.domain.moimRole.MoimRoleMapper;
+import com.korit.nomoreback.domain.user.User;
 import com.korit.nomoreback.dto.forum.*;
 import com.korit.nomoreback.dto.moim.MoimRoleDto;
 import com.korit.nomoreback.security.model.PrincipalUtil;
@@ -28,13 +29,13 @@ public class ForumService {
     private final MoimRoleMapper moimRoleMapper;
     private final ImageUrlUtil imageUrlUtil;
 
-    public Integer getCurrentUser(){
-        return principalUtil.getPrincipalUser().getUser().getUserId();
+    public User getCurrentUser(){
+        return principalUtil.getPrincipalUser().getUser();
     }
 
     @Transactional(rollbackFor = Exception.class)
     public void registerForum(ForumRegisterDto dto) {
-        Integer userId = getCurrentUser();
+        Integer userId = getCurrentUser().getUserId();
         dto.setUserId(userId);
         Forum forum = dto.toEntity();
         forumMapper.registerForum(forum);
@@ -61,7 +62,7 @@ public class ForumService {
     }
 
     public Forum getForumById(Integer forumId) {
-        Integer userId = getCurrentUser();
+        Integer userId = getCurrentUser().getUserId();
 
         Forum forum = forumMapper.getForum(forumId, userId);
 
@@ -81,7 +82,7 @@ public class ForumService {
     }
 
     public ForumSearchRespDto getForumsByMoimId(ForumSearchReqDto dto) {
-        Integer userId = getCurrentUser();
+        Integer userId = getCurrentUser().getUserId();
         Integer moimId = dto.getMoimId();
 
         if (!hasAdminRole() && !moimRoleMapper.isMoimIdAndUserId(moimId, userId)) {
@@ -111,7 +112,7 @@ public class ForumService {
     }
 
     public List<Forum> getForumsByCategoryId(Integer moimId, Integer categoryId) {
-        Integer userId = getCurrentUser();
+        Integer userId = getCurrentUser().getUserId();
 
         if (!hasAdminRole() && !moimRoleMapper.isMoimIdAndUserId(moimId, userId)) {
             throw new IllegalArgumentException("게시판 접근 권한이 없습니다. 모임에 가입해주세요.");
@@ -122,18 +123,22 @@ public class ForumService {
 
     @Transactional(rollbackFor = Exception.class)
     public void modifyForum(ForumModifyDto dto){
-        Integer userId = getCurrentUser();
+        Integer userId = getCurrentUser().getUserId();
+        String userRole = getCurrentUser().getUserRole();
         Integer forumId = dto.getForumId();
         Forum forum = forumMapper.findByForumId(forumId);
         Forum originForum = forumMapper.getForum(forumId,userId);
 
         List<ForumImg> forumImgs = forumImgMapper.findImgById(forumId);
+        System.out.println("forumImgs" + forumImgs);
+        forumImgs.forEach(forumImg -> fileService.deleteFile(forumImg.getPath(), "forum"));
         if (forumImgs != null && !forumImgs.isEmpty()) {
             List<Integer> imgIds = forumImgs.stream()
                     .map(forumImg -> forumImg.getForumImgId())
                     .toList();
             forumImgMapper.deleteImg(imgIds);
         }
+
 
         List<MultipartFile> imageFiles = dto.getForumImages();
         List<ForumImg> modifiedImgList = new ArrayList<>();
@@ -149,9 +154,11 @@ public class ForumService {
                 modifiedImgList.add(forumImg);
             }
         }
+        String moimRole = moimRoleMapper.findMoimRole(userId, forum.getMoim().getMoimId());
 
-        if (userId.equals(forum.getUser().getUserId()) ||
-                moimRoleMapper.findMoimRole(userId,forum.getMoim().getMoimId()).equals("OWNER")){
+        if ("ROLE_ADMIN".equals(userRole) ||
+                userId.equals(forum.getUser().getUserId()) ||
+                "OWNER".equals(moimRole)) {
             if (modifiedImgList != null && !modifiedImgList.isEmpty()) {
                 forumImgMapper.insertMany(modifiedImgList);
             }
@@ -162,14 +169,13 @@ public class ForumService {
     }
 
     public void deleteForum(Integer forumId,Integer moimId) {
-        Integer userId = getCurrentUser();
+        Integer userId = getCurrentUser().getUserId();
         Forum forum = forumMapper.findByForumId(forumId);
         List<ForumImg> forumImgs = forumImgMapper.findImgById(forumId);
         List<Integer> imgIds = forumImgs.stream()
                 .map(ForumImg::getForumImgId)
                 .toList();
 
-        System.out.println(moimRoleMapper.findMoimRole(userId,moimId));
         if (userId.equals(forum.getUser().getUserId()) || moimRoleMapper.findMoimRole(userId,moimId).equals("OWNER")) {
             if (!imgIds.isEmpty()) {
                 forumImgMapper.deleteImg(imgIds);
@@ -185,19 +191,19 @@ public class ForumService {
     }
 
     public Integer registerComment(ForumCommentRegDto dto) {
-        Integer userId = getCurrentUser();
+        Integer userId = getCurrentUser().getUserId();
         forumCommentMapper.insert(dto.toEntity(userId));
         return forumCommentMapper.getCountByForumId(dto.getForumId());
     }
 
     public void modifyComment(ForumCommentModifyDto dto, Integer forumId) {
-        Integer userId = getCurrentUser();
+        Integer userId = getCurrentUser().getUserId();
         ForumComment comment = forumCommentMapper.findByCommentId(dto.getForumCommentId());
         forumCommentMapper.modifyComment(dto.toEntity(comment));
     }
 
     public void deleteComment(Integer forumCommentId, Integer forumId, Integer moimId) {
-        Integer userId = getCurrentUser();
+        Integer userId = getCurrentUser().getUserId();
         ForumComment comment = forumCommentMapper.findByCommentId(forumCommentId);
         if (comment == null) {
             throw new IllegalArgumentException("댓글을 찾을 수 없습니다.");
@@ -226,12 +232,12 @@ public class ForumService {
     }
 
     public void like(Integer forumId) {
-        Integer userId = getCurrentUser();
+        Integer userId = getCurrentUser().getUserId();
         forumLikeMapper.insertLike(forumId, userId);
     }
 
     public void dislike(Integer forumId) {
-        Integer userId = getCurrentUser();
+        Integer userId = getCurrentUser().getUserId();
         forumLikeMapper.deleteLike(forumId, userId);
     }
 
