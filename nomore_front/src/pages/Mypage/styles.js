@@ -15,8 +15,8 @@ export const layout = css`
   background-color: #fafafa;
   border-radius: 1rem;
   box-sizing: border-box;
-  height: 100vh; 
-  overflow-y: hidden; 
+  min-height: 100vh; 
+  overflow-y: auto; 
 `;
 
 // 페이지 제목
