@@ -19,5 +19,8 @@ public class ChatResponseDto {
     private String userNickName;
     private LocalDateTime chattedAt;
     private List<ChatImgRepDto> images;
+    private Integer unreadCount;
+    private boolean deleted;
+    private List<Integer> readUsers;
 
 }

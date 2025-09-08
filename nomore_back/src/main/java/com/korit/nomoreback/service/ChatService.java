@@ -1,9 +1,7 @@
 package com.korit.nomoreback.service;
 
-import com.korit.nomoreback.domain.chat.Chat;
-import com.korit.nomoreback.domain.chat.ChatImg;
-import com.korit.nomoreback.domain.chat.ChatImgMapper;
-import com.korit.nomoreback.domain.chat.ChatMapper;
+import com.korit.nomoreback.domain.chat.*;
+import com.korit.nomoreback.domain.moim.MoimMapper;
 import com.korit.nomoreback.domain.user.User;
 import com.korit.nomoreback.domain.user.UserMapper;
 import com.korit.nomoreback.dto.chat.ChatImgRepDto;
@@ -28,6 +26,9 @@ public class ChatService {
     private final ChatMapper chatMapper;
     private final UserMapper userMapper;
     private final ChatImgMapper chatImgMapper;
+    private final ChatReadMapper chatReadMapper;
+
+    private MoimMapper moimMapper;
 
     private final ImageUrlUtil imageUrlUtil;
     private final PrincipalUtil principalUtil;
@@ -93,25 +94,6 @@ public class ChatService {
         return userMapper.findById(userId);
     }
 
-//    public void deleteChat(Integer chatId) {
-//        Integer userId = principalUtil.getPrincipalUser().getUser().getUserId();
-//
-//        Chat chat = chatMapper.findByChatId(chatId);
-//
-//        User user = userMapper.findById(userId);
-//
-//        if (chat == null) {
-//            throw new IllegalArgumentException("존재하지 않는 채팅입니다.");
-//        }
-//
-//        if (!chat.getUserNickName().equals(user.getNickName())){
-//            throw new IllegalArgumentException("본인 채팅만 삭제 가능");
-//        }
-//
-//        chatMapper.deleteChatById(chatId);
-//        chatImgMapper.deleteByChatId(chatId);
-//    }
-
     public void softDelete(Integer chatId) {
         Integer userId = principalUtil.getPrincipalUser().getUser().getUserId();
 
@@ -129,4 +111,78 @@ public class ChatService {
 
         chatMapper.softDeleteChat(chatId);
     }
+
+    // WebSocket용
+    public boolean readUser(Integer chatId, Integer userId) {
+        int result = chatReadMapper.insertRead(new ChatRead(chatId, userId));
+        return result > 0;
+    }
+
+    // REST API용
+    public boolean readUser(Integer chatId) {
+        Integer userId = principalUtil.getPrincipalUser().getUser().getUserId();
+        return readUser(chatId, userId); // 위 메서드 재사용
+    }
+
+    public List<Integer> readList(Integer chatId) {
+        return chatReadMapper.selectReadUser(chatId);
+    }
+
+    public int getUnreadCount(Integer moimId, Integer chatId) {
+        int totalMembers = moimMapper.countMemberByMoimId(moimId);
+
+        // 읽은 사람 수
+        int readCount = chatReadMapper.countUserByChatId(chatId);
+
+        // 안 읽은 사람 수 = 전체 - 읽은
+        return totalMembers - readCount;
+    }
+    public List<ChatResponseDto> getChatsWithUnreadCount(Integer moimId, Integer limit, Integer offset) {
+        List<Chat> chats = chatMapper.getMessages(moimId,limit,offset);
+        List<ChatResponseDto> result = new ArrayList<>();
+
+        int totalMembers = moimMapper.countMemberByMoimId(moimId); // 모임 총 인원수
+
+        for (Chat chat : chats) {
+            int readCount = chatReadMapper.countUserByChatId(chat.getChatId());
+            int unreadCount = totalMembers - readCount;
+
+            result.add(ChatResponseDto.builder()
+                    .chatId(chat.getChatId())
+                    .chattingContent(chat.getChattingContent())
+                    .userNickName(chat.getUserNickName())
+                    .chattedAt(chat.getChattedAt())
+                    .unreadCount(unreadCount) // ✅ unreadCount 추가
+                    .build());
+        }
+        return result;
+    }
+    @Transactional
+    public ChatResponseDto softDeleteAndReturnDto(Integer chatId) {
+        Integer userId = principalUtil.getPrincipalUser().getUser().getUserId();
+
+        Chat chat = chatMapper.findByChatId(chatId);
+        if (chat == null) {
+            throw new IllegalArgumentException("존재하지 않는 채팅입니다.");
+        }
+
+        User user = userMapper.findById(userId);
+        if (!chat.getUserNickName().equals(user.getNickName())) {
+            throw new IllegalArgumentException("본인 채팅만 삭제 가능");
+        }
+
+        // DB에서 soft delete
+        chatMapper.softDeleteChat(chatId);
+
+        // 삭제된 메시지 DTO 반환
+        return ChatResponseDto.builder()
+                .chatId(chat.getChatId())
+                .chattingContent("삭제된 메시지입니다.")
+                .userNickName(chat.getUserNickName())
+                .chattedAt(chat.getChattedAt())
+                .images(List.of()) // 삭제된 메시지는 이미지 없음
+                .deleted(true)
+                .build();
+    }
+
 }

@@ -83,6 +83,7 @@ export const MyMessageItem = css`
   padding: 8px 12px;
   border-radius: 16px;
   max-width: 60%;
+  flex-shrink: 0;    
   word-break: break-word;
 
   strong {
@@ -97,6 +98,7 @@ export const OtherUserMessage = css`
   padding: 8px 12px;
   border-radius: 16px;
   max-width: 60%;
+  flex-shrink: 0;
   word-break: break-word;
 `;
 
@@ -441,4 +443,11 @@ export const reportButton = css`
   &:hover {
     background-color: #ff475720;
   }
+`;
+
+export const DateSeparator = css`
+  text-align: center;
+  font-size: 12px;
+  color: #888;
+  margin: 12px 0;
 `;
