@@ -2,11 +2,11 @@ import api from './axios';
 
 export const reqAllUser = async () => api.get('/api/user/admin');
 
+export const deleteUser = async (userId) => api.delete(`/api/user/${userId}`);
+
 export const reqBlockUser = async (userId) => api.put(`/api/user/banUser?userId=${userId}`);
 
 export const reqUnBlockUser = async (userId) => api.put(`/api/user/liftBanUser?userId=${userId}`);
-
-export const deleteUser = async (userId) => api.delete(`/api/user/${userId}`);
 
 export const reqUserMoims = async (userId) => {
     return await api.get(`/api/user/admin/user/${userId}/moims`);
