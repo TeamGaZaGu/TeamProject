@@ -2,7 +2,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import SockJS from 'sockjs-client';
 import { Client } from '@stomp/stompjs';
-import Slider from "react-slick";
 import * as s from './styles';
 import { reqGetMessages } from '../../api/chatApi';
 import { reqMoimUserList } from '../../api/moimApi';
@@ -46,11 +45,13 @@ function ChattingPage({ moimId }) {
 
   const principalQuery = usePrincipalQuery();
   const userObj = principalQuery?.data?.data?.user;
-  const userBlockListQuery = useUserBlockListQuery(userObj.userId);
+  const userBlockListQuery = useUserBlockListQuery(userObj?.userId);
   const userBlockList = userBlockListQuery?.data?.data?.body; 
   const isBlockedUser = userBlockList?.includes(selectedUser?.userId);
 
-
+  // // 🔹 읽음 기능 state (메시지별 읽은 유저 목록)
+  // const [readUsersMap, setReadUsersMap] = useState({}); 
+  // // 예: { 101: [3, 5], 102: [1, 3, 5] }
 
   if (!moimId || isNaN(moimIdNum)) return <div>올바른 채팅방 ID가 필요합니다.</div>;
   if (!userObj) return <div>사용자 정보를 가져오는 중...</div>;
@@ -66,59 +67,58 @@ function ChattingPage({ moimId }) {
   };
 
   const handleOpenUserModal = (member) => {
-        setSelectedUser(member);
-        setIsUserModalOpen(true);
-    }
-
+    setSelectedUser(member);
+    setIsUserModalOpen(true);
+  }
   const handleCloseUserModal = () => {
-      setIsUserModalOpen(false);
-      setSelectedUser(null);
+    setIsUserModalOpen(false);
+    setSelectedUser(null);
   }    
   const handleModalBackdropClick = (e) => {
-      if (e.target === e.currentTarget) {
-          handleCloseUserModal();
-      }
+    if (e.target === e.currentTarget) {
+      handleCloseUserModal();
+    }
   }
   const handleReportUserOnClick = () => {
-      setReportTargetType(1);
-      setReportTargetId(selectedUser.userId);
-      setIsReportModalOpen(true);
+    setReportTargetType(1);
+    setReportTargetId(selectedUser.userId);
+    setIsReportModalOpen(true);
   }
   const handleCloseReportModal = () => {
-        setIsReportModalOpen(false);
-        setSelectedReason('');
-        setCustomReason('');
-        setReportTargetType(3);
-        setReportTargetId(null);
-    }
+    setIsReportModalOpen(false);
+    setSelectedReason('');
+    setCustomReason('');
+    setReportTargetType(3);
+    setReportTargetId(null);
+  }
 
-      const reportReasons = [
-      '스팸 / 광고성 활동',
-      '욕설 / 비방 / 혐오 발언',
-      '음란물 / 불건전한 내용',
-      '사기 / 도용 / 사칭',
-      '불법 행위 (범죄, 불법거래 등)',
-      '기타'
+  const reportReasons = [
+    '스팸 / 광고성 활동',
+    '욕설 / 비방 / 혐오 발언',
+    '음란물 / 불건전한 내용',
+    '사기 / 도용 / 사칭',
+    '불법 행위 (범죄, 불법거래 등)',
+    '기타'
   ];
   const handleSubmitReport = async () => {
-        if (!selectedReason) return alert('신고 사유를 선택해주세요.');
-        if (selectedReason === '기타' && !customReason.trim()) return alert('기타 사유를 입력해주세요.');
+    if (!selectedReason) return alert('신고 사유를 선택해주세요.');
+    if (selectedReason === '기타' && !customReason.trim()) return alert('기타 사유를 입력해주세요.');
 
-        try {
-            const reportData = {
-                userId,
-                targetType: reportTargetType,
-                targetId: reportTargetId,
-                reason: selectedReason === '기타' ? customReason : selectedReason
-            };
-            await submitReport(reportData);
-            toast.success('신고가 접수되었습니다');
-            handleCloseReportModal();
-        } catch (error) {
-            console.error('신고 제출 실패:', error);
-            toast.error('신고 제출에 실패했습니다.');
-        }
+    try {
+      const reportData = {
+        userId,
+        targetType: reportTargetType,
+        targetId: reportTargetId,
+        reason: selectedReason === '기타' ? customReason : selectedReason
+      };
+      await submitReport(reportData);
+      toast.success('신고가 접수되었습니다');
+      handleCloseReportModal();
+    } catch (error) {
+      console.error('신고 제출 실패:', error);
+      toast.error('신고 제출에 실패했습니다.');
     }
+  }
 
   const handleScroll = async () => {
     if (!chatContainerRef.current || isLoading || !hasMore) return;
@@ -147,32 +147,41 @@ function ChattingPage({ moimId }) {
   };
 
   const handleToggleUserBlock = async (targetUserId, nickName) => {
-          const action = isBlockedUser ? '차단해제' : '차단';
-          const isConfirmed = window.confirm(`"${nickName}" 님을 ${action}하시겠습니까?`);
-          if (!isConfirmed) return;
-  
-          try {
-              if (isBlockedUser) await reqUserUnBlock(targetUserId);
-              else await reqUserBlock(targetUserId);
-              await queryClient.invalidateQueries(['userBlockList', userId]);
-          } catch (error) {
-              console.log(`사용자 ${action} 실패:`, error);
-              alert(`${action}에 실패했습니다. 다시 시도해주세요.`);
-          }
-      }
+    const action = isBlockedUser ? '차단해제' : '차단';
+    const isConfirmed = window.confirm(`"${nickName}" 님을 ${action}하시겠습니까?`);
+    if (!isConfirmed) return;
 
-  useEffect(() => {
-    async function fetchInitial() {
-      try {
-        const res = await reqGetMessages(moimIdNum, 0, 50);
-        setMessages(res.data.reverse());
-        setTimeout(() => {
-          messageEndRef.current?.scrollIntoView({ behavior: "auto" });
-        }, 100);
-      } catch (err) {
-        console.error('과거 메시지 불러오기 실패:', err);
-      }
+    try {
+      if (isBlockedUser) await reqUserUnBlock(targetUserId);
+      else await reqUserBlock(targetUserId);
+      await queryClient.invalidateQueries(['userBlockList', userObj.userId]);
+    } catch (error) {
+      console.log(`사용자 ${action} 실패:`, error);
+      alert(`${action}에 실패했습니다. 다시 시도해주세요.`);
     }
+  }
+
+    // 🔹 초기 메시지 불러오기
+  useEffect(() => {
+  async function fetchInitial() {
+    try {
+      const res = await reqGetMessages(moimIdNum, 0, 50);
+      const messages = res.data.reverse();
+      setMessages(messages);
+
+      // 🔹 각 메시지에 대해 현재 사용자 읽음 처리
+      messages.forEach(msg => {
+        stompClientRef.current?.publish({
+          destination: `/pub/chat/${moimIdNum}/read`,
+          body: JSON.stringify({ chatId: msg.chatId, userId: userObj.userId }),
+        });
+      });
+
+      setTimeout(() => messageEndRef.current?.scrollIntoView({ behavior: 'auto' }), 100);
+    } catch (err) {
+      console.error('과거 메시지 불러오기 실패:', err);
+    }
+  }
     async function fetchMembers() {
       try {
         const res = await reqMoimUserList(moimIdNum);
@@ -185,64 +194,109 @@ function ChattingPage({ moimId }) {
     fetchMembers();
   }, [moimIdNum]);
 
-  useEffect(() => {
-    const stompClient = new Client({
-      brokerURL: undefined,
-      webSocketFactory: () =>
-        new SockJS(
-          `http://192.168.2.17:8080/ws?access_token=${localStorage.getItem(
-            'AccessToken'
-          )}&moimId=${moimIdNum}&userId=${userObj.userId}`
-        ),
-      connectHeaders: {
-        moimId: moimIdNum,
-        userId: userObj.userId,
-      },
-      reconnectDelay: 5000,
+// 🔹 WebSocket 연결 및 읽음 처리
+// 🔹 WebSocket 연결 및 읽음 처리 (initRead 포함)
+useEffect(() => {
+  if (!members.length) return; // 멤버 정보 없으면 skip
+
+  const stompClient = new Client({
+    brokerURL: undefined,
+    webSocketFactory: () =>
+      new SockJS(
+        `http://192.168.2.17:8080/ws?access_token=${localStorage.getItem('AccessToken')}&moimId=${moimIdNum}&userId=${userObj.userId}`
+      ),
+    connectHeaders: { moimId: moimIdNum, userId: userObj.userId },
+    reconnectDelay: 5000,
+  });
+
+  stompClient.onConnect = () => {
+    console.log('✅ WebSocket connected');
+
+  
+
+    // 🔹 채팅 수신
+  stompClient.subscribe(`/sub/chat/${moimIdNum}`, (msg) => {
+  const chatMessage = JSON.parse(msg.body);
+  chatMessage.readUsers = chatMessage.readUsers || []; // 🔹 추가
+  setMessages(prev => [...prev, chatMessage]);
+
+  // 본인이 읽음 표시
+  stompClient.publish({
+    destination: `/pub/chat/${moimIdNum}/read`,
+    body: JSON.stringify({ chatId: chatMessage.chatId, userId: userObj.userId }),
+  });
+
+  setTimeout(() => messageEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 50);
+});
+  // 🔹 읽음 이벤트 수신
+stompClient.subscribe(`/sub/chat/${moimIdNum}/read`, (msg) => {
+  const { chatId, readUserId } = JSON.parse(msg.body); // 🔹 readUsers -> readUserId
+  setMessages(prev =>
+    prev.map(m => {
+      if (m.chatId === chatId) {
+        const readUsers = m.readUsers || [];
+        if (!readUsers.includes(readUserId)) readUsers.push(readUserId);
+        return { ...m, readUsers }; // 🔹 readUsers 업데이트
+      }
+      return m;
+    })
+  );
+});
+    // 🔹 삭제 이벤트
+    stompClient.subscribe(`/sub/chat/delete`, (msg) => {
+      const deletedChat = JSON.parse(msg.body);
+      setMessages(prev =>
+        prev.map(m => (m.chatId === deletedChat.chatId ? { ...m, ...deletedChat } : m))
+      );
     });
 
-    stompClient.onConnect = () => {
-      console.log('✅ WebSocket connected');
+    // 🔹 온라인 상태
+    stompClient.subscribe(`/sub/chat/${moimIdNum}/online`, (msg) => {
+      const onlineData = JSON.parse(msg.body);
+      setOnlineUsers(onlineData.map(id => Number(id)));
+    });
 
-      // 메시지 수신
-      stompClient.subscribe(`/sub/chat/${moimIdNum}`, (msg) => {
-        const chatMessage = JSON.parse(msg.body);
-        setMessages(prev => [...prev, chatMessage]);
-        if (chatMessage.userNickName === userObj.nickName) {
-          setTimeout(() => {
-            messageEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-          }, 50);
-        }
-      });
+    // 🔹 ✅ 초기 메시지 read 처리 (initRead)
+    stompClient.publish({
+      destination: `/pub/chat/${moimIdNum}/initRead`,
+      headers: { userId: userObj.userId },
+    });
 
-      // 삭제 이벤트 수신 → deleted=true로 처리
-      stompClient.subscribe(`/sub/chat/delete`, (msg) => {
-        const deletedChatId = Number(msg.body);
-        setMessages(prev =>
-          prev.map(m =>
-            m.chatId === deletedChatId ? { ...m, deleted: true } : m
-          )
-        );
-      });
+    // 🔹 온라인 상태 브로드캐스트
+    stompClient.publish({ destination: `/pub/chat/${moimIdNum}/online` });
+  };
 
-      // 온라인 상태
-      stompClient.subscribe(`/sub/chat/${moimIdNum}/online`, (msg) => {
-        const onlineData = JSON.parse(msg.body);
-        setOnlineUsers(onlineData.map((id) => Number(id)));
-      });
-      stompClient.publish({ destination: `/pub/chat/${moimIdNum}/online` });
-    };
+  stompClient.activate();
+  stompClientRef.current = stompClient;
 
-    stompClient.activate();
-    stompClientRef.current = stompClient;
-
-    return () => {
-      stompClientRef.current.publish({
+  return () => {
+    try {
+      stompClientRef.current?.publish({
         destination: `/pub/chat/${moimIdNum}/${userObj.userId}/offline`,
       });
-      stompClient.deactivate();
-    };
-  }, [moimIdNum, userObj.userId, userObj.nickName]);
+    } catch {}
+    stompClient.deactivate();
+  };
+}, [moimIdNum, userObj.userId, members]);
+
+// 2️⃣ 기존 메시지 초기 읽음 처리
+// useEffect(() => {
+//   if (!stompClientRef.current || messages.length === 0) return;
+
+//   messages.forEach(msg => {
+//     if (msg.chatId && msg.unreadCount === undefined) {
+//       try {
+//         stompClientRef.current.publish({
+//           destination: `/pub/chat/${moimIdNum}/read`,
+//           body: JSON.stringify({ chatId: msg.chatId, userId: userObj.userId }),
+//         });
+//       } catch (e) {
+//         console.error('초기 메시지 읽음 publish 실패:', e);
+//       }
+//     }
+//   });
+// }, [messages, moimIdNum, userObj.userId]);
+
 
   const handleFileUpload = async (fileList) => {
     if (!fileList || fileList.length === 0) return [];
@@ -294,7 +348,6 @@ function ChattingPage({ moimId }) {
         method: 'DELETE',
         headers: { Authorization: localStorage.getItem('AccessToken') },
       });
-      // WebSocket에서 삭제 이벤트 받으면 메시지 state에서 deleted=true로 변경
     } catch (err) {
       console.error('채팅 삭제 실패:', err);
     }
@@ -305,6 +358,8 @@ function ChattingPage({ moimId }) {
     return member ? member.profileImgPath : null;
   };
 
+
+
   return (
     <div css={s.PageContainer}>
       {/* 유저 리스트 */}
@@ -313,6 +368,7 @@ function ChattingPage({ moimId }) {
           const isMe = member.userId === userObj.userId;
           const isOnline = onlineUsers.includes(member.userId);
           const circleColor = isMe ? 'blue' : isOnline ? 'green' : 'gray';
+          
           return (
             <div key={member.userId} css={s.UserItem}>
               <img 
@@ -321,7 +377,7 @@ function ChattingPage({ moimId }) {
                 css={s.UserProfileImage}
                 onClick={() => handleOpenUserModal(member)}
                 style={{cursor: 'pointer'}}
-               />
+              />
               <div css={s.UserDetails}>
                 <span>{member.nickName}</span>
                 <span css={s.RoleTag}>{member.moimRole === 'OWNER' ? '👑 방장' : '👤 멤버'}</span>
@@ -336,116 +392,144 @@ function ChattingPage({ moimId }) {
       <div css={s.ChatContainer}>
         <div css={s.MessageList} ref={chatContainerRef} onScroll={handleScroll}>
           {messages.map((msg, idx) => {
-            const isCurrentUser = msg.userNickName === userObj.nickName;
-            const hasText = msg.chattingContent && msg.chattingContent.trim() !== '';
-            const hasImages = msg.images && msg.images.length > 0;
+          const isCurrentUser = msg.userNickName === userObj.nickName;
+          const hasText = msg.chattingContent && msg.chattingContent.trim() !== '';
+          const hasImages = msg.images && msg.images.length > 0;
+          const prevMsg = idx > 0 ? messages[idx - 1] : null;
+          const formatDate = (dateString) => {
+          const date = new Date(dateString);
+          const month = String(date.getMonth() + 1).padStart(2, '0'); // 월 2자리
+          const day = String(date.getDate()).padStart(2, '0'); // 일 2자리
+          return `${month}월 ${day}일`;
+        };
 
-            const prevMsg = idx > 0 ? messages[idx - 1] : null;
-            const showProfileAndName =
-              !isCurrentUser &&
-              (!prevMsg || prevMsg.userNickName !== msg.userNickName);
+// map 안에서 사용
+const currentDate = formatDate(msg.chattedAt);
+const prevDate = prevMsg ? formatDate(prevMsg.chattedAt) : null;
+  const showProfileAndName =
+    !isCurrentUser &&
+    (!prevMsg || prevMsg.userNickName !== msg.userNickName);
 
-            return (
+  // 🔹 읽음 수 계산
+const unreadCount = (members?.length || 0) - (msg.readUsers?.length || 0); 
+  return (
+    <div
+      key={msg.chatId}
+      style={{ marginBottom: '12px' }}
+      onClick={() =>
+        setHoveredMessageId(prev => (prev === msg.chatId ? null : msg.chatId))
+      }
+          >
+            {currentDate !== prevDate && (
+        <div css={s.DateSeparator}>
+          {currentDate}
+        </div>
+      )}
+      {showProfileAndName && (
+        <div style={{ fontSize: '12px',  marginBottom: '2px', color: '#444', display: 'flex', alignItems: 'center', gap: 6 }}>
+          <img
+            src={findUserProfile(msg.userNickName) || '/default-profile.png'}
+            alt="프로필"
+            style={{ width:'32px', height:'32px', borderRadius:'50%' }}
+          />
+          <span>{msg.userNickName}</span>
+        </div>
+      )}
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: isCurrentUser ? 'row-reverse' : 'row',
+          alignItems: 'flex-end',
+          marginBottom: '12px',
+          gap: '8px', // 버튼과 메시지 사이 간격
+        }}
+      >
+        
+
+        {/* 메시지 내용 */}
+        {msg.deleted ? (
+          <div css={isCurrentUser ? s.MyMessageItem : s.OtherUserMessage}>삭제된 메시지입니다.</div>
+        ) : (
+          <div css={isCurrentUser ? s.MyMessageItem : s.OtherUserMessage}
+          style={{
+                  backgroundColor: hasText ? (isCurrentUser ? '#fef01b' : '#ffffff') : 'transparent'
+                }}>
+            {hasText && msg.chattingContent}
+            {hasImages && (
               <div
-                key={idx}
-                style={{ 
-                  marginBottom: '12px'
-                 }}
-                onMouseEnter={() => setHoveredMessageId(msg.chatId)}
-                onMouseLeave={() => setHoveredMessageId(null)}
+                style={{
+                  display: 'flex',
+                  backgroundColor:'transparent',
+                  flexWrap: 'wrap',
+                  flexDirection: 'row-reverse',
+                  gap: '4px',
+                  marginTop: hasText ? '6px' : '0',
+                  maxWidth: 'calc(120px * 3 + 8px)',
+                }}
               >
-                {showProfileAndName && (
-                  
-                  <div style={{ fontSize: '12px',  marginBottom: '2px', color: '#444' }}>
-                     <img
-                        src={findUserProfile(msg.userNickName) || '/default-profile.png'}
-                        alt="프로필"
-                        style={{
-                          width:'40px',
-                          borderRadius:'50%',
-                          gap:'5px'
-                        }}
-                      />
-                    {msg.userNickName}
-                  </div>
-                )}
-
-                <div css={isCurrentUser ?  s.MyMessageWrapper : s.OtherMessageWrapper}>
-                  {isCurrentUser &&  hoveredMessageId === msg.chatId && !msg.deleted && (
-                    <button
-                      onClick={() => deleteChat(msg.chatId)}
-                      style={{ 
-                        marginRight: '8px', 
-                        cursor: 'pointer', 
-                        fontSize: '12px', 
-                        color: 'black',
-                        backgroundColor:'transparent',
-                        border:'none'
-                      }}
-                    >
-                      삭제
-                    </button>
-                  )}
-
-                  {msg.deleted ? (
-                    <div
-                      css={isCurrentUser ? s.MyMessageItem : s.OtherUserMessage}
-                      // style={{ fontStyle: 'italic', color: '#888' }}
-                    >
-                      삭제된 메시지입니다.
-                      {msg.chattedAt && (
-                        <span css={s.Timestamp}>
-                          {new Date(msg.chattedAt).toLocaleTimeString()}
-                        </span>
-                      )}
-                    </div>
-                  ) : (
-                    <>
-                      {hasText && (
-                        <div css={isCurrentUser ? s.MyMessageItem : s.OtherUserMessage}>
-                          {msg.chattingContent}
-                          {msg.chattedAt && (
-                            <span css={s.Timestamp}>
-                              {new Date(msg.chattedAt).toLocaleTimeString()}
-                            </span>
-                          )}
-                        </div>
-                      )}
-
-                      {hasImages && (
-                        <div
-                          style={{
-                            display: 'flex',
-                            flexWrap: 'wrap',
-                            flexDirection: 'row-reverse',
-                            gap: '4px',
-                            marginTop: hasText ? '6px' : '0',
-                            maxWidth: 'calc(120px * 3 + 8px)',
-                          }}
-                        >
-                          {msg.images.map((img, i) => (
-                            <img
-                              key={i}
-                              src={img.path}
-                              alt="chat-img"
-                              style={{
-                                width: '120px',
-                                height: '120px',
-                                objectFit: 'cover',
-                                borderRadius: '6px',
-                                cursor: 'pointer',
-                              }}
-                              onClick={() => openLightbox(msg.images, i)}
-                            />
-                          ))}
-                        </div>
-                      )}
-                    </>
-                  )}
-                </div>
+                {msg.images.map((img, i) => (
+                  <img
+                    key={i}
+                    src={img.path}
+                    alt="chat-img"
+                    style={{
+                      width: '120px',
+                      height: '120px',
+                      objectFit: 'cover',
+                      borderRadius: '6px',
+                      cursor: 'pointer',
+                    }}
+                    onClick={() => openLightbox(msg.images, i)}
+                  />
+                ))}
               </div>
-            );
-          })}
+            )}
+          </div>
+        )}
+        {/* 삭제 버튼 */}
+        {isCurrentUser && hoveredMessageId === msg.chatId && !msg.deleted && (
+          <button
+            onClick={() => deleteChat(msg.chatId)}
+            style={{
+              cursor: 'pointer',
+              fontSize: '12px',
+              color: 'black',
+              backgroundColor: 'transparent',
+              border: 'none',
+            }}
+          >
+            삭제
+          </button>
+        )}
+
+                      {/* 🔹 시간 + 읽음 수 (측면 표시, 삭제 메시지 제외) */}
+                      {!msg.deleted && (
+  <div style={{
+    display: 'flex',
+    flexDirection: isCurrentUser ? 'row-reverse' : 'row',
+    alignItems: 'center',
+    gap: '6px',
+    fontSize: '10px',
+    color: '#666',
+    marginTop: '2px',
+  }}>
+    {unreadCount > 0 && (
+      <span style={{ fontWeight: 'bold', color: 'red' }}>{unreadCount}</span>
+    )}
+    {msg.chattedAt && (
+      <span>
+        {new Date(msg.chattedAt).toLocaleTimeString([], {
+          hour: '2-digit',
+          minute: '2-digit',
+        })}
+      </span>
+    )}
+  </div>
+)}
+                  </div>
+                </div>
+              );
+            })}
           <div ref={messageEndRef}></div>
         </div>
 
@@ -458,16 +542,19 @@ function ChattingPage({ moimId }) {
             placeholder="메시지를 입력하세요"
           />
           <label htmlFor="imageUpload" 
-          style={{ 
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            cursor: 'pointer',
-            padding: '0 12px',
-            background: '#eee',
-            borderRadius: '6px',
-            marginLeft: '8px',
-          }}>파일</label>
+            style={{ 
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              cursor: 'pointer',
+              padding: '0 12px',
+              background: '#eee',
+              borderRadius: '6px',
+              marginLeft: '8px',
+            }}
+          >
+            파일
+          </label>
           <input
             type="file"
             id="imageUpload"
@@ -506,98 +593,99 @@ function ChattingPage({ moimId }) {
           <button onClick={sendMessage}>전송</button>
         </div>
       </div>
+      
 
       {isUserModalOpen && selectedUser && (
         <div css={s.modalOverlay} onClick={handleModalBackdropClick}>
-            <div css={s.modalContent}>
-                <div css={s.modalHeader}>
-                    <h3>사용자 프로필</h3>
-                    <div css={s.modalHeaderButtons}>
-                        <button css={s.reportButton} onClick={handleReportUserOnClick}>
-                            <MdReport />
-                        </button>
-                        <button css={s.closeButton} onClick={handleCloseUserModal}>
-                            <IoClose />
-                        </button>
-                    </div>
-                </div>
-                <div css={s.modalBody}>
-                    <div css={s.userProfile}>
-                        <img
-                            src={`${selectedUser.profileImgPath}`}
-                            alt="프로필"
-                            css={s.modalProfileImageLarge}
-                        />
-                        <div css={s.userDetails}>
-                            <div css={s.userNameRow}>
-                                <h4>{selectedUser.nickName}</h4>
-                                {selectedUser.birthDate && <div>{selectedUser.birthDate}</div>}
-                            </div>
-                            <div css={s.userCategory}>
-                                {categories?.find(category => category.categoryId === selectedUser.categoryId)?.categoryEmoji}
-                                {categories?.find(category => category.categoryId === selectedUser.categoryId)?.categoryName}
-                            </div>
-                            {selectedUser.introduction && (
-                                <p css={s.userIntroduction}>{selectedUser.introduction}</p>
-                            )}
-                            <div css={s.modalButtonContainer}>
-                                <button onClick={() => handleToggleUserBlock(selectedUser.userId, selectedUser.nickName)}>
-                                    {isBlockedUser ? '차단 해제' : '차단하기'}
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+          <div css={s.modalContent}>
+            <div css={s.modalHeader}>
+              <h3>사용자 프로필</h3>
+              <div css={s.modalHeaderButtons}>
+                <button css={s.reportButton} onClick={handleReportUserOnClick}>
+                  <MdReport />
+                </button>
+                <button css={s.closeButton} onClick={handleCloseUserModal}>
+                  <IoClose />
+                </button>
+              </div>
             </div>
-        </div>
-    )}
-
-    {isReportModalOpen && (
-      <div css={s.reportModalOverlay} onClick={(e) => e.target === e.currentTarget && handleCloseReportModal()}>
-          <div css={s.reportModalContent}>
-              <div css={s.reportModalHeader}>
-                  <h3>
-                      {reportTargetType === 3 ? '게시글 신고' : 
-                        reportTargetType === 4 ? '댓글 신고' : '사용자 신고'}
-                  </h3>
-                  <button css={s.closeButton} onClick={handleCloseReportModal}>
-                      <IoClose />
-                  </button>
-              </div>
-              <div css={s.reportModalBody}>
-                  <p css={s.reportModalDescription}>신고 사유를 선택해주세요:</p>
-                  <div css={s.reasonList}>
-                      {reportReasons.map((reason, index) => (
-                          <label key={index} css={s.reasonItem}>
-                              <input
-                                  type="radio"
-                                  name="reportReason"
-                                  value={reason}
-                                  checked={selectedReason === reason}
-                                  onChange={() => handleReasonChange(reason)}
-                              />
-                              <span css={s.reasonText}>{reason}</span>
-                          </label>
-                      ))}
+            <div css={s.modalBody}>
+              <div css={s.userProfile}>
+                <img
+                  src={`${selectedUser.profileImgPath}`}
+                  alt="프로필"
+                  css={s.modalProfileImageLarge}
+                />
+                <div css={s.userDetails}>
+                  <div css={s.userNameRow}>
+                    <h4>{selectedUser.nickName}</h4>
+                    {selectedUser.birthDate && <div>{selectedUser.birthDate}</div>}
                   </div>
-                  {selectedReason === '기타' && (
-                      <textarea
-                          css={s.customReasonInput}
-                          placeholder="기타 사유를 입력해주세요..."
-                          value={customReason}
-                          onChange={(e) => setCustomReason(e.target.value)}
-                          maxLength={200}
-                      />
+                  <div css={s.userCategory}>
+                    {categories?.find(category => category.categoryId === selectedUser.categoryId)?.categoryEmoji}
+                    {categories?.find(category => category.categoryId === selectedUser.categoryId)?.categoryName}
+                  </div>
+                  {selectedUser.introduction && (
+                    <p css={s.userIntroduction}>{selectedUser.introduction}</p>
                   )}
-                  <div css={s.reportModalFooter}>
-                      <button css={s.submitReportButton} onClick={handleSubmitReport}>
-                          신고하기
-                      </button>
+                  <div css={s.modalButtonContainer}>
+                    <button onClick={() => handleToggleUserBlock(selectedUser.userId, selectedUser.nickName)}>
+                      {isBlockedUser ? '차단 해제' : '차단하기'}
+                    </button>
                   </div>
+                </div>
               </div>
+            </div>
           </div>
-      </div>
-  )}
+        </div>
+      )}
+
+      {isReportModalOpen && (
+        <div css={s.reportModalOverlay} onClick={(e) => e.target === e.currentTarget && handleCloseReportModal()}>
+          <div css={s.reportModalContent}>
+            <div css={s.reportModalHeader}>
+              <h3>
+                {reportTargetType === 3 ? '게시글 신고' : 
+                 reportTargetType === 4 ? '댓글 신고' : '사용자 신고'}
+              </h3>
+              <button css={s.closeButton} onClick={handleCloseReportModal}>
+                <IoClose />
+              </button>
+            </div>
+            <div css={s.reportModalBody}>
+              <p css={s.reportModalDescription}>신고 사유를 선택해주세요:</p>
+              <div css={s.reasonList}>
+                {reportReasons.map((reason, index) => (
+                  <label key={index} css={s.reasonItem}>
+                    <input
+                      type="radio"
+                      name="reportReason"
+                      value={reason}
+                      checked={selectedReason === reason}
+                      onChange={() => setSelectedReason(reason)}
+                    />
+                    <span css={s.reasonText}>{reason}</span>
+                  </label>
+                ))}
+              </div>
+              {selectedReason === '기타' && (
+                <textarea
+                  css={s.customReasonInput}
+                  placeholder="기타 사유를 입력해주세요..."
+                  value={customReason}
+                  onChange={(e) => setCustomReason(e.target.value)}
+                  maxLength={200}
+                />
+              )}
+              <div css={s.reportModalFooter}>
+                <button css={s.submitReportButton} onClick={handleSubmitReport}>
+                  신고하기
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Lightbox */}
       {isLightboxOpen && (
@@ -649,37 +737,37 @@ function ChattingPage({ moimId }) {
                     )
                   }
                   style={{
-                      position: 'fixed',
-                      top: '50%',
-                      left: '5%',
-                      transform: 'translateY(-50%)',
-                      fontSize: '48px',
-                      background: 'transparent',
-                      border: 'none',
-                      color: 'white',
-                      cursor: 'pointer',
-                    }}
+                    position: 'fixed',
+                    top: '50%',
+                    left: '5%',
+                    transform: 'translateY(-50%)',
+                    fontSize: '48px',
+                    background: 'transparent',
+                    border: 'none',
+                    color: 'white',
+                    cursor: 'pointer',
+                  }}
                 >
                   ◀
                 </button>
-                 <button
-                    onClick={() =>
-                      setCurrentLightboxIndex((prev) =>
-                        prev === lightboxImages.length - 1 ? 0 : prev + 1
-                      )
-                    }
-                    style={{
-                      position: 'fixed',
-                      top: '50%',
-                      right: '5%',
-                      transform: 'translateY(-50%)',
-                      fontSize: '48px',
-                      background: 'transparent',
-                      border: 'none',
-                      color: 'white',
-                      cursor: 'pointer',
-                    }}
-                  >
+                <button
+                  onClick={() =>
+                    setCurrentLightboxIndex((prev) =>
+                      prev === lightboxImages.length - 1 ? 0 : prev + 1
+                    )
+                  }
+                  style={{
+                    position: 'fixed',
+                    top: '50%',
+                    right: '5%',
+                    transform: 'translateY(-50%)',
+                    fontSize: '48px',
+                    background: 'transparent',
+                    border: 'none',
+                    color: 'white',
+                    cursor: 'pointer',
+                  }}
+                >
                   ▶
                 </button>
               </>

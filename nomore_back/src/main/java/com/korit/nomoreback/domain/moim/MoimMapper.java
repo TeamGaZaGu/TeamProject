@@ -29,4 +29,6 @@ public interface MoimMapper {
     List<Moim> myMoimList(Integer userId);
 
     List<Moim> findMoimsByUserId(@Param("userId") Integer userId);
+
+    int countMemberByMoimId(@Param("moimId") Integer moimId);
 }

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.korit.nomoreback.domain.chat.ChatReadMapper">
+
+    <insert id="insertRead">
+        INSERT IGNORE INTO chat_read_tb (chat_id, user_id)
+        VALUES (#{chatId}, #{userId})
+        ON DUPLICATE KEY UPDATE user_id = VALUES(user_id)
+    </insert>
+
+    <select id="selectReadUser" resultType="java.lang.Integer">
+        select user_id
+        from chat_read_tb
+        where chat_id = #{chatId}
+    </select>
+
+    <select id="countUserByChatId" resultType="java.lang.Integer">
+        SELECT COUNT(*)
+        FROM chat_read_tb
+        WHERE chat_id = #{chatId}
+    </select>
+
+
+</mapper>

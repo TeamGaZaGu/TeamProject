@@ -19,37 +19,37 @@
 
     <insert id="createMoim" useGeneratedKeys="true" keyProperty="moimId">
         INSERT INTO moim_tb (
-            moim_title,
-            moim_discription,
-            moim_max_member,
-            moim_member_count,
-            moim_img_path,
-            district_id,
-            category_id,
-            user_id
+        moim_title,
+        moim_discription,
+        moim_max_member,
+        moim_member_count,
+        moim_img_path,
+        district_id,
+        category_id,
+        user_id
         ) VALUES (
-            #{title},
-            #{discription},
-            #{maxMember},
-            1,
-            #{moimImgPath},
-            #{districtId},
-            #{categoryId},
-            #{userId}
+        #{title},
+        #{discription},
+        #{maxMember},
+        1,
+        #{moimImgPath},
+        #{districtId},
+        #{categoryId},
+        #{userId}
         )
     </insert>
 
     <update id="updateMoimCount">
         UPDATE
-            moim_tb mt
+        moim_tb mt
         SET
-            mt.moim_member_count = (
-                SELECT COUNT(*)
-                FROM moim_role_tb mrt
-                WHERE mrt.moim_id = mt.moim_id
-            )
+        mt.moim_member_count = (
+        SELECT COUNT(*)
+        FROM moim_role_tb mrt
+        WHERE mrt.moim_id = mt.moim_id
+        )
         WHERE
-            mt.moim_id = #{moimId}
+        mt.moim_id = #{moimId}
     </update>
 
     <update id="updateMoim">
@@ -72,88 +72,88 @@
 
     <select id="findMoimId" resultMap="MoimResultMap">
         SELECT
-            mt.moim_id,
-            mt.moim_title,
-            mt.moim_discription,
-            mt.moim_member_count,
-            mt.moim_max_member,
-            mt.moim_img_path,
-            mt.district_id,
-            mt.category_id,
-            mt.user_id,
+        mt.moim_id,
+        mt.moim_title,
+        mt.moim_discription,
+        mt.moim_member_count,
+        mt.moim_max_member,
+        mt.moim_img_path,
+        mt.district_id,
+        mt.category_id,
+        mt.user_id,
 
-            dt.district_id,
-            dt.district_name
+        dt.district_id,
+        dt.district_name
         FROM
-            moim_tb mt
-            left outer join district_tb dt on(dt.district_id = mt.district_id)
+        moim_tb mt
+        left outer join district_tb dt on(dt.district_id = mt.district_id)
         WHERE
-            mt.moim_id = #{moimId}
+        mt.moim_id = #{moimId}
     </select>
 
     <select id="findAll" resultMap="MoimResultMap">
         select
-            mt.moim_id,
-            mt.moim_title,
-            mt.moim_discription,
-            mt.moim_member_count,
-            mt.moim_max_member,
-            mt.district_id as mt_district_id,
-            mt.category_id,
-            mt.user_id,
-            mt.moim_img_path,
+        mt.moim_id,
+        mt.moim_title,
+        mt.moim_discription,
+        mt.moim_member_count,
+        mt.moim_max_member,
+        mt.district_id as mt_district_id,
+        mt.category_id,
+        mt.user_id,
+        mt.moim_img_path,
 
-            dt.district_id,
-            dt.district_name
+        dt.district_id,
+        dt.district_name
         from
-            moim_tb mt
-            join district_tb dt on(dt.district_id = mt.district_id)
+        moim_tb mt
+        join district_tb dt on(dt.district_id = mt.district_id)
     </select>
 
     <select id="findMoimByUserId" resultMap="MoimResultMap">
         SELECT
-            m.moim_id,
-            m.moim_title,
-            m.moim_discription,
-            m.moim_member_count,
-            m.moim_img_path,
-            m.category_id
+        m.moim_id,
+        m.moim_title,
+        m.moim_discription,
+        m.moim_member_count,
+        m.moim_img_path,
+        m.category_id
         FROM
-            moim_tb m
+        moim_tb m
         JOIN
-            user_tb u ON m.category_id = u.category_id
+        user_tb u ON m.category_id = u.category_id
         WHERE
-            u.user_id = #{userId}
+        u.user_id = #{userId}
     </select>
 
     <select id="findMoimByCategoryId" resultType="com.korit.nomoreback.domain.moim.Moim">
         SELECT
-            moim_id,
-            moim_title,
-            moim_discription,
-            moim_member_count,
-            moim_img_path
+        moim_id,
+        moim_title,
+        moim_discription,
+        moim_member_count,
+        moim_img_path
         FROM
-            moim_tb
+        moim_tb
         WHERE
-            (#{categoryId} = 1 OR category_id = #{categoryId})
+        (#{categoryId} = 1 OR category_id = #{categoryId})
     </select>
 
     <select id="searchMoim" parameterType="com.korit.nomoreback.dto.moim.MoimSearchReqDto" resultType="com.korit.nomoreback.dto.moim.MoimListRespDto">
         SELECT
-            m.moim_id AS moimId,
-            m.moim_title AS moimTitle,
-            m.moim_discription AS moimDiscription,
-            m.moim_member_count AS moimMemberCount,
-            m.moim_max_member AS moimMaxMember,
-            m.district_id AS districtId, d.district_name AS districtName,
-            m.category_id AS categoryId, c.category_name AS categoryName,
-            m.user_id AS userId, u.nick_name AS nickName,
-            m.moim_img_path AS moimImagePath
+        m.moim_id AS moimId,
+        m.moim_title AS moimTitle,
+        m.moim_discription AS moimDiscription,
+        m.moim_member_count AS moimMemberCount,
+        m.moim_max_member AS moimMaxMember,
+        m.district_id AS districtId, d.district_name AS districtName,
+        m.category_id AS categoryId, c.category_name AS categoryName,
+        m.user_id AS userId, u.nick_name AS nickName,
+        m.moim_img_path AS moimImagePath
         FROM moim_tb m
-            JOIN district_tb d ON m.district_id = d.district_id
-            JOIN category_tb c ON m.category_id = c.category_id
-            JOIN user_tb u ON m.user_id = u.user_id
+        JOIN district_tb d ON m.district_id = d.district_id
+        JOIN category_tb c ON m.category_id = c.category_id
+        JOIN user_tb u ON m.user_id = u.user_id
         <where>
             <if test="districtId != null">
                 m.district_id = #{districtId}
@@ -172,87 +172,92 @@
                 AND (m.moim_title LIKE CONCAT('%', #{keyword}, '%') OR m.moim_discription LIKE CONCAT('%', #{keyword}, '%'))
             </if>
         </where>
-            ORDER BY m.moim_id DESC
+        ORDER BY m.moim_id DESC
     </select>
 
     <select id="moimUserList" resultType="com.korit.nomoreback.domain.user.User">
         select
-            ut.*,
-            mrt.moim_role
+        ut.*,
+        mrt.moim_role
         from
-            moim_role_tb mrt
-            join user_tb ut on(ut.user_id = mrt.user_id)
+        moim_role_tb mrt
+        join user_tb ut on(ut.user_id = mrt.user_id)
         where
-            mrt.moim_id = #{moimId};
+        mrt.moim_id = #{moimId};
     </select>
 
     <select id="findAllOfOptions" resultMap="MoimResultMap">
         select
-            mt.moim_id,
-            mt.moim_title,
-            mt.moim_discription,
-            mt.moim_member_count,
-            mt.moim_max_member,
-            mt.district_id as mt_district_id,
-            mt.category_id,
-            mt.user_id,
-            mt.moim_img_path,
+        mt.moim_id,
+        mt.moim_title,
+        mt.moim_discription,
+        mt.moim_member_count,
+        mt.moim_max_member,
+        mt.district_id as mt_district_id,
+        mt.category_id,
+        mt.user_id,
+        mt.moim_img_path,
 
-            dt.district_id,
-            dt.district_name
+        dt.district_id,
+        dt.district_name
         from
-            moim_tb mt
-            left outer join district_tb dt on(dt.district_id = mt.district_id)
+        moim_tb mt
+        left outer join district_tb dt on(dt.district_id = mt.district_id)
         where
-            1 = 1
-            <if test="categoryId != null and categoryId != 1">
-                and category_id = #{categoryId}
-            </if>
-            <if test="districtId != null and districtId != 1">
-                and mt.district_id = #{districtId}
-            </if>
-            <if test="searchText != null and searchText != ''">
-                and (moim_title like concat('%', #{searchText}, '%') or moim_discription like concat('%', #{searchText}, '%'))
-            </if>
+        1 = 1
+        <if test="categoryId != null and categoryId != 1">
+            and category_id = #{categoryId}
+        </if>
+        <if test="districtId != null and districtId != 1">
+            and mt.district_id = #{districtId}
+        </if>
+        <if test="searchText != null and searchText != ''">
+            and (moim_title like concat('%', #{searchText}, '%') or moim_discription like concat('%', #{searchText}, '%'))
+        </if>
         limit #{startIndex}, #{size}
     </select>
 
     <select id="getCountOfOptions" resultType="java.lang.Integer">
         select
-            count(*)
+        count(*)
         from
-            moim_tb mt
+        moim_tb mt
         where
-            1 = 1
-            <if test="categoryId != null and categoryId != 1">
-                and category_id = #{categoryId}
-            </if>
-            <if test="districtId != null and districtId != 1">
-                and mt.district_id = #{districtId}
-            </if>
-            <if test="searchText != null and searchText != ''">
-                and (moim_title = concat('%', #{searchText}, '%') or moim_discription = concat('%', #{searchText}, '%'))
-            </if>
+        1 = 1
+        <if test="categoryId != null and categoryId != 1">
+            and category_id = #{categoryId}
+        </if>
+        <if test="districtId != null and districtId != 1">
+            and mt.district_id = #{districtId}
+        </if>
+        <if test="searchText != null and searchText != ''">
+            and (moim_title = concat('%', #{searchText}, '%') or moim_discription = concat('%', #{searchText}, '%'))
+        </if>
     </select>
 
     <select id="myMoimList" resultMap="MoimResultMap">
         select
-            mt.*,
-            dt.district_name
+        mt.*,
+        dt.district_name
         from
-            moim_tb mt
-            inner join moim_role_tb mrt on(mrt.moim_id = mt.moim_id)
-            join district_tb dt on(dt.district_id = mt.district_id)
+        moim_tb mt
+        inner join moim_role_tb mrt on(mrt.moim_id = mt.moim_id)
+        join district_tb dt on(dt.district_id = mt.district_id)
         where
-            mrt.user_id = #{userId}
+        mrt.user_id = #{userId}
     </select>
 
     <select id="findMoimsByUserId" resultMap="MoimResultMap">
         select m.*
-            from moim_tb m
-            join moim_role_tb mr ON m.moim_id = mr.moim_id
-            left join district_tb dt ON m.district_id = dt.district_id
+        from moim_tb m
+        join moim_role_tb mr ON m.moim_id = mr.moim_id
+        left join district_tb dt ON m.district_id = dt.district_id
         where mr.user_id = #{userId}
         order by m.moim_id DESC
+    </select>
+    <select id="countMemberByMoimId" resultType="java.lang.Integer">
+        select moim_member_count
+        from moim_tb
+        where moim_id = #{moimId}
     </select>
 </mapper>
