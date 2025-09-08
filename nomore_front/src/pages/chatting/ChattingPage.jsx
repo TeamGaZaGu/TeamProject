@@ -216,6 +216,34 @@ function ChattingPage({ moimId }) {
     fetchMembers();
   }, [moimId]);
 
+useEffect(() => {
+  if (!stompClientRef.current) return;
+
+  // ✅ WebSocket 구독 (실시간 반영)
+  const subscription = stompClientRef.current.subscribe(
+    `/sub/chat/${moimIdNum}/online`,
+    (msg) => {
+      const onlineData = JSON.parse(msg.body); // [ "1", "2", "3" ] 이런 식
+      setOnlineUsers(onlineData.map((id) => Number(id)));
+    }
+  );
+
+  // ✅ Polling 보강 (5초마다 REST API 요청)
+  const interval = setInterval(async () => {
+    try {
+      const res = await api.get(`/api/chat/${moimIdNum}/onlineUsers`);
+      setOnlineUsers(res.data);
+    } catch (err) {
+      console.error("온라인 유저 리스트 가져오기 실패:", err);
+    }
+  }, 5000);
+
+  return () => {
+    subscription.unsubscribe();
+    clearInterval(interval);
+  };
+}, [moimIdNum]);
+
   useEffect(() => {
   const interval = setInterval(async () => {
     try {
@@ -247,6 +275,8 @@ useEffect(() => {
     console.log('✅ WebSocket connected');
 
   
+
+    
 
     // 🔹 채팅 수신
   stompClient.subscribe(`/sub/chat/${moimIdNum}`, (msg) => {
