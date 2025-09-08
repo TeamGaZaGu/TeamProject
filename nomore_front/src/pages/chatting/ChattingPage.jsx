@@ -161,6 +161,28 @@ function ChattingPage({ moimId }) {
     }
   }
 
+  useEffect(() => {
+  const interval = setInterval(async () => {
+    try {
+      const res = await reqGetMessages(moimIdNum, 0, 50);
+      const serverMessages = res.data.reverse();
+
+      // 클라이언트 메시지 상태와 비교해서 갱신
+      setMessages(prev => {
+        // 메시지가 갯수나 내용이 다르면 업데이트
+        if (JSON.stringify(prev) !== JSON.stringify(serverMessages)) {
+          return serverMessages;
+        }
+        return prev;
+      });
+    } catch (err) {
+      console.error("메시지 리패치 실패:", err);
+    }
+  }, 5000); // 🔹 5초마다 최신화
+
+  return () => clearInterval(interval);
+}, [moimIdNum]);
+
     // 🔹 초기 메시지 불러오기
   useEffect(() => {
   async function fetchInitial() {
@@ -192,8 +214,20 @@ function ChattingPage({ moimId }) {
     }
     fetchInitial();
     fetchMembers();
-  }, [moimIdNum]);
+  }, [moimId]);
 
+  useEffect(() => {
+  const interval = setInterval(async () => {
+    try {
+      const res = await api.get(`/api/chat/${moimId}/users`); 
+      setOnlineUsers(res.data); 
+    } catch (err) {
+      console.error("유저 리스트 리패치 실패:", err);
+    }
+  }, 5000);
+
+  return () => clearInterval(interval);
+}, [moimId]);
 // 🔹 WebSocket 연결 및 읽음 처리
 // 🔹 WebSocket 연결 및 읽음 처리 (initRead 포함)
 useEffect(() => {
@@ -403,6 +437,7 @@ stompClient.subscribe(`/sub/chat/${moimIdNum}/read`, (msg) => {
           return `${month}월 ${day}일`;
         };
 
+        
 // map 안에서 사용
 const currentDate = formatDate(msg.chattedAt);
 const prevDate = prevMsg ? formatDate(prevMsg.chattedAt) : null;
