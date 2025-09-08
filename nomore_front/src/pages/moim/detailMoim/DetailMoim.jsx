@@ -2,7 +2,7 @@
     import * as s from './styles.js';
     import React, { useEffect, useState } from 'react';
     import { useNavigate, useSearchParams } from 'react-router-dom';
-    import { reqDeleteMoim, reqExitMoim, reqJoinMoim, reqMoimBanUserList, reqMoimUserList, reqSelectMoim } from '../../../api/moimApi.js';
+    import { reqDeleteMoim, reqExitMoim, reqJoinMoim, reqMoimBanUserList, reqMoimUserBan, reqMoimUserList, reqSelectMoim } from '../../../api/moimApi.js';
     import useCategoryQuery from '../../../queries/useCategoryQuery.jsx';
     import { IoChatbubbleEllipses, IoChatbubbleEllipsesOutline, IoClipboard, IoClipboardOutline, IoClose } from 'react-icons/io5';
     import { RiHome7Fill, RiHome7Line } from 'react-icons/ri';
@@ -159,6 +159,34 @@
                 }
             }
         }
+
+        const handleKickUserOnClick = async (userId, nickName) => {
+
+            const isConfirmed = window.confirm(`"${nickName}" 님을 강퇴하시겠습니까?`);
+            
+            if (!isConfirmed) {
+                return;
+            }
+
+            try {
+                await reqMoimUserBan(moimId, userId);
+                alert(`${nickName}님을 강퇴했습니다.`);
+                handleCloseModal();
+
+                const [userResponse, moimResponse] = await Promise.all([
+                    reqMoimUserList(moimId),
+                    reqSelectMoim(moimId)
+                ]);
+                
+                setUserList(userResponse?.data);
+                setMoim(moimResponse.data);
+            
+            } catch(error) {
+                console.log('강퇴 실패:', error);
+                alert('강퇴에 실패했습니다. 다시 시도해주세요.');
+            }
+        }
+
 
         // 모임 수정 페이지로 이동
         const handleNavigateToEdit = () => {
@@ -733,7 +761,7 @@
                                             
                                             {userList.find(u => u.userId === userId)?.moimRole === "OWNER" && 
                                             selectedUser.userId !== userId && (
-                                                <button css={s.modalKickButton} onClick={() => {}}>
+                                                <button css={s.modalKickButton} onClick={() => handleKickUserOnClick(selectedUser.userId, selectedUser.nickName)}>
                                                     강퇴하기
                                                 </button>
                                             )}
