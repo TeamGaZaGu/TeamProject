@@ -140,14 +140,16 @@ public class ChattingController {
         return ResponseEntity.noContent().build();
     }
 
-    // WebSocket: 온라인 유저 리스트 조회
+    // WebSocket: 온라인 유저 리스트 조회/갱신
     @MessageMapping("/chat/{moimId}/online")
     public void getOnlineUserList(@DestinationVariable Integer moimId) {
         Set<Integer> userSet = chatOnlineUsersState.getOnlineUsersByMoim().get(moimId);
-        if (userSet != null && !userSet.isEmpty()) {
-            template.convertAndSend("/sub/chat/" + moimId + "/online",
-                    userSet.stream().map(String::valueOf).toList());
-        }
+
+        // 🔥 null일 경우 빈 리스트라도 무조건 브로드캐스트
+        template.convertAndSend(
+                "/sub/chat/" + moimId + "/online",
+                userSet == null ? List.of() : userSet.stream().map(String::valueOf).toList()
+        );
     }
 
     // WebSocket: 유저 오프라인 처리
@@ -155,6 +157,13 @@ public class ChattingController {
     public void userOffline(@DestinationVariable Integer moimId,
                             @DestinationVariable Integer userId) {
         chatOnlineUsersState.removeOnlineUserByMoimId(moimId, userId);
+
+        // 🔥 오프라인 반영 후 즉시 브로드캐스트
+        Set<Integer> userSet = chatOnlineUsersState.getOnlineUsersByMoim().get(moimId);
+        template.convertAndSend(
+                "/sub/chat/" + moimId + "/online",
+                userSet == null ? List.of() : userSet.stream().map(String::valueOf).toList()
+        );
     }
 
     @PostMapping("/{chatId}/read")
