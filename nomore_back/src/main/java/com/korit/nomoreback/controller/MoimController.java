@@ -128,4 +128,17 @@ public class MoimController {
             return ResponseEntity.ok(errorResponse);
         }
     }
+
+    @PostMapping("/{moimId}/transfer-ownership")
+    public ResponseEntity<?> transferOwnership(@PathVariable Integer moimId, @RequestBody Map<String, Object> requestBody) {
+        try {
+            Integer targetUserId = (Integer) requestBody.get("targetUserId");
+            Integer currentUserId = principalUtil.getPrincipalUser().getUser().getUserId();
+
+            moimService.transferOwnership(moimId, currentUserId, targetUserId);
+            return ResponseEntity.ok("권한이 성공적으로 이양되었습니다.");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 }

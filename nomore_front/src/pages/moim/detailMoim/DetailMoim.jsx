@@ -2,7 +2,7 @@
     import * as s from './styles.js';
     import React, { useEffect, useState } from 'react';
     import { useNavigate, useSearchParams } from 'react-router-dom';
-    import { reqDeleteMoim, reqExitMoim, reqJoinMoim, reqMoimBanUserList, reqMoimUserBan, reqMoimUserList, reqSelectMoim } from '../../../api/moimApi.js';
+    import { reqDeleteMoim, reqExitMoim, reqJoinMoim, reqMoimBanUserList, reqMoimUserBan, reqMoimUserList, reqSelectMoim, reqTransferOwnership } from '../../../api/moimApi.js';
     import useCategoryQuery from '../../../queries/useCategoryQuery.jsx';
     import { IoChatbubbleEllipses, IoChatbubbleEllipsesOutline, IoClipboard, IoClipboardOutline, IoClose } from 'react-icons/io5';
     import { RiHome7Fill, RiHome7Line } from 'react-icons/ri';
@@ -223,26 +223,11 @@
             if (!isConfirmed) return;
 
             try {
-                const response = await fetch(`http://localhost:8080/api/moim/transfer-ownership/${moimId}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ 
-                        newOwnerId: targetUser.userId,
-                        currentUserId: userId 
-                    })
-                });
-
-                if (response.ok) {
-                    alert('권한이 성공적으로 이양되었습니다.');
-                    await fetchMoimUserList();
-                    await fetchMoim();
-                    handleCloseModal();
-                } else {
-                    const errorText = await response.text();
-                    alert(errorText);
-                }
+                const response = await reqTransferOwnership(moimId, targetUser.userId);
+                alert('권한이 성공적으로 이양되었습니다.');
+                await fetchMoimUserList();
+                await fetchMoim();
+                handleCloseModal();
             } catch (error) {
                 console.error('권한 이양 실패:', error);
                 alert('권한 이양에 실패했습니다.');
