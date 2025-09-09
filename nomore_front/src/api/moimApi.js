@@ -30,7 +30,9 @@ export const reqMoimBanUserList = async (moimId) => await api.get(`/api/moim/${m
 
 export const reqMyMoimList = async (userId) => await api.get(`/api/moim/${userId}/moims`);
 
-export const reqTransferOwnership = (moimId, targetUserId) => api.post(`/api/moim/${moimId}/transfer-ownership`, { targetUserId });
+export const reqTransferOwnership = async (moimId, targetUserId) => {
+    return await api.post(`/api/moim/${moimId}/transfer-ownership`, { targetUserId });
+};
 
 export const reqCheckUserIsOwner = async () => {
     try {
