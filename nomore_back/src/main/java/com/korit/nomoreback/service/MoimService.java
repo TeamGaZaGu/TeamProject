@@ -116,8 +116,12 @@ public class MoimService {
 
     public Moim findMoim (Integer moimId) {
         moimMapper.updateMoimCount(moimId);
-        Moim findMoim = moimMapper.findMoimId(moimId).buildImageUrl(imageUrlUtil);
-        return findMoim;
+        Moim findMoim = moimMapper.findMoimId(moimId);
+        if (findMoim == null) {
+            return  null;
+        }
+        Moim moim = findMoim.buildImageUrl(imageUrlUtil);
+        return moim;
     }
 
     public void modifyMoim(MoimModifyDto modifyDto) {

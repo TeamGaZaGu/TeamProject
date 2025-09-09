@@ -14,6 +14,7 @@ import com.korit.nomoreback.security.model.PrincipalUtil;
 import com.korit.nomoreback.service.MoimBanService;
 import com.korit.nomoreback.service.MoimService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -52,8 +53,14 @@ public class MoimController {
 
     @GetMapping("/{moimId}/select")
     public ResponseEntity<?> selectMoim(@PathVariable Integer moimId) {
-        return ResponseEntity.ok(moimService.findMoim(moimId));
+        moimMapper.updateMoimCount(moimId);
+        Moim moim = moimService.findMoim(moimId);
+        if (moim == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("모임을 찾을 수 없습니다");
+        }
+        return ResponseEntity.ok(moim);
     }
+
 
 
     @GetMapping("/find")
