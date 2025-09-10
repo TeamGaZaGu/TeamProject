@@ -60,5 +60,5 @@ jobs:
       - name: build react app
         run: |
           cd nomore_front
-          docker build --build-arg SERVERNAME=${{ env.BUID_MODE }} -t ${{ env.DOCKER_USERNAME }}/react-app:latest .
+          docker build --build-arg SERVERNAME=${{ env.BUILD_MODE }} -t ${{ env.DOCKER_USERNAME }}/react-app:latest .
           docker push ${{ env.DOCKER_USERNAME }}/react-app:latest
