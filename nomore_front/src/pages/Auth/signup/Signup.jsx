@@ -6,6 +6,7 @@ import toast, { Toaster } from 'react-hot-toast';
 import useCategoryQuery from '../../../queries/useCategoryQuery.jsx';
 import { reqAuthorizationPublic, reqSignup } from '../../../api/authApi.js';
 import * as s from './styles.js';
+import { baseURL } from '../../../api/axios.js';
 
 function Signup() {
   const navigate = useNavigate();
@@ -106,7 +107,7 @@ function Signup() {
     try {
       await reqSignup(inputValue);
       toast.success("회원가입 완료!");
-      window.location.href = `http://localhost:8080/oauth2/authorization/${provider}`;
+      window.location.href = `${baseURL}/oauth2/authorization/${provider}`;
     } catch (error) {
       const errorMessage = error.response.data.body.nickName;
       toast.error(errorMessage);

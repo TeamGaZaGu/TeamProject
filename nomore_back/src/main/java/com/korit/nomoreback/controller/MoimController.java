@@ -80,7 +80,7 @@ public class MoimController {
     }
 
     @GetMapping("/{moimId}/users")
-    public ResponseEntity<List<User>> moimUserList(@RequestParam Integer moimId) {
+    public ResponseEntity<List<User>> moimUserList(@PathVariable Integer moimId) {
         return ResponseEntity.ok(moimService.moimUserList(moimId));
     }
 

@@ -6,6 +6,10 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "build:kyushul": "vite build --mode kyuchul",
+    "build:jaewon": "vite build --mode jaewon",
+    "build:jinhyuk": "vite build --mode jinhyuk",
+    "build:deaung": "vite build --mode deaung",
     "lint": "eslint .",
     "preview": "vite preview"
   },

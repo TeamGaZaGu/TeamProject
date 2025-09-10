@@ -2,16 +2,17 @@
 import * as s from './styles';
 import { FcGoogle } from 'react-icons/fc';
 import { SiKakaotalk } from 'react-icons/si';
+import { baseURL } from '../api/axios';
 
 function Oauth2({ customStyle }) {
 
 
     const handleGoogleOnClick = () => {
-        window.location.href = "http://localhost:8080/oauth2/authorization/google";
+        window.location.href = `${baseURL}/oauth2/authorization/google`;
     };
 
     const handleKakaoOnClick = () => {
-        window.location.href = "http://localhost:8080/oauth2/authorization/kakao";
+        window.location.href = `${baseURL}/oauth2/authorization/kakao`;
     };
 
     return (

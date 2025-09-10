@@ -3,6 +3,52 @@ spring:
     active: local
     group:
       local: local-server, common, secret
+      kyuchul: kyuchul-server, common, secret
+      jaewon: jaewon-server, common, secret
+      jinhyuk: jinhyuk-server, common, secret
+      daewoong: deaung-server, common, secret
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: kyuchul-server
+
+app:
+  web-host: "https://imtheking.store"
+  server-host: "https://imtheking.store"
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: jaewon-server
+
+app:
+  web-host: "https://meetyou.store"
+  server-host: "https://meetyou.store"
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: jinhyuk-server
+
+app:
+  server-host: "https://meetuu.store"
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: deaung-server
+
+app:
+  server-host: "https://deaung.store"
 
 ---
 
@@ -12,8 +58,39 @@ spring:
       on-profile: local-server
 
 app:
+  web-host: "http://localhost:5173"
   server-host: "http://localhost:8080"
-#  server-host: "http://192.168.2.17:8080"
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: common
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            redirect-uri: "${app.server-host}/login/oauth2/code/google"
+          kakao:
+            redirect-uri: "${app.server-host}/login/oauth2/code/kakao"
+
+  datasource:
+    url: jdbc:mysql://mysql.cj6okecyk9qf.ap-northeast-2.rds.amazonaws.com:3306/team_project
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+      enabled: true
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
+  type-aliases-package: com.korit.nomoreback.domain.entity
+
+app:
   image-configs:
     profile:
       prefix: "${app.server-host}/image/profile"
@@ -31,24 +108,4 @@ app:
       prefix: "${app.server-host}/image/chat"
       dir-path: "${user.dir}/upload/chat"
       default-img: "default.jpg"
----
-
-spring:
-  config:
-    activate:
-      on-profile: common
-
-  datasource:
-    url: jdbc:mysql://mysql.cj6okecyk9qf.ap-northeast-2.rds.amazonaws.com:3306/team_project
-    driver-class-name: com.mysql.cj.jdbc.Driver
-  servlet:
-    multipart:
-      max-file-size: 100MB
-      max-request-size: 100MB
-      enabled: true
-mybatis:
-  mapper-locations: classpath:mapper/*.xml
-  configuration:
-    map-underscore-to-camel-case: true
-  type-aliases-package: com.korit.nomoreback.domain.entity
 

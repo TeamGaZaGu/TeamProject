@@ -50,12 +50,12 @@ public class SecurityConfig {
             auth.requestMatchers("/api/auth/**").permitAll();
             auth.requestMatchers("/image/**").permitAll();
             auth.requestMatchers("/api/search/**").permitAll();
-            auth.requestMatchers("/api/category/**").permitAll();
-            auth.requestMatchers("/api/forum/**").permitAll();
-            auth.requestMatchers("/api/moim/**").permitAll();
+            auth.requestMatchers("/api/categories/**").permitAll();
+            auth.requestMatchers("/api/forums/**").permitAll();
+            auth.requestMatchers("/api/moims/**").permitAll();
             auth.requestMatchers("/api/admin/**").hasRole("ADMIN");
             auth.requestMatchers("/ws/**").permitAll();
-            auth.requestMatchers("/api/user/**").permitAll();
+            auth.requestMatchers("/api/users/**").permitAll();
             auth.requestMatchers("/api/chat/").permitAll();
             auth.anyRequest().authenticated();
         });

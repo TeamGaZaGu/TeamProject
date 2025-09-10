@@ -4,6 +4,7 @@ import com.korit.nomoreback.domain.user.User;
 import com.korit.nomoreback.security.jwt.JwtUtil;
 import com.korit.nomoreback.security.model.PrincipalUser;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -19,6 +20,8 @@ import java.nio.charset.StandardCharsets;
 @RequiredArgsConstructor
 public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
+    @Value("${app.web-host}")
+    private String webhost;
     private final JwtUtil jwtUtil;
 
     @Override
@@ -35,12 +38,12 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
             String providerId = URLEncoder.encode(user.getProviderId(), StandardCharsets.UTF_8);
             String publicToken = jwtUtil.generatePublicToken(1000 * 60 * 5);
             System.out.println("리다이렉트: 회원가입 페이지");
-            String redirectUrl = String.format("http://localhost:5173/auth/signup?email=%s&name=%s&provider=%s&providerId=%s&publicToken=%s" ,email,name,provider, providerId, publicToken);
+            String redirectUrl = String.format("%s/auth/signup?email=%s&name=%s&provider=%s&providerId=%s&publicToken=%s" ,webhost ,email,name,provider, providerId, publicToken);
             response.sendRedirect(redirectUrl);
         } else {
             System.out.println("리다이렉트: 메인페이지");
             String accessToken = jwtUtil.generateAccessToken(principalUser.getUser());
-            response.sendRedirect("http://localhost:5173/oauth2/login?accessToken=" + accessToken);
+            response.sendRedirect(webhost + "/oauth2/login?accessToken=" + accessToken);
         }
     }
 }
