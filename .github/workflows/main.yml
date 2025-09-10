@@ -21,10 +21,10 @@ jobs:
         github.ref_name == 'deploy_deaung' && secrets.DOCKER_PASSWORD_DEAUNG
         }}
       APPLICATION_SECRET: ${{
-        github.ref_name == 'deploy_kyuchul' && secrets.DOCKER_SECRET_KYUCHUL  ||
-        github.ref_name == 'deploy_jaewon' && secrets.DOCKER_SECRET_JAEWON  ||
-        github.ref_name == 'deploy_jinhyuk' && secrets.DOCKER_SECRET_JINHYUK  ||
-        github.ref_name == 'deploy_deaung' && secrets.DOCKER_SECRET_DEAUNG
+        github.ref_name == 'deploy_kyuchul' && secrets.APPLICATION_SECRET_KYUCHUL  ||
+        github.ref_name == 'deploy_jaewon' && secrets.APPLICATION_SECRET_JAEWON  ||
+        github.ref_name == 'deploy_jinhyuk' && secrets.APPLICATION_SECRET_JINHYUK  ||
+        github.ref_name == 'deploy_deaung' && secrets.APPLICATION_SECRET_DEAUNG
         }}
         
     steps:
