@@ -20,7 +20,19 @@ jobs:
         github.ref_name == 'deploy_jinhyuk' && secrets.DOCKER_PASSWORD_JINHYUK  ||
         github.ref_name == 'deploy_deaung' && secrets.DOCKER_PASSWORD_DEAUNG
         }}
-
+      APPLICATION_SECRET: ${{
+        github.ref_name == 'deploy_kyuchul' && secrets.DOCKER_SECRET_KYUCHUL  ||
+        github.ref_name == 'deploy_jaewon' && secrets.DOCKER_SECRET_JAEWON  ||
+        github.ref_name == 'deploy_jinhyuk' && secrets.DOCKER_SECRET_JINHYUK  ||
+        github.ref_name == 'deploy_deaung' && secrets.DOCKER_SECRET_DEAUNG
+        }}
+      REACT_ENV: ${{
+        github.ref_name == 'deploy_kyuchul' && secrets.REACT_ENV_KYUCHUL  ||
+        github.ref_name == 'deploy_jaewon' && secrets.REACT_ENV_JAEWON  ||
+        github.ref_name == 'deploy_jinhyuk' && secrets.REACT_ENV_JINHYUK  ||
+        github.ref_name == 'deploy_deaung' && secrets.REACT_ENV_DEAUNG
+        }}
+        
     steps:
       - name: checkout
         uses: actions/checkout@v5.0.0
