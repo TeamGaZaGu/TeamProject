@@ -26,6 +26,12 @@ jobs:
         github.ref_name == 'deploy_jinhyuk' && secrets.APPLICATION_SECRET_JINHYUK  ||
         github.ref_name == 'deploy_deaung' && secrets.APPLICATION_SECRET_DEAUNG
         }}
+      BUILD_MODE: ${{
+        github.ref_name == 'deploy_kyuchul' && 'kyuchul' ||
+        github.ref_name == 'deploy_jaewon' &&  'jaewon' ||
+        github.ref_name == 'deploy_jinhyuk' && 'jinhyuk' ||
+        github.ref_name == 'deploy_deaung' && 'deaung'
+        }}
         
     steps:
       - name: checkout
@@ -54,7 +60,5 @@ jobs:
       - name: build react app
         run: |
           cd nomore_front
-          npm install
-          npm run build
-          docker build -t ${{ env.DOCKER_USERNAME }}/react-app:latest .
+          docker build --build-arg SERVERNAME=${{ env.BUID_MODE }} -t ${{ env.DOCKER_USERNAME }}/react-app:latest .
           docker push ${{ env.DOCKER_USERNAME }}/react-app:latest
