@@ -13,14 +13,14 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/search")
+@RequestMapping("/api")
 @CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 @RequiredArgsConstructor
 public class DistrictController {
 
     private final DistrictService districtService;
 
-    @GetMapping("/district")
+    @GetMapping("/districts")
     public List<District> searchDistrict(){
         return districtService.searchDistrict();
     }

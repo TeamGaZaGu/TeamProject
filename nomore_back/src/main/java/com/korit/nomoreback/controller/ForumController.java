@@ -12,14 +12,14 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/forum")
+@RequestMapping("/api/forums")
 @RequiredArgsConstructor
 public class ForumController {
 
     private final ForumService forumService;
     private final BlobService blobService;
 
-    @PostMapping(value = "/{moimId}/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/{moimId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> registerForum(@PathVariable Integer moimId ,
                                            @ModelAttribute ForumRegisterDto dto) {
         dto.setMoimId(moimId);
@@ -34,12 +34,12 @@ public class ForumController {
     }
 
 
-    @GetMapping("/forums")
+    @GetMapping("")
     public ResponseEntity<ResponseDto<?>> getForumList(ForumSearchReqDto dto) {
         return ResponseEntity.ok(ResponseDto.success(forumService.getForumsByMoimId(dto)));
     }
 
-    @GetMapping("/forums/blobs")
+    @GetMapping("/blobs")
     public ResponseEntity<byte[]> getImage(@RequestParam String url, @RequestParam String imageConfigsName) {
         System.out.println("url " + url);
         byte[] data = blobService.getBlob(url, imageConfigsName);
@@ -59,7 +59,7 @@ public class ForumController {
         return ResponseEntity.ok(froms);
     }
 
-    @PutMapping("/{forumId}/modify")
+    @PutMapping("/{forumId}")
     public ResponseEntity<?> modifyForum(@PathVariable Integer forumId,
                                          @ModelAttribute ForumModifyDto forumModifyDto) {
         System.out.println(forumModifyDto);
@@ -68,14 +68,14 @@ public class ForumController {
         return ResponseEntity.ok("수정 완료");
     }
 
-    @DeleteMapping("/{moimId}/{forumId}/delete")
+    @DeleteMapping("/{moimId}/{forumId}")
     public ResponseEntity<?> deleteForum(@PathVariable Integer moimId,
                                          @PathVariable Integer forumId){
         forumService.deleteForum(forumId,moimId);
         return ResponseEntity.ok("삭제 완료");
     }
 
-    @PostMapping("/{moimId}/{forumId}/comment")
+    @PostMapping("/{moimId}/{forumId}/comments")
     public ResponseEntity<?> registerComment(@PathVariable Integer moimId,
                                              @PathVariable Integer forumId,
                                              @RequestBody ForumCommentRegDto dto) {
@@ -94,7 +94,7 @@ public class ForumController {
         return ResponseEntity.ok("댓글 수정 완료");
     }
 
-    @GetMapping("/forumCategories")
+    @GetMapping("/categories")
     public ResponseEntity<?> getFourumCategories() {
         return ResponseEntity.ok(forumService.getFourumCategories());
     }
@@ -105,11 +105,9 @@ public class ForumController {
         return ResponseEntity.ok(ResponseDto.success(forumService.getCommentsByForumId(dto)));
     }
 
-    @DeleteMapping("/{moimId}/{forumId}/comment/delete/{forumCommentId}")
-    public ResponseEntity<?> deleteComment(@PathVariable Integer moimId,
-                                           @PathVariable Integer forumId,
-                                           @PathVariable Integer forumCommentId) {
-        forumService.deleteComment(forumCommentId,forumId, moimId);
+    @DeleteMapping("/comments/{forumCommentId}")
+    public ResponseEntity<?> deleteComment(@PathVariable Integer forumCommentId) {
+        forumService.deleteComment(forumCommentId);
         return ResponseEntity.ok("댓글 삭제 완료");
     }
 
@@ -119,7 +117,7 @@ public class ForumController {
         return ResponseEntity.ok("좋아요");
     }
 
-    @DeleteMapping("/{forumId}/dislike")
+    @DeleteMapping("/{forumId}/like")
     public ResponseEntity<?> dislike(@PathVariable Integer forumId) {
         forumService.dislike(forumId);
         return ResponseEntity.ok("좋아요 삭제 요청 완료");

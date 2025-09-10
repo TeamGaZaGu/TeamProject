@@ -14,19 +14,19 @@ public class ReportController {
 
     private final ReportService reportService;
 
-    @GetMapping("/report")
+    @GetMapping("/reports")
     public ResponseEntity<ResponseDto<?>> reqAllReport() {
         return ResponseEntity.ok(ResponseDto.success(reportService.reqAllReport()));
     }
 
-    @PutMapping("/report")
+    @PutMapping("/reports")
     public ResponseEntity<ResponseDto<?>> reportUser(@RequestBody ReportDto dto) {
         System.out.println(dto);
         reportService.reportUser(dto);
         return ResponseEntity.ok(ResponseDto.success("신고되었습니다."));
     }
 
-    @PostMapping("/report/{reportId}")
+    @PostMapping("/reports/{reportId}/complete")
     public ResponseEntity<ResponseDto<?>> reportComplete(@PathVariable Integer reportId) {
         reportService.reportComplete(reportId);
         return ResponseEntity.ok(ResponseDto.success("조치완료 되었습니다."));

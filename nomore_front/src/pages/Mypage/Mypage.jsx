@@ -7,7 +7,6 @@ import usePrincipalQuery from '../../queries/usePrincipalQuery';
 import { reqCheckUserIsOwner, reqMyMoimList } from '../../api/moimApi';
 import { useNavigate } from 'react-router-dom';
 import { deleteUser, reqModifyUserBlob } from '../../api/userApi';
-import { reqGetForumsWithParams } from '../../api/forumApi';
 import { useQueryClient } from '@tanstack/react-query';
 
 function Mypage(props) {
@@ -110,7 +109,7 @@ function Mypage(props) {
         formData.append("profileImgPath", modifyUser.profileImgPath.file)
 
         try {
-            await api.put("/api/user/profile", formData, {
+            await api.put("/api/users/profile", formData, {
                 headers: { "Content-Type": "multipart/form-data" }
             });
             await principalQuery.refetch();
