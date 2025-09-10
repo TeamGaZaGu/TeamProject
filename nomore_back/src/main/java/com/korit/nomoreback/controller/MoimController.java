@@ -14,6 +14,7 @@ import com.korit.nomoreback.security.model.PrincipalUtil;
 import com.korit.nomoreback.service.MoimBanService;
 import com.korit.nomoreback.service.MoimService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -52,9 +53,13 @@ public class MoimController {
 
     @GetMapping("/{moimId}")
     public ResponseEntity<?> selectMoim(@PathVariable Integer moimId) {
-        return ResponseEntity.ok(moimService.findMoim(moimId));
+        moimMapper.updateMoimCount(moimId);
+        Moim moim = moimService.findMoim(moimId);
+        if (moim == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("모임을 찾을 수 없습니다");
+        }
+        return ResponseEntity.ok(moim);
     }
-
 
     @GetMapping("/search")
     public ResponseEntity<ResponseDto<?>> findMoims(MoimCategoryReqDto dto) {
@@ -72,21 +77,6 @@ public class MoimController {
     public ResponseEntity<?> remove(@PathVariable Integer moimId) {
         moimService.deleteMoim(moimId);
         return ResponseEntity.ok("삭제 완");
-    }
-
-    @GetMapping("/search")
-    public ResponseEntity<List<MoimListRespDto>> searchMoim(
-            @RequestParam(required = false) Integer districtId,
-            @RequestParam(required = false) Integer categoryId,
-            @RequestParam(required = false) String keyword
-    ) {
-        MoimSearchReqDto searchReqDto = new MoimSearchReqDto();
-        searchReqDto.setDistrictId(districtId);
-        searchReqDto.setCategoryId(categoryId);
-        searchReqDto.setKeyword(keyword);
-
-        List<MoimListRespDto> moimList = moimService.searchMoim(searchReqDto);
-        return ResponseEntity.ok(moimList);
     }
 
     @GetMapping("/{moimId}/users")
@@ -126,6 +116,19 @@ public class MoimController {
             Map<String, Boolean> errorResponse = new HashMap<>();
             errorResponse.put("hasOwnerMoims", false);
             return ResponseEntity.ok(errorResponse);
+        }
+    }
+
+    @PostMapping("/{moimId}/transfer-ownership")
+    public ResponseEntity<?> transferOwnership(@PathVariable Integer moimId, @RequestBody Map<String, Object> requestBody) {
+        try {
+            Integer targetUserId = (Integer) requestBody.get("targetUserId");
+            Integer currentUserId = principalUtil.getPrincipalUser().getUser().getUserId();
+
+            moimService.transferOwnership(moimId, currentUserId, targetUserId);
+            return ResponseEntity.ok("권한이 성공적으로 이양되었습니다.");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 }

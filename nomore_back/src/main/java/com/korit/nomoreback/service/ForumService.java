@@ -69,10 +69,7 @@ public class ForumService {
         if (forum == null && hasAdminRole()) {
             forum = forumMapper.findByForumId(forumId);
         }
-
-        if (forum == null) {
-            throw new IllegalArgumentException("존재하지 않는 게시글이거나 접근 권한이 없습니다.");
-        }
+        
         List<ForumImg> forumImgs = forumImgMapper.findImgById(forum.getForumId());
         forumImgs.forEach(img -> img.buildImageUrl(imageUrlUtil));
         forum.setForumImgList(forumImgs);
@@ -82,13 +79,6 @@ public class ForumService {
     }
 
     public ForumSearchRespDto getForumsByMoimId(ForumSearchReqDto dto) {
-        Integer userId = getCurrentUser().getUserId();
-        Integer moimId = dto.getMoimId();
-
-        if (!hasAdminRole() && !moimRoleMapper.isMoimIdAndUserId(moimId, userId)) {
-            throw new IllegalArgumentException("게시판 접근 권한이 없습니다. 모임에 가입해주세요.");
-        }
-
         Integer totalElements = forumMapper.getCountOfOptions(dto.toOption());
         Integer totalPages = (int) Math.ceil(totalElements.doubleValue() / dto.getSize().doubleValue());
         List<Forum> foundForums = forumMapper.findAllOfOptions(dto.toOption());
@@ -111,12 +101,12 @@ public class ForumService {
                 .build();
     }
 
-    public List<Forum> getForumsByCategoryId(Integer moimId, Integer categoryId) {
-        Integer userId = getCurrentUser().getUserId();
+        public List<Forum> getForumsByCategoryId(Integer moimId, Integer categoryId) {
+            Integer userId = getCurrentUser().getUserId();
 
-        if (!hasAdminRole() && !moimRoleMapper.isMoimIdAndUserId(moimId, userId)) {
-            throw new IllegalArgumentException("게시판 접근 권한이 없습니다. 모임에 가입해주세요.");
-        }
+            if (!hasAdminRole() && !moimRoleMapper.isMoimIdAndUserId(moimId, userId)) {
+                throw new IllegalArgumentException("게시판 접근 권한이 없습니다. 모임에 가입해주세요.");
+            }
 
         return forumMapper.findByCategoryId(moimId, categoryId, userId);
     }

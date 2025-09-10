@@ -10,6 +10,7 @@ import com.korit.nomoreback.security.model.PrincipalUtil;
 import com.korit.nomoreback.util.ImageUrlUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -115,8 +116,12 @@ public class MoimService {
 
     public Moim findMoim (Integer moimId) {
         moimMapper.updateMoimCount(moimId);
-        Moim findMoim = moimMapper.findMoimId(moimId).buildImageUrl(imageUrlUtil);
-        return findMoim;
+        Moim findMoim = moimMapper.findMoimId(moimId);
+        if (findMoim == null) {
+            return  null;
+        }
+        Moim moim = findMoim.buildImageUrl(imageUrlUtil);
+        return moim;
     }
 
     public void modifyMoim(MoimModifyDto modifyDto) {
@@ -185,5 +190,21 @@ public class MoimService {
 
     public boolean hasOwnerMoims(Integer userId) {
         return moimRoleMapper.hasOwnerMoims(userId);
+    }
+
+    @Transactional
+    public void transferOwnership(Integer moimId, Integer currentUserId, Integer newOwnerId) {
+        String currentUserRole = moimRoleMapper.findMoimRole(currentUserId, moimId);
+        if (!"OWNER".equals(currentUserRole)) {
+            throw new IllegalArgumentException("권한이 없습니다.");
+        }
+
+        String targetUserRole = moimRoleMapper.findMoimRole(newOwnerId, moimId);
+        if (!"MEMBER".equals(targetUserRole)) {
+            throw new IllegalArgumentException("대상 사용자가 모임 멤버가 아닙니다.");
+        }
+
+        moimRoleMapper.updateMoimRole(currentUserId, moimId, "MEMBER");
+        moimRoleMapper.updateMoimRole(newOwnerId, moimId, "OWNER");
     }
 }
