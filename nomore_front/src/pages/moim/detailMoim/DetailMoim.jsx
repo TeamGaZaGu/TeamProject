@@ -15,8 +15,6 @@ import useForumQuery from '../../../queries/useForumQuery.jsx';
 import useForumCategoryQuery from '../../../queries/useForumCategoryQuery.jsx';
 import { BiLike } from 'react-icons/bi';
 import ChattingPage from '../../chatting/ChattingPage.jsx';
-import { FcGoogle } from 'react-icons/fc';
-import { SiKakaotalk } from 'react-icons/si';
 import toast, { Toaster } from 'react-hot-toast';
 import { MdReport } from 'react-icons/md';
 import { submitReport } from '../../../api/reportApi.js';
@@ -60,7 +58,43 @@ function DetailMoim(props) {
     const userBlockList = userBlockListQuery?.data?.data?.body;
     const isBlockedUser = userBlockList?.includes(selectedUser?.userId);
 
+    const forumQuery = useForumQuery({ size: 10, moimId });
+    const allForums = forumQuery?.data?.pages?.map(page => page.data.body.contents).flat() || [];
+    const allImages = allForums.flatMap(forum => forum.forumImgList || []);
 
+    const forumCategoryQuery = useForumCategoryQuery();
+    const respForumCategories = forumCategoryQuery?.data?.data || [];
+    
+    const [forumCategory, setForumCategory] = useState("전체");
+    const categoriesWithAll = [{ forumCategoryId: 0, forumCategoryName: '전체' }, ...respForumCategories];
+
+    // 신고 사유 옵션
+    const reportReasons = [
+        '스팸 / 광고성 활동',
+        '욕설 / 비방 / 혐오 발언',
+        '음란물 / 불건전한 내용',
+        '사기 / 도용 / 사칭',
+        '불법 행위 (범죄, 불법거래 등)',
+        '기타'
+    ];
+
+    // 선택된 카테고리에 따른 포럼 필터링
+    const filteredForums = forumCategory === "전체"
+        ? allForums
+        : allForums.filter(forum => forum.forumCategory.forumCategoryName === forumCategory);
+
+    // 현재 사용자가 모임에 가입되어 있는지 확인
+    const isUserJoined = userList.find(user => user.userId === userId);
+
+    // 모임 정보 조회
+    const fetchMoim = async () => {
+        try {
+            const response = await reqSelectMoim(moimId);
+            setMoim(response.data);
+        } catch (err) {
+            console.error(err);
+        }
+    };
 
     // 모임 사용자 목록 조회
     const fetchMoimUserList = async () => {
@@ -188,7 +222,7 @@ function DetailMoim(props) {
             if (!isConfirmed) return;
 
             try {
-
+                await reqTransferOwnership(moimId, targetUser.userId);
                 alert('권한이 성공적으로 이양되었습니다.');
                 await fetchMoimUserList();
                 await fetchMoim();
@@ -198,20 +232,6 @@ function DetailMoim(props) {
                 console.error('권한 이양 실패:', error);
                 alert('권한 이양에 실패했습니다.');
             }
-        };
-
-        // 사용자 프로필 모달 열기
-        const handleMemberClick = (targetUserId) => {
-            const user = userList.find(u => u.userId === targetUserId);
-            if (user) {
-                setSelectedUser(user);
-                setIsModalOpen(true);
-
-            }
-        } catch (error) {
-            console.error('권한 이양 실패:', error);
-            alert('권한 이양에 실패했습니다.');
-        }
     };
 
     // 사용자 프로필 모달 열기
@@ -373,11 +393,6 @@ function DetailMoim(props) {
             saveRecentlyViewed(moimData);
         }
     }, [moim, getCategory]);
-
-    
-    if (notFound) {
-        return <NotFound />;
-    }
 
     return (
         <div css={s.container}>
@@ -792,5 +807,6 @@ function DetailMoim(props) {
         </div>
     );
 }
+
 
 export default DetailMoim;
