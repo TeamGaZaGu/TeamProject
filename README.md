@@ -42,7 +42,6 @@
 - **Framework/Library**: React 18
 - **State**: Zustand, TanStack React Query
 - **Styling** : Emotion (CSS-in-JS)
-- **UI Library** : Material-UI
 - **Build Tool** : Vite
 
 ### ⚙️ Backend  
