@@ -19,7 +19,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/user")
+@RequestMapping("/api/users")
 public class UserController {
 
     private final UserService userService;
@@ -84,20 +84,14 @@ public class UserController {
         return ResponseEntity.ok(ResponseDto.success(blockedUserIds));
     }
 
-    @GetMapping("/userBlock/status")
-    public ResponseEntity<ResponseDto<Boolean>> checkBlockStatus(@RequestParam int userId) {
-        boolean blocked = userBlockService.isBlocked(userId);
-        return ResponseEntity.ok(ResponseDto.success(blocked));
-    }
-
-    @DeleteMapping("{userId}")
+    @DeleteMapping("/{userId}")
     public ResponseEntity<ResponseDto<?>> deleteUser(@PathVariable Integer userId) {
         userService.deleteUser(userId);
         System.out.println(userId);
         return ResponseEntity.ok(ResponseDto.success("회원 탈퇴 완료"));
     }
 
-    @GetMapping("/admin/user/{userId}/moims")
+    @GetMapping("/admin/{userId}/moims")
     public ResponseEntity<?> getUserMoims(@PathVariable Integer userId) {
         String currentUserRole = principalUtil.getPrincipalUser().getUser().getUserRole();
         if (!"ROLE_ADMIN".equals(currentUserRole)) {
@@ -108,7 +102,7 @@ public class UserController {
         return ResponseEntity.ok(userMoims);
     }
 
-    @GetMapping("/admin/user/{userId}/posts")
+    @GetMapping("/admin/{userId}/posts")
     public ResponseEntity<?> getUserPosts(@PathVariable Integer userId) {
         Integer currentUserId = principalUtil.getPrincipalUser().getUser().getUserId();
         String currentUserRole = principalUtil.getPrincipalUser().getUser().getUserRole();

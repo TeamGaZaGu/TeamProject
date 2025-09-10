@@ -1,6 +1,6 @@
 import { useInfiniteQuery} from '@tanstack/react-query';
 import React from 'react';
-import { reqGetComment, reqGetForums } from '../api/forumApi';
+import { reqGetComment } from '../api/forumApi';
 
 function useCommentsQuery({size, forumId}) {
     return useInfiniteQuery({

@@ -1,5 +1,5 @@
 import { data } from "react-router-dom";
 import api from "./axios";
-export const reqDistrict = () => api.get("/api/search/district");
+export const reqDistrict = () => api.get("/api/districts");
 
-export const reqCategory = () => api.get("/api/search/category");
+export const reqCategory = () => api.get("/api/categories");

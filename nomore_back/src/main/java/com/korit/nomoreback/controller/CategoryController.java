@@ -12,14 +12,14 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/search")
+@RequestMapping("/api")
 @CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 @RequiredArgsConstructor
 public class CategoryController {
 
     private final CategoryService categoryService;
 
-    @GetMapping("/category")
+    @GetMapping("/categories")
     public List<Category> searchCategory() {
         return categoryService.searchCategory();
     }

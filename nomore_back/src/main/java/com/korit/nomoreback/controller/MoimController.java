@@ -24,7 +24,7 @@ import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/moim")
+@RequestMapping("/api/moims")
 public class MoimController {
 
     private final MoimService moimService;
@@ -50,25 +50,25 @@ public class MoimController {
         return ResponseEntity.ok("탈퇴 완");
     }
 
-    @GetMapping("/{moimId}/select")
+    @GetMapping("/{moimId}")
     public ResponseEntity<?> selectMoim(@PathVariable Integer moimId) {
         return ResponseEntity.ok(moimService.findMoim(moimId));
     }
 
 
-    @GetMapping("/find")
+    @GetMapping("/search")
     public ResponseEntity<ResponseDto<?>> findMoims(MoimCategoryReqDto dto) {
         return ResponseEntity.ok(ResponseDto.success(moimService.findMoims(dto)));
     }
 
-    @PatchMapping(value = "/{moimId}/modify", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PatchMapping(value = "/{moimId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> updateMoim(@PathVariable Integer moimId, @ModelAttribute MoimModifyDto dto) {
         dto.setMoimId(moimId);
         moimService.modifyMoim(dto);
         return ResponseEntity.ok("수정 완");
     }
 
-    @DeleteMapping("/{moimId}/delete")
+    @DeleteMapping("/{moimId}")
     public ResponseEntity<?> remove(@PathVariable Integer moimId) {
         moimService.deleteMoim(moimId);
         return ResponseEntity.ok("삭제 완");
@@ -89,7 +89,7 @@ public class MoimController {
         return ResponseEntity.ok(moimList);
     }
 
-    @GetMapping("/userList")
+    @GetMapping("/{moimId}/users")
     public ResponseEntity<List<User>> moimUserList(@RequestParam Integer moimId) {
         return ResponseEntity.ok(moimService.moimUserList(moimId));
     }
@@ -107,12 +107,12 @@ public class MoimController {
         return ResponseEntity.ok(moimBanService.banUserList(moimId));
     }
 
-    @GetMapping("/{userId}/moims")
+    @GetMapping("/users/{userId}/moims")
     public ResponseEntity<List<Moim>> myMoimList(@PathVariable Integer userId) {
         return ResponseEntity.ok(moimService.myMoimList(userId));
     }
 
-    @GetMapping("/checkowner")
+    @GetMapping("/ownership")
     public ResponseEntity<Map<String, Boolean>> checkUserHasOwnerMoims() {
         try {
             Integer userId = principalUtil.getPrincipalUser().getUser().getUserId();

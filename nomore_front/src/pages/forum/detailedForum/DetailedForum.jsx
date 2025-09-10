@@ -225,7 +225,7 @@ function DetailedForum(props) {
 
     const handleLikeOnClick = async () => { try { await reqLike(forumId); await fetchForum(); queryClient.invalidateQueries(['forums']); } catch (error) { console.error("좋아요 실패", error); } }
     const handleDislikeOnClick = async () => { try { await reqDislike(forumId); await fetchForum(); queryClient.invalidateQueries(['forums']); } catch (error) { console.error("좋아요 취소 실패", error); } }
-    const handleCommentDeleteOnClick = async (forumId, moimId, forumCommentId) => { if (!window.confirm("댓글을 삭제하시겠습니까?")) return; try { await reqDeleteComment(forumId, moimId, forumCommentId); alert("댓글이 삭제되었습니다."); await queryClient.invalidateQueries(['comments', forumId]); await fetchForum(); } catch { alert("권한이 없습니다."); } }
+    const handleCommentDeleteOnClick = async (forumId, moimId, forumCommentId) => { if (!window.confirm("댓글을 삭제하시겠습니까?")) return; try { await reqDeleteComment(forumCommentId); alert("댓글이 삭제되었습니다."); await queryClient.invalidateQueries(['comments', forumId]); await fetchForum(); } catch { alert("권한이 없습니다."); } }
 
     const canDeleteComment = (commentUserId) => userId === commentUserId || userRole === 'ADMIN';
 

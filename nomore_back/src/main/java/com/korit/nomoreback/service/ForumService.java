@@ -202,7 +202,7 @@ public class ForumService {
         forumCommentMapper.modifyComment(dto.toEntity(comment));
     }
 
-    public void deleteComment(Integer forumCommentId, Integer forumId, Integer moimId) {
+    public void deleteComment(Integer forumCommentId) {
         Integer userId = getCurrentUser().getUserId();
         ForumComment comment = forumCommentMapper.findByCommentId(forumCommentId);
         if (comment == null) {

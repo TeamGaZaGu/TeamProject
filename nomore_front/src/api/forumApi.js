@@ -1,12 +1,12 @@
 import api from "./axios";
 
-export const reqRegisterForum = async (data, moimId) => await api.post(`/api/forum/${moimId}/register`, data, {
+export const reqRegisterForum = async (data, moimId) => await api.post(`/api/forums/${moimId}`, data, {
     headers: {
     'Content-Type': 'multipart/form-data'
   }
 });
 
-export const reqGetForums = async ({page, size, moimId}) => await api.get("/api/forum/forums", {
+export const reqGetForums = async ({page, size, moimId}) => await api.get("/api/forums", {
   params: {
     page,
     size,
@@ -14,22 +14,20 @@ export const reqGetForums = async ({page, size, moimId}) => await api.get("/api/
   }
 });
 
-export const reqGetForumsWithParams = async (moimId, params) => await api.get(`/api/moims/${moimId}/forums`, { params });
+export const reqDetailForum = async (forumId) => await api.get(`/api/forums/${forumId}`);
 
-export const reqGetForumCategories = async () => await api.get("/api/forum/forumCategories");
+export const reqModifyForum = async (forumId, data) => await api.put(`/api/forums/${forumId}`, data);
 
-export const reqDetailForum = async (forumId) => await api.get(`/api/forum/${forumId}`);
+export const reqDeleteForum = async (forumId, moimId) => await api.delete(`/api/forums/${moimId}/${forumId}`);
 
-export const reqDetailForumBlob = async ({url, imageConfigsName}) => await api.get(`/api/forum/forums/blobs`, {
+export const reqGetForumCategories = async () => await api.get("/api/forums/categories");
+
+export const reqDetailForumBlob = async ({url, imageConfigsName}) => await api.get(`/api/forums/blobs`, {
     params: {url, imageConfigsName},
     responseType: 'blob',
   });
 
-export const reqModifyForum = async (forumId, data) => await api.put(`/api/forum/${forumId}/modify`, data);
-
-export const reqDeleteForum = async (forumId, moimId) => await api.delete(`/api/forum/${moimId}/${forumId}/delete`);
-
-export const reqGetComment = async ({page, size, forumId}) => await api.get(`api/forum/comments`, {
+export const reqGetComment = async ({page, size, forumId}) => await api.get(`api/forums/comments`, {
   params: {
     page,
     size,
@@ -37,10 +35,10 @@ export const reqGetComment = async ({page, size, forumId}) => await api.get(`api
   }
 });
 
-export const reqRegisterComment = async (forumId, moimId, data) => await api.post(`api/forum/${moimId}/${forumId}/comment`, data);
+export const reqLike = async (forumId) => await api.post(`api/forums/${forumId}/like`);
 
-export const reqDeleteComment = async (forumId, moimId, forumCommentId) => await api.delete(`api/forum/${moimId}/${forumId}/comment/delete/${forumCommentId}`)
+export const reqDislike = async (forumId) => await api.delete(`/api/forums/${forumId}/like`);
 
-export const reqLike = async (forumId) => await api.post(`api/forum/${forumId}/like`);
-
-export const reqDislike = async (forumId) => await api.delete(`/api/forum/${forumId}/dislike`);
+export const reqRegisterComment = async (forumId, moimId, data) => await api.post(`api/forums/${moimId}/${forumId}/comments`, data);
+  
+export const reqDeleteComment = async (forumCommentId) => await api.delete(`api/forums/comments/${forumCommentId}`)
