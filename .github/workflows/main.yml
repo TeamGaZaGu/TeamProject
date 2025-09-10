@@ -1,4 +1,4 @@
-name: github-actions-test
+name: github-actions-ci/cd
 
 on:
   push:
