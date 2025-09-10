@@ -5,7 +5,7 @@ on:
     branches: [deploy_kyuchul, deploy_jaewon, deploy_jinhyuk, deploy_deaung]
 
 jobs:
-  print-test:
+  build:
     runs-on: ubuntu-latest
     env:
       DOCKER_USERNAME: ${{
@@ -56,5 +56,5 @@ jobs:
           cd nomore_front
           npm install
           npm run build
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/react-app:latest .
-          docker push ${{ secrets.DOCKER_USERNAME }}/react-app:latest
+          docker build -t ${{ env.DOCKER_USERNAME }}/react-app:latest .
+          docker push ${{ env.DOCKER_USERNAME }}/react-app:latest
