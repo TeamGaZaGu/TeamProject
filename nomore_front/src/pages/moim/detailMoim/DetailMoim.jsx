@@ -232,7 +232,7 @@ function DetailMoim(props) {
                 console.error('권한 이양 실패:', error);
                 alert('권한 이양에 실패했습니다.');
             }
-    };
+        };
 
     // 사용자 프로필 모달 열기
     const handleMemberClick = (targetUserId) => {
