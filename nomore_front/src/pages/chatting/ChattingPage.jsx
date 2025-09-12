@@ -12,6 +12,7 @@ import { MdReport } from 'react-icons/md';
 import { IoClose } from 'react-icons/io5';
 import useCategoryQuery from '../../queries/useCategoryQuery';
 import useUserBlockListQuery from '../../queries/useUserBlockListQuery';
+import { baseURL } from '../../api/axios';
 
 function ChattingPage({ moimId }) {
   const moimIdNum = Number(moimId);
@@ -265,7 +266,7 @@ useEffect(() => {
     brokerURL: undefined,
     webSocketFactory: () =>
       new SockJS(
-        `http://192.168.2.17:8080/ws?access_token=${localStorage.getItem('AccessToken')}&moimId=${moimIdNum}&userId=${userObj.userId}`
+        `${baseURL}/ws?access_token=${localStorage.getItem('AccessToken')}&moimId=${moimIdNum}&userId=${userObj.userId}`
       ),
     connectHeaders: { moimId: moimIdNum, userId: userObj.userId },
     reconnectDelay: 5000,
