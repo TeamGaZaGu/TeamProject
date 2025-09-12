@@ -32,6 +32,18 @@ jobs:
         github.ref_name == 'deploy_jinhyuk' && 'jinhyuk' ||
         github.ref_name == 'deploy_deaung' && 'deaung'
         }}
+      SSH_HOST: ${{
+        github.ref_name == 'deploy_kyuchul' && secrets.SSH_HOST_KYUCHUL ||
+        github.ref_name == 'deploy_jaewon' &&  secrets.SSH_HOST_JAEWON ||
+        github.ref_name == 'deploy_jinhyuk' && secrets.SSH_HOST_JINHYUK ||
+        github.ref_name == 'deploy_deaung' && secrets.SSH_HOST_DEAUNG
+        }}
+      SSH_KEY: ${{
+        github.ref_name == 'deploy_kyuchul' && secrets.SSH_KEY_KYUCHUL ||
+        github.ref_name == 'deploy_jaewon' &&  secrets.SSH_KEY_JAEWON ||
+        github.ref_name == 'deploy_jinhyuk' && secrets.SSH_KEY_JINHYUK ||
+        github.ref_name == 'deploy_deaung' && secrets.SSH_KEY_DEAUNG
+        }}
         
     steps:
       - name: checkout
@@ -62,3 +74,12 @@ jobs:
           cd nomore_front
           docker build --build-arg SERVERNAME=${{ env.BUILD_MODE }} -t ${{ env.DOCKER_USERNAME }}/react-app:latest .
           docker push ${{ env.DOCKER_USERNAME }}/react-app:latest
+
+      - name: ssh 배포
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ env.SSH_HOST }}
+          username: ubuntu
+          key: ${{ env.SSH_KEY }}
+          script: |
+          
