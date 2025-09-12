@@ -369,7 +369,7 @@ stompClient.subscribe(`/sub/chat/${moimIdNum}/read`, (msg) => {
     fileList.forEach((file) => formData.append("files", file));
     try {
       const token = localStorage.getItem("AccessToken");
-      const res = await fetch('${baseURL}/api/chat/${moimIdNum}/upload`, {
+      const res = await fetch(`${baseURL}/api/chat/${moimIdNum}/upload`, {
         method: "POST",
         headers: { Authorization: token },
         body: formData,
