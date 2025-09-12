@@ -82,4 +82,9 @@ jobs:
           username: ubuntu
           key: ${{ env.SSH_KEY }}
           script: |
+            cd /home/ubuntu/project
+
+            sudo docker-compose pull
+            sudo docker-compose down
+            sudo docker-compose up -d
           
