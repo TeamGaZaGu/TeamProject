@@ -51,7 +51,7 @@ function RootRoute(props) {
                 <Route path='/moim/*' element={<MoimRoute />} />
                 <Route path='/forum/*' element={<ForumRoute />} />
                 <Route path='/searchpage' element={<SearchPage />} />
-                <Route path='/oauth2/login' element={<Oauth2Redirect />} />
+                <Route path='/auth/oauth2/login' element={<Oauth2Redirect />} />
                 <Route path='/auth/signup' element={<Signup />} />
                 <Route path='/chatting/:moimId' element={<ChattingPage />} />
                 <Route path='/mypage' element={<Mypage />} />
