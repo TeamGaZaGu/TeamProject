@@ -38,6 +38,7 @@ spring:
       on-profile: jinhyuk-server
 
 app:
+  web-host: "https://meetuu.store"
   server-host: "https://meetuu.store"
 
 ---
@@ -48,6 +49,7 @@ spring:
       on-profile: deaung-server
 
 app:
+  web-host: "https://deaung.store"
   server-host: "https://deaung.store"
 
 ---
