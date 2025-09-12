@@ -43,7 +43,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
         } else {
             System.out.println("리다이렉트: 메인페이지");
             String accessToken = jwtUtil.generateAccessToken(principalUser.getUser());
-            response.sendRedirect(webhost + "/oauth2/login?accessToken=" + accessToken);
+            response.sendRedirect(webhost + "/auth/oauth2/login?accessToken=" + accessToken);
         }
     }
 }
