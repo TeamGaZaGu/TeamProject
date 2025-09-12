@@ -369,7 +369,7 @@ stompClient.subscribe(`/sub/chat/${moimIdNum}/read`, (msg) => {
     fileList.forEach((file) => formData.append("files", file));
     try {
       const token = localStorage.getItem("AccessToken");
-      const res = await fetch(`http://192.168.2.17:8080/api/chat/${moimIdNum}/upload`, {
+      const res = await fetch(${baseURL}/api/chat/${moimIdNum}/upload`, {
         method: "POST",
         headers: { Authorization: token },
         body: formData,
@@ -409,7 +409,7 @@ stompClient.subscribe(`/sub/chat/${moimIdNum}/read`, (msg) => {
 
   const deleteChat = async (chatId) => {
     try {
-      await fetch(`http://192.168.2.17:8080/api/chat/${chatId}`, {
+      await fetch(`${baseURL}/api/chat/${chatId}`, {
         method: 'DELETE',
         headers: { Authorization: localStorage.getItem('AccessToken') },
       });
